@@ -1,46 +1,52 @@
 import axios from 'axios';
-import BaseService from '../../http/base-service.js';
+import UserService from '../../http/user-service.js';
 
-const userService = new BaseService('users');
+const userService = new UserService('users');
 const USERS = 'USERS';
 
 export function list(params, options) {
-  return function(dispatch) {
-    let users = userService.list(params, options).then(response => {
-        console.log(response.data.entity)
-        dispatch({type: USERS, data: response.data.entity});
-    });
+  return async function(dispatch) {
+    let users = await userService.list(params, options);
+    dispatch({type: USERS, data: response.data.entity});
   }
 }
 
 export function get(id, options) {
-  return function(dispatch) {
-    let user = userService.get(id, options).then(response => {
-        dispatch({type: USER, data: response.data.entity});
-    });
+  return async function(dispatch) {
+    let reponse = userService.get(id, options);
+    dispatch({type: USER, data: response.data.entity});
   }
 }
 
 export function create(entity, options) {
-  return function(dispatch) {
-    let response = userService.create(entity, options).then(response => {
-        get(response.data.entity.id);
-    })
+  return async function (dispatch) {
+    let response = await userService.create(entity, options);
+    get(response.data.entity.id);
   }
 }
 
 export function update(id, entity, options) {
-  return function(dispatch) {
-    let response = userService.update(id, entity, options).then(response => {
-        get(response.data.entity.id);
-    })
+  return async function(dispatch) {
+    let response = await userService.update(id, entity, options);
+    get(response.data.entity.id);
   }
 }
 
 export function remove(id, options) {
-  return function(dispatch) {
-    let response = userService.remove(id, options).then(response => {
-        get(response.data.entity.id);
-    })
+  return async function(dispatch) {
+    let response = await userService.remove(id, options);
+    get(response.data.entity.id);
+  }
+}
+
+export function login(token) {
+  return async function(dispatch) {
+    await accountService.login(entity);
+  }
+}
+
+export function sendToken(email) {
+  return async function(dispatch) {
+    await accountService.sendToken(id, options);
   }
 }

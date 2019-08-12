@@ -7,6 +7,9 @@ const userReducer = (state = userState, action) => {
         case 'USERS':
            state = { ...state, users: action.data };
            break;
+        case 'SESSION':
+           state = { ...state, users: action.data };
+           break;
         default:
           break
     }

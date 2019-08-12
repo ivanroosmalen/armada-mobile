@@ -48,6 +48,7 @@ class BaseService {
             url: this.buildURL(),
             data: entity
         };
+        console.log("REQUEST %j", httpConfig)
         return this.httpRequest(httpConfig, options);
     }
 
