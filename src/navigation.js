@@ -1,50 +1,19 @@
-import { Navigation } from 'react-native-navigation'
+import { createStackNavigator, createAppContainer } from "react-navigation";
+import Home from './screens/home';
+import SignUp from './screens/users/sign-up';
+import Login from './screens/users/login';
+import CreateAcademy from './screens/academies/create';
 
-export const goToAuth = () => Navigation.setRoot({
-  root: {
-    bottomTabs: {
-      id: 'BottomTabsId',
-      children: [
-        {
-          component: {
-            name: 'Login',
-            options: {
-              bottomTab: {
-                fontSize: 12,
-                text: 'Login'
-//                icon: require('./signin.png')
-              }
-            }
-          },
-        },
-        {
-          component: {
-            name: 'SignUp',
-            options: {
-              bottomTab: {
-                text: 'Sign Up',
-                fontSize: 12
-//                icon: require('./signup.png')
-              }
-            }
-          },
-        },
-      ],
-    }
-  }
-});
+const AppNavigator = createStackNavigator(
+    {
+      Home: Home,
+      SignUp: SignUp,
+      Login: Login,
+      CreateAcademy: CreateAcademy
+    },
+   {
+     initialRouteName: "Home"
+   }
+);
 
-export const goHome = () => Navigation.setRoot({
-  root: {
-    stack: {
-      id: 'App',
-      children: [
-        {
-          component: {
-            name: 'Home',
-          }
-        }
-    ],
-    }
-  }
-})
+export default AppNavigator;

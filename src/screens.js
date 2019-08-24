@@ -5,7 +5,7 @@ import {store} from './state/store';
 import Home from './screens/home';
 import Login from './screens/users/login';
 import SignUp from './screens/users/sign-up';
-import Initializing from './screens/initializing';
+import CreateAcademy from './screens/academies/create';
 
 export function registerScreens() {
   Navigation.registerComponent('Home', () => (props) => (
@@ -20,8 +20,8 @@ export function registerScreens() {
                                                    <Provider store={reduxStore}>
                                                      <SignUp {...props} />
                                                    </Provider> ));
-  Navigation.registerComponent('Initializing', () => (props) => (
+  Navigation.registerComponent('CreateAcademy', () => (props) => (
                                                    <Provider store={reduxStore}>
-                                                     <Initializing {...props} />
+                                                     <CreateAcademy {...props} />
                                                    </Provider> ));
 }

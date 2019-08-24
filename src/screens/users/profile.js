@@ -2,85 +2,97 @@
 import React from 'react'
 import {
   View,
-  StyleSheet
+  StyleSheet,
+  TextInput,
+  Text,
+  Button
 } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { Input, Button } from 'react-native-elements';
-import isEmail from 'validator/lib/isEmail';
 import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
 
-import * as userActions from '../../state/users/actions';
+import * as martialArtsActions from '../../state/martialArts/actions';
 
 class SignUp extends React.Component {
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
     }
 
-     componentDidMount() {
-            this.props.get(); //call our action
+    state = {
+        entity: {
+            martialArt: ''
+        },
+        errors: {
+            martialArtError: ''
+        },
+        isValid: false
+    }
+
+    onChangeText = async (key, val) => {
+      this.state.entity[key] = val;
+
+      if(this.state) {
+         this.setState({
+              entity: this.state.entity
+         })
+      }
+
+      await this.validate();
+    }
+
+  validate = async() => {
+        this.state.isValid = true;
+
+        if(!isEmail(this.state.entity.martialArt)) {
+            this.state.errors.emailError = 'You must select a martial art';
+            this.state.isValid = false;
+        } else {
+            this.state.errors.emailError = '';
         }
+
+        this.setState({
+            errors: this.state.errors
+        })
+  }
+
+  submit = async () => {
+        if(this.state.isValid) {
+            await this.props.create(this.state.entity);
+        }
+  }
+
+  componentDidMount() {
+    this.validate();
+  }
 
   render() {
     return (
-      <View style={styles.container}>
+      <KeyboardAwareScrollView
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            scrollEnabled={true}
+          >
 
-        <Input
+        <View style={styles.container}>
+        <TextInput
           label='Email'
           style={styles.input}
           placeholder='Email'
           autoCapitalize="none"
           placeholderTextColor='white'
-          onChangeText={val => this.onChangeText('email', val)}
-          errorMessage={this.state.errors.emailError}
+          onChangeText={val => this.onChangeText('martialArt', val)}
         />
-        <Input
-          label='Password'
-          style={styles.input}
-          placeholder='Password'
-          secureTextEntry={true}
-          autoCapitalize="none"
-          placeholderTextColor='white'
-          onChangeText={val => this.onChangeText('password', val)}
-          errorMessage={this.state.errors.passwordError}
-        />
-
-        <Input
-          label='First Name'
-          style={styles.input}
-          placeholder='First name'
-          autoCapitalize="none"
-          placeholderTextColor='white'
-          onChangeText={val => this.onChangeText('firstName', val)}
-          errorMessage={this.state.errors.firstNameError}
-        />
-
-        <Input
-          label='Last Name'
-          style={styles.input}
-          placeholder='Last name'
-          autoCapitalize="none"
-          placeholderTextColor='white'
-          onChangeText={val => this.onChangeText('lastName', val)}
-          errorMessage={this.state.errors.lastNameError}
-        />
-
-        <Input
-          label='Alias'
-          style={styles.input}
-          placeholder='Alias'
-          autoCapitalize="none"
-          placeholderTextColor='white'
-          onChangeText={val => this.onChangeText('alias', val)}
-          errorStyle={{ color: 'red' }}
-          errorMessage={this.state.errors.aliasError}
-        />
+        <Text style={{ fontSize: 12, color: 'red'}}>
+            {this.state.errors.martialArtError}
+        </Text>
 
         <Button
           title='Sign Up'
           onPress={this.submit}
         />
-      </View>
+
+        </View>
+      </KeyboardAwareScrollView>
     )
   }
 }

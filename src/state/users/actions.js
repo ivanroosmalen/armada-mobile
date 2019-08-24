@@ -1,8 +1,8 @@
-import axios from 'axios';
 import UserService from '../../http/user-service.js';
 
 const userService = new UserService('users');
 const USERS = 'USERS';
+const USER = 'USER';
 
 export function list(params, options) {
   return async function(dispatch) {
@@ -21,7 +21,7 @@ export function get(id, options) {
 export function create(entity, options) {
   return async function (dispatch) {
     let response = await userService.create(entity, options);
-    get(response.data.entity.id);
+    await get(response.data.entity._id);
   }
 }
 
@@ -34,8 +34,7 @@ export function update(id, entity, options) {
 
 export function remove(id, options) {
   return async function(dispatch) {
-    let response = await userService.remove(id, options);
-    get(response.data.entity.id);
+    await userService.remove(id, options);
   }
 }
 

@@ -2,10 +2,13 @@
 import React from 'react'
 import {
   View,
-  StyleSheet
+  StyleSheet,
+  TextInput,
+  Text,
+  Button
 } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { Input, Button } from 'react-native-elements';
 import isEmail from 'validator/lib/isEmail';
 import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
@@ -15,7 +18,6 @@ import * as userActions from '../../state/users/actions';
 class SignUp extends React.Component {
     constructor() {
         super();
-        this.validate();
     }
 
     state = {
@@ -38,6 +40,12 @@ class SignUp extends React.Component {
 
     onChangeText = async (key, val) => {
       this.state.entity[key] = val;
+
+      if(this.state) {
+         this.setState({
+              entity: this.state.entity
+         })
+      }
 
       await this.validate();
     }
@@ -79,6 +87,10 @@ class SignUp extends React.Component {
         } else {
             this.state.errors.lastNameError = '';
         }
+
+        this.setState({
+            errors: this.state.errors
+        })
   }
 
   submit = async () => {
@@ -87,20 +99,30 @@ class SignUp extends React.Component {
         }
   }
 
+  componentDidMount() {
+    this.validate();
+  }
+
   render() {
     return (
-      <View style={styles.container}>
+      <KeyboardAwareScrollView
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            scrollEnabled={true}
+          >
 
-        <Input
+        <View style={styles.container}>
+        <TextInput
           label='Email'
           style={styles.input}
           placeholder='Email'
           autoCapitalize="none"
           placeholderTextColor='white'
           onChangeText={val => this.onChangeText('email', val)}
-          errorMessage={this.state.errors.emailError}
         />
-        <Input
+        <Text style={{ fontSize: 12, color: 'red'}}>
+            {this.state.errors.emailError}
+        </Text>
+        <TextInput
           label='Password'
           style={styles.input}
           placeholder='Password'
@@ -108,20 +130,25 @@ class SignUp extends React.Component {
           autoCapitalize="none"
           placeholderTextColor='white'
           onChangeText={val => this.onChangeText('password', val)}
-          errorMessage={this.state.errors.passwordError}
         />
+        <Text style={{ fontSize: 12, color: 'red'}}>
+            {this.state.errors.passwordError}
+        </Text>
 
-        <Input
+        <TextInput
           label='First Name'
           style={styles.input}
           placeholder='First name'
           autoCapitalize="none"
           placeholderTextColor='white'
           onChangeText={val => this.onChangeText('firstName', val)}
-          errorMessage={this.state.errors.firstNameError}
         />
+        <Text style={{ fontSize: 12, color: 'red'}}>
+            {this.state.errors.firstNameError}
+        </Text>
 
-        <Input
+
+        <TextInput
           label='Last Name'
           style={styles.input}
           placeholder='Last name'
@@ -130,8 +157,11 @@ class SignUp extends React.Component {
           onChangeText={val => this.onChangeText('lastName', val)}
           errorMessage={this.state.errors.lastNameError}
         />
+        <Text style={{ fontSize: 12, color: 'red'}}>
+            {this.state.errors.lastNameError}
+        </Text>
 
-        <Input
+        <TextInput
           label='Alias'
           style={styles.input}
           placeholder='Alias'
@@ -139,14 +169,18 @@ class SignUp extends React.Component {
           placeholderTextColor='white'
           onChangeText={val => this.onChangeText('alias', val)}
           errorStyle={{ color: 'red' }}
-          errorMessage={this.state.errors.aliasError}
         />
+        <Text style={{ fontSize: 12, color: 'red'}}>
+            {this.state.errors.aliasError}
+        </Text>
 
         <Button
           title='Sign Up'
           onPress={this.submit}
         />
-      </View>
+
+        </View>
+      </KeyboardAwareScrollView>
     )
   }
 }

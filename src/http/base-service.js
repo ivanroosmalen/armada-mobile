@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:3000/';
+const BASE_URL = 'http://10.0.2.2:3000/v1/';
 
 class BaseService {
 
@@ -46,10 +46,13 @@ class BaseService {
         const httpConfig = {
             method: 'POST',
             url: this.buildURL(),
-            data: entity
+            data: entity,
+            headers: {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}
         };
-        console.log("REQUEST %j", httpConfig)
+
+        console.log("create %j", httpConfig)
         return this.httpRequest(httpConfig, options);
+
     }
 
 

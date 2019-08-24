@@ -1,14 +1,14 @@
 import { combineReducers } from 'redux';
 
-let userState = { users: [] };
+let userState = { users: [], user: null };
 
 const userReducer = (state = userState, action) => {
      switch (action.type) {
         case 'USERS':
            state = { ...state, users: action.data };
            break;
-        case 'SESSION':
-           state = { ...state, users: action.data };
+        case 'USER':
+           state = { ...state, user: action.data };
            break;
         default:
           break

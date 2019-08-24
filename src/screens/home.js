@@ -6,47 +6,25 @@ import {
   StyleSheet,
   AsyncStorage
 } from 'react-native'
-import { goToAuth } from '../navigation'
-import {Navigation} from 'react-native-navigation';
 import { connect } from 'react-redux';
 
-import { USER_KEY } from '../utils/constants';
 
 class Home extends React.Component {
-  static get options() {
-    return {
-      topBar: {
-        title: {
-          text: 'Home'
-        },
-      }
-    };
-  }
-  logout = async () => {
-    try {
-      await AsyncStorage.removeItem(USER_KEY)
-      goToAuth()
-    } catch (err) {
-      console.log('error signing out...: ', err)
-    }
-  }
   render() {
     return (
       <View style={styles.container}>
         <Text>Hello from Home screen.</Text>
         <Button
-          onPress={this.logout}
-          title="Sign Out"
+          onPress={() => this.props.navigation.navigate('SignUp')}
+          title="Sign up"
         />
         <Button
-          onPress={() => {
-            Navigation.push(this.props.componentId, {
-              component: {
-                name: 'Home',
-              }
-            });
-          }}
-          title="View next screen"
+          onPress={() => this.props.navigation.navigate('Login')}
+          title="Login"
+        />
+        <Button
+          onPress={() => this.props.navigation.navigate('CreateAcademy')}
+          title="CreateAcademy"
         />
       </View>
     )
@@ -59,11 +37,9 @@ function mapStateToProps(state, props) {
     }
 }
 
-function mapDispatchToProps(dispatch) {
-}
 
 //Connect everything
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps, null)(Home);
 
 const styles = StyleSheet.create({
   container: {
