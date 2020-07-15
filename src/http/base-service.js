@@ -1,6 +1,8 @@
 import axios from 'axios';
 
 const BASE_URL = 'http://10.0.2.2:3000/v1/';
+import { store } from '../redux/store.js';
+const state = store.getState();
 
 class BaseService {
 
@@ -9,10 +11,26 @@ class BaseService {
         this.httpRequest = axios;
     }
 
-    buildURL(urlParams) {
-            if(!urlParams) return this.url;
+    async makeRequest(httpConfig, options) {
+        let constHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '+ state.users.jwt
+        }
 
-            return `${this.url}/${urlParams.join('/')}`;
+        httpConfig.headers = Object.assign(httpConfig.headers || {}, constHeaders);
+        return await this.httpRequest(httpConfig, options).then(res => {
+            return res;
+        }).catch(e => {
+            console.error('Failed request', e);
+            return e.response;
+        });
+    }
+
+    buildURL(urlParams) {
+        if(!urlParams) return this.url;
+
+        return `${this.url}/${urlParams.join('/')}`;
     }
 
     async list(params, options = {}) {
@@ -21,16 +39,17 @@ class BaseService {
             url: this.buildURL(),
             params: params
         };
-        return this.httpRequest(httpConfig, options);
+        return this.makeRequest(httpConfig, options);
     }
 
     async get(id, params = {}, options = {}) {
         const httpConfig = {
             method: 'GET',
-            url: this.buildURL(id),
+            url: this.buildURL([id]),
             params: params
         };
-        return this.httpRequest(httpConfig, options);
+
+        return this.makeRequest(httpConfig, options);
     }
 
     async count(params = {}, options = {}) {
@@ -39,19 +58,17 @@ class BaseService {
             url: this.buildURL('count'),
             params: params
         };
-        return this.httpRequest(httpConfig, options);
+        return this.makeRequest(httpConfig, options);
     }
 
     async create(entity, options = {}) {
         const httpConfig = {
             method: 'POST',
             url: this.buildURL(),
-            data: entity,
-            headers: {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}
+            data: entity
         };
 
-        console.log("create %j", httpConfig)
-        return this.httpRequest(httpConfig, options);
+        return this.makeRequest(httpConfig, options);
 
     }
 
@@ -62,7 +79,7 @@ class BaseService {
             url: this.buildURL(id),
             data: entity
         };
-        return this.httpRequest(httpConfig, options).then(() => {
+        return this.makeRequest(httpConfig, options).then(() => {
             if(getEntity) return this.get(id);
         });
     }
@@ -72,7 +89,7 @@ class BaseService {
             method: 'DELETE',
             url: this.buildURL(id)
         };
-        return this.httpRequest(httpConfig, options);
+        return this.makeRequest(httpConfig, options);
     }
 
 }

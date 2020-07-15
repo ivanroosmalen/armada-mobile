@@ -1,24 +1,32 @@
 import BaseService from './base-service.js';
 
-class AccountService extends BaseService {
+class UserService extends BaseService {
 
-    async login(token) {
+    async login(entity) {
             const httpConfig = {
                 method: 'POST',
                 url: this.buildURL(['login']),
-                data: { token }
+                data: entity
             };
-            return this.httpRequest(httpConfig, {});
+            return this.makeRequest(httpConfig, {});
     }
 
-    async sendToken(email) {
+    async logout() {
+                const httpConfig = {
+                    method: 'GET',
+                    url: this.buildURL(['logout'])
+                };
+                return this.makeRequest(httpConfig, {});
+        }
+
+    async register(entity) {
                 const httpConfig = {
                     method: 'POST',
-                    url: this.buildURL(['sendToken']),
-                    data: { email: email }
+                    url: this.buildURL(['register']),
+                    data: entity
                 };
-                return this.httpRequest(httpConfig, {});
+                return this.makeRequest(httpConfig, {});
             }
 }
 
-export default AccountService;
+export default UserService;

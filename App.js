@@ -1,22 +1,38 @@
-import React, { Component } from 'react';
 import { Provider } from 'react-redux';
+import React from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { PersistGate } from 'redux-persist/integration/react';
+import { colors } from './src/styles';
+import { NavigationContainer } from '@react-navigation/native';
 
-import store from './src/state/store'; //Import the store
-import SignUp from './src/screens/users/sign-up' //Import the component file
-import { View, Text, Button } from "react-native";
-import { createAppContainer } from "react-navigation";
-import AppNavigator from "./src/navigation"
+import { store, persistor } from './src/redux/store';
 
-const AppContainer = createAppContainer(AppNavigator);
+import AppView from './src/modules/AppViewContainer';
 
-export default class App extends React.Component {
-  render() {
-    return (
-                <Provider store={store}>
-                    <AppContainer />
-                </Provider>
-            );
-  }
+export default function App() {
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <PersistGate
+          loading={
+            <View style={styles.container}>
+              <ActivityIndicator color={colors.red} />
+            </View>
+          }
+          persistor={persistor}
+        >
+          <AppView />
+        </PersistGate>
+      </NavigationContainer>
+    </Provider>
+  );
 }
 
-
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
+});
