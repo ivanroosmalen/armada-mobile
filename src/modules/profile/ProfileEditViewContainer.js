@@ -3,7 +3,7 @@ import { compose, lifecycle } from 'recompose';
 import { connect } from 'react-redux';
 
 import ProfileEditView from './ProfileEditView';
-import { get } from '../../redux/users/actions.js'
+import { get, update } from '../../redux/users/actions.js'
 import { list } from '../../redux/martialArts/actions.js'
 
 export default compose(
@@ -16,6 +16,7 @@ export default compose(
     })},
     dispatch => ({
       getUser: (id) => dispatch(get(id)),
-      getMartialArts: () => dispatch(list())
+      getMartialArts: () => dispatch(list()),
+      updateUser: (id, entity) => dispatch(update(id, entity))
     }),
   ))(ProfileEditView);

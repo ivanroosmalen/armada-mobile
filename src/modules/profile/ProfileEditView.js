@@ -13,6 +13,8 @@ import { StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
+import MonthPicker from 'react-native-month-year-picker';
+import moment from 'moment';
 import { RadioGroup, Dropdown } from '../../components';
 
 import { fonts, colors } from '../../styles';
@@ -27,8 +29,6 @@ export default class ProfileEditScreen extends React.Component {
 
         // Current visible form
         isKeyboardVisible: false,
-
-        selectedMartialArt: {},
         errors: {
            aliasError: ''
         },
@@ -37,27 +37,61 @@ export default class ProfileEditScreen extends React.Component {
         selectedMAIndex: 0,
         selectedMAs: [],
         selectedMANames: [],
-        martialArtList: []
+        martialArtList: [],
+        datePickerVisible: false,
+        datePickerValue: moment(),
+        editingUser: {}
       };
 
+      showDatePicker = () => {
+            this.setState({ datePickerVisible: true })
+        };
+
+        hideDatePicker = () => {
+          this.setState({ datePickerVisible: false })
+        };
+
+        handleDateSelected = (event, date) => {
+            if(date) {
+                this.state.editingUser.martialArts[this.state.selectedMAIndex].startDate = moment(date, "MM-YYYY");
+
+                this.setState({
+                    editingUser: this.state.editingUser,
+                    datePickerValue: moment(date, "MM-YYYY"),
+                    datePickerVisible: false
+                })
+            } else {
+                this.hideDatePicker();
+            }
+          };
+
         setMartialArt(index) {
-            this.setState({ selectedMAIndex: index })
+            this.setState({
+                selectedMAIndex: index,
+                datePickerValue: this.state.editingUser.martialArts[index].startDate ? moment(this.state.editingUser.martialArts[index].startDate) : moment()
+            })
         }
 
         onChangeText = async (key, val) => {
-          this.props.user[key] = val;
+          this.state.editingUser[key] = val;
 
-          if(this.state) {
-             this.setState({
-                  user: this.props.user
-             })
-          }
+          this.setState({
+              editingUser: this.state.editingUser
+          })
+        }
+
+        onChangeLevel = async (val) => {
+          this.state.editingUser.martialArts[this.state.selectedMAIndex].level = val;
+
+           this.setState({
+               editingUser: this.state.editingUser
+           })
         }
 
         validate = () => {
             this.state.isValid = true;
 
-            if(!this.props.user.alias) {
+            if(!this.state.editingUser.alias) {
                 this.state.errors.aliasError = 'You must provide a valid alias';
                 this.state.isValid = false;
             } else {
@@ -73,12 +107,13 @@ export default class ProfileEditScreen extends React.Component {
 
       submit = async () => {
             if(this.validate()) {
-
+                await this.props.updateUser(this.props.loggedInUser._id, this.state.editingUser);
+                this.props.navigation.navigate('Profile', { id: this.props.loggedInUser._id })
             }
       }
 
       addNewMartialArt = async (index) => {
-        if(this.props.user.martialArts.find(ma => ma.name === this.state.martialArtList[index])) {
+        if(this.state.editingUser.martialArts.find(ma => ma.name === this.state.martialArtList[index])) {
             return; //MA already exists for user
         }
 
@@ -91,24 +126,46 @@ export default class ProfileEditScreen extends React.Component {
          }
 
           this.state.selectedMANames.push(this.state.martialArtList[index]);
-          this.setState({ selectedMANames: this.state.selectedMANames })
 
-          this.props.user.martialArts.push(martialArt);
+          this.state.editingUser.martialArts.push(martialArt);
           await this.setState({
-            user: this.props.user
+            editingUser: this.state.editingUser,
+            selectedMANames: this.state.selectedMANames
           })
 
       }
 
+    removeMartialArt = async (index) => {
+          this.state.editingUser.martialArts.splice(index, 1);
+          this.state.selectedMANames.splice(index, 1);
+
+          this.setState({
+            editingUser: this.state.editingUser,
+            selectedMANames: this.state.selectedMANames,
+            selectedMAIndex: 0
+          })
+
+      }
+
+      async getData() {
+        return Promise.all([
+            this.props.getMartialArts(),
+            this.props.getUser(this.props.loggedInUser._id)
+        ])
+      }
+
       async componentDidMount() {
-        await this.props.getMartialArts();
+        await this.getData();
 
         let martialArtList = this.props.martialArts && this.props.martialArts.map(ma => ma.name).sort()
-        this.setState({ martialArtList })
         let user = this.props.user || {};
         let martialArts = user.martialArts || [];
-        let martialArtNames = martialArts.map(ma => ma.name).sort();
-        this.setState({selectedMANames: martialArtNames});
+        let martialArtNames = martialArts.map(ma => ma.name)
+        this.setState({
+            selectedMANames: martialArtNames,
+            martialArtList,
+            editingUser: user
+        });
 
         this.keyboardDidShowListener = Keyboard.addListener(
           Platform.select({ android: 'keyboardDidShow', ios: 'keyboardWillShow' }),
@@ -174,7 +231,7 @@ export default class ProfileEditScreen extends React.Component {
                     <TextInput
                       placeholder="Alias"
                       style={styles.textInput}
-                      value={this.props.user.alias}
+                      value={this.state.editingUser.alias}
                       onChangeText={val => this.onChangeText('alias', val)}
                     />
 
@@ -187,14 +244,14 @@ export default class ProfileEditScreen extends React.Component {
                     <TextInput
                       placeholder="First Name"
                       style={styles.textInput}
-                      value={this.props.user.firstName}
+                      value={this.state.editingUser.firstName}
                       onChangeText={val => this.onChangeText('firstName', val)}
                     />
 
                     <TextInput
                       placeholder="Last Name"
                       style={styles.textInput}
-                      value={this.props.user.lastName}
+                      value={this.state.editingUser.lastName}
                       onChangeText={val => this.onChangeText('lastName', val)}
                     />
 
@@ -217,12 +274,12 @@ export default class ProfileEditScreen extends React.Component {
                           />
                         </View>
 
-                        {this.props.user.martialArts && this.props.user.martialArts.length &&
+                        {!!(this.state.editingUser.martialArts && this.state.editingUser.martialArts.length) &&
                             <View style={styles.maSection}>
                                     <RadioGroup
                                       underline
                                       style={styles.martialArtRadio}
-                                      items={this.state.selectedMANames}
+                                      items={this.state.selectedMANames || []}
                                       selectedIndex={this.state.selectedMAIndex}
                                       onChange={index => this.setMartialArt(index)}
                                     />
@@ -230,16 +287,46 @@ export default class ProfileEditScreen extends React.Component {
                                 <TextInput
                                   placeholder="Level"
                                   style={styles.textInput}
-                                  value={this.props.user.martialArts[this.state.selectedMAIndex].level}
-                                  onChangeText={val => this.onChangeText('alias', val)}
+                                  value={this.state.editingUser.martialArts[this.state.selectedMAIndex].level}
+                                  onChangeText={val => this.onChangeLevel(val)}
                                 />
 
-                                <TextInput
-                                  placeholder="Start date"
-                                  style={styles.textInput}
-                                  value={this.props.user.martialArts[this.state.selectedMAIndex].startDate}
-                                  onChangeText={val => this.onChangeText('alias', val)}
-                                />
+                                <TouchableOpacity onPress={() => this.showDatePicker()}>
+
+                                <View style={styles.dateSection}>
+                                      <Text style={styles.dateText}>
+                                        {this.state.editingUser.martialArts[this.state.selectedMAIndex].startDate ? moment(this.state.editingUser.martialArts[this.state.selectedMAIndex].startDate).format('MMMM YYYY') : 'Start Date'}
+                                      </Text>
+
+                                          <Image
+                                                  source={require('../../../assets/images/drawer/calendar.png')}
+                                                  resizeMode="contain"
+                                                  style={{
+                                                    height: 40,
+                                                  }}
+                                                />
+                                    </View>
+                                </TouchableOpacity>
+
+                                {this.state.datePickerVisible && (
+                                              <MonthPicker
+                                                onChange={this.handleDateSelected}
+                                                value={this.state.datePickerValue}
+                                                minimumDate={new Date(1900, 1)}
+                                                maximumDate={new Date()}
+                                                enableAutoDarkMode={false}
+                                              />
+                                            )}
+
+                              <Button
+                                bgColor={colors.secondary}
+                                textColor={colors.white}
+                                secondary
+                                rounded
+                                caption={ 'Remove' }
+                                style={styles.removeButton}
+                                onPress={() => this.removeMartialArt(this.state.selectedMAIndex)}
+                              />
                             </View>
                         }
 
@@ -339,5 +426,22 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignSelf: 'stretch'
+  },
+  dateSection: {
+    color: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomColor: 'white',
+    borderBottomWidth: 1
+  },
+  dateText: {
+    paddingTop: 10,
+    color: 'white'
+  },
+  removeButton: {
+    width: 150,
+    alignSelf: 'flex-end'
+
+
   }
 });

@@ -2,7 +2,6 @@ import axios from 'axios';
 
 const BASE_URL = 'http://10.0.2.2:3000/v1/';
 import { store } from '../redux/store.js';
-const state = store.getState();
 
 class BaseService {
 
@@ -12,6 +11,8 @@ class BaseService {
     }
 
     async makeRequest(httpConfig, options) {
+        const state = store.getState();
+
         let constHeaders = {
             'Access-Control-Allow-Origin': '*',
             'Content-Type': 'application/json',
@@ -76,9 +77,10 @@ class BaseService {
     async update(id, entity, options = {}, getEntity = true) {
         const httpConfig = {
             method: 'PUT',
-            url: this.buildURL(id),
+            url: this.buildURL([ id ]),
             data: entity
         };
+
         return this.makeRequest(httpConfig, options).then(() => {
             if(getEntity) return this.get(id);
         });

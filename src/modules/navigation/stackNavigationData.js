@@ -4,6 +4,8 @@ import { TouchableOpacity, Image } from 'react-native';
 import TabNavigator from './MainTabNavigator';
 import ProfileScreen from '../profile/ProfileViewContainer';
 import ProfileEditScreen from '../profile/ProfileEditViewContainer';
+import UpdatePasswordScreen from '../auth/UpdatePasswordContainer';
+import ForgotPasswordScreen from '../auth/ForgotPasswordContainer';
 import GalleryScreen from '../gallery/GalleryViewContainer';
 import ArticleScreen from '../article/ArticleViewContainer';
 import ChatScreen from '../chat/ChatViewContainer';
@@ -39,7 +41,7 @@ const headerBackground = require('../../../assets/images/topBarBg.png');
 const StackNavigationData = [
   {
     name: 'React Native Starter',
-    displayName: 'React Native Starter',
+    displayName: 'Armada',
     component: TabNavigator,
     headerLeft: null,
     headerBackground: { source: headerBackground },
@@ -97,6 +99,30 @@ const StackNavigationData = [
       fontSize: 18,
     },
   },
+  {
+    name: 'Account',
+    displayName: 'Account',
+    component: UpdatePasswordScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+      name: 'ForgotPassword',
+      displayName: 'Forgot Password',
+      component: ForgotPasswordScreen,
+      headerLeft: headerLeftComponent,
+      headerBackground: { source: headerBackground },
+      headerTitleStyle: {
+        fontFamily: fonts.primaryRegular,
+        color: colors.white,
+        fontSize: 18,
+      },
+    },
   {
     name: 'Article',
     displayName: 'Article',

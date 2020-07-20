@@ -27,6 +27,46 @@ class UserService extends BaseService {
                 };
                 return this.makeRequest(httpConfig, {});
             }
+
+    async updateProfileImage(id, data, options) {
+                const httpConfig = {
+                    method: 'POST',
+                    url: this.buildURL([id, 'profile']),
+                    data
+                };
+
+                return this.makeRequest(httpConfig, options)
+            }
+
+    async updateThumbnailImage(id, data, options) {
+                const httpConfig = {
+                    method: 'POST',
+                    url: this.buildURL([id, 'thumbnail']),
+                    data
+                };
+
+                return this.makeRequest(httpConfig, options)
+            }
+
+async updatePassword(id, data, options) {
+                const httpConfig = {
+                    method: 'PATCH',
+                    url: this.buildURL(['updatePassword', id]),
+                    data
+                };
+
+                return this.makeRequest(httpConfig, options)
+            }
+
+async forgotPassword(data, options) {
+                const httpConfig = {
+                    method: 'POST',
+                    url: this.buildURL(['forgotPassword']),
+                    data
+                };
+
+                return this.makeRequest(httpConfig, options)
+            }
 }
 
 export default UserService;

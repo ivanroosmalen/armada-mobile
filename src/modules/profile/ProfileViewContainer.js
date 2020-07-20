@@ -3,7 +3,7 @@ import { compose, lifecycle } from 'recompose';
 import { connect } from 'react-redux';
 
 import ProfileView from './ProfileView';
-import { get } from '../../redux/users/actions.js'
+import { get, updateProfileImage } from '../../redux/users/actions.js'
 
 export default compose(
   connect(
@@ -14,5 +14,7 @@ export default compose(
     })},
     dispatch => ({
       getUser: (id) => dispatch(get(id)),
+      updateUser: (id, entity) => dispatch(update(id, entity)),
+      updateProfileImage: (id, data) => dispatch(updateProfileImage(id, data))
     }),
   ))(ProfileView);

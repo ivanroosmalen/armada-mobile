@@ -16,18 +16,12 @@ import { TextInput, Button } from '../../components';
 
 import isEmail from 'validator/lib/isEmail';
 
-const FORM_STATES = {
-  LOGIN: 0,
-  REGISTER: 1,
-};
-
-export default class AuthScreen extends React.Component {
+export default class ForgotPasswordScreen extends React.Component {
 
   state = {
     anim: new Animated.Value(0),
 
     // Current visible form
-    formState: FORM_STATES.LOGIN,
     isKeyboardVisible: false,
     entity: {
                 email: ''
@@ -68,35 +62,17 @@ export default class AuthScreen extends React.Component {
 
   submit = async () => {
         if(this.validate()) {
-            if(this.state.formState === FORM_STATES.REGISTER) {
-                let response = await this.props.register(this.state.entity);
-                if(response.status === 201) {
-                    this.state.errors.pageError = '';
-
-                    this.setState({
-                        formState: FORM_STATES.LOGIN,
-                        submitSuccess: true,
-                        errors: this.state.errors
-                    });
-
-                } else {
-                    this.state.errors.pageError = 'Unable to register. An account with this email may already exist';
-                }
-            } else {
-                let response = await this.props.login(this.state.entity);
-
+            let response = await this.props.forgotPassword(this.state.entity);
                 if(response.status === 200) {
-                    this.props.navigation.navigate('Home');
+                    this.state.submitSuccess = true;
+                    this.setState({ submitSuccess: this.state.submitSuccess });
                 } else {
-                    this.state.errors.pageError = 'Unable to login. Make sure your credentials are correct';
+                    this.state.errors.pageError = 'Could not reset password';
                 }
-            }
         }
   }
 
   componentDidMount() {
-    this.props.logout();
-
     this.keyboardDidShowListener = Keyboard.addListener(
       Platform.select({ android: 'keyboardDidShow', ios: 'keyboardWillShow' }),
       this._keyboardDidShow.bind(this),
@@ -145,8 +121,6 @@ export default class AuthScreen extends React.Component {
   }
 
   render() {
-    const isRegister = this.state.formState === FORM_STATES.REGISTER;
-
     return (
       <ImageBackground
         source={require('../../../assets/images/background.png')}
@@ -169,7 +143,6 @@ export default class AuthScreen extends React.Component {
           <Animated.View
             style={[styles.section, styles.middle, this.fadeIn(700, -20)]}
           >
-
             <TextInput
               placeholder="Email"
               style={styles.textInput}
@@ -183,101 +156,23 @@ export default class AuthScreen extends React.Component {
                 {this.state.errors.emailError}
             </Text>
 
-            {this.state.formState === FORM_STATES.LOGIN && (
-                <View style={{alignSelf: 'stretch'}}>
-                    <TextInput
-                      placeholder="Password"
-                      secureTextEntry
-                      style={styles.textInput}
-                      onChangeText={val => this.onChangeText('password', val)}
-                    />
-
-                    <Text style={{ fontSize: 12, color: 'red'}}>
-                        {this.state.errors.passwordError}
-                    </Text>
-                </View>
-            )}
-
-            {(this.state.formState === FORM_STATES.LOGIN && this.state.submitSuccess) && (
-                        <Text style={{ fontSize: 16, color: 'white'}}>
-                            {'Please check your email and log in with the password provided'}
-                        </Text>
-                )}
-
             <Animated.View
               style={[styles.section, styles.bottom, this.fadeIn(700, -20)]}
             >
-
-                  <Text style={{ fontSize: 12, color: 'red'}}>
-                        {this.state.errors.pageError}
+              {this.state.submitSuccess && (
+                  <Text style={{ fontSize: 20, color: 'white'}}>
+                       {'Please check your email for a new password'}
                   </Text>
-
+              )}
               <Button
                 bgColor="white"
                 textColor={colors.primary}
                 secondary
                 rounded
                 style={{ alignSelf: 'stretch', marginBottom: 10 }}
-                caption={
-                  this.state.formState === FORM_STATES.LOGIN
-                    ? 'Login'
-                    : 'Register'
-                }
+                caption={'Request new password'}
                 onPress={this.submit}
               />
-
-
-
-              {!this.state.isKeyboardVisible && (
-                <TouchableOpacity
-                  onPress={() => {
-                    LayoutAnimation.spring();
-                    this.setState({
-                      formState: isRegister
-                        ? FORM_STATES.LOGIN
-                        : FORM_STATES.REGISTER,
-                    });
-                  }}
-                  style={{ paddingTop: 30, flexDirection: 'row' }}
-                >
-                  <Text
-                    style={{
-                      color: colors.white,
-                      fontFamily: fonts.primaryRegular,
-                    }}
-                  >
-                    {isRegister
-                      ? 'Already have an account?'
-                      : "Don't have an account?"}
-                  </Text>
-                  <Text
-                    style={{
-                      color: colors.white,
-                      fontFamily: fonts.primaryBold,
-                      marginLeft: 5,
-                    }}
-                  >
-                    {isRegister ? 'Login' : 'Register'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-
-              {this.state.formState === FORM_STATES.LOGIN && (
-                <TouchableOpacity
-                  onPress={() => this.props.navigation.navigate('ForgotPassword')}
-                  style={{ paddingTop: 30, flexDirection: 'row' }}
-                >
-                  <Text
-                    style={{
-                      color: colors.white,
-                      fontFamily: fonts.primaryBold,
-                      marginLeft: 5,
-                    }}
-                  >
-                    {'Forgot password'}
-                  </Text>
-                </TouchableOpacity>
-              )}
             </Animated.View>
           </Animated.View>
         </View>

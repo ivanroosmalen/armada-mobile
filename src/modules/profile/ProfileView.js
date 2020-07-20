@@ -1,8 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, Text, ImageBackground } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import LinearGradient from 'react-native-linear-gradient';
+import { StyleSheet, View, Text, ImageBackground, Image } from 'react-native';
+import ImagePicker from 'react-native-image-picker'
+import Icon from 'react-native-vector-icons/Entypo';
 import { RadioGroup } from '../../components';
+import moment from 'moment';
+import S3Service from '../../http/s3-service.js';
+const s3Service = new S3Service();
 
 import { Button } from '../../components';
 import { fonts, colors } from '../../styles';
@@ -10,30 +13,37 @@ import { fonts, colors } from '../../styles';
 export default class ProfileScreen extends React.Component {
 
   state = {
-      selectedMartialArt: {},
-      martialArtNames: [],
-      userIsOwner: false
-  }
-
-  setMartialArt(index) {
-    this.state.selectedMartialArt = this.props.user && this.props.user.martialArts && this.props.user.martialArts[index];
+      martialArts: [],
+      userIsOwner: this.props.user._id === this.props.loggedInUser._id,
+      selectedIndex: 0,
+      placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg'
   }
 
   getStudentAcademies(martialArt = {}) {
     return martialArt.studentAcademies || [];
   }
 
+  async selectImage() {
+        const options = {
+          noData: false,
+          mediaType: 'photo'
+        }
+        ImagePicker.showImagePicker(options, async file => {
+          if (file.uri) {
+            let response = await this.props.updateProfileImage(this.props.loggedInUser._id, { contentType: file.type });
+            let uploadUrl = response.data.entity;
+
+            if(uploadUrl) {
+                await s3Service.uploadImage(file, uploadUrl.split('?')[0]);
+            }
+
+            await this.props.getUser(this.props.route.params.id);
+          }
+        })
+  }
+
   async componentDidMount() {
     await this.props.getUser(this.props.route.params.id);
-
-    this.setState({
-        selectedMartialArt: this.props.user && this.props.user.martialArts && this.props.user.martialArts[0]
-    })
-
-    let user = this.props.user || {}
-    this.setState({ userIsOwner: user._id === this.props.loggedInUser._id });
-    let martialArts = user.martialArts || [];
-    this.setState({ martialArtNames: martialArts.map(ma => ma.name) });
   }
 
   render() {
@@ -41,15 +51,27 @@ export default class ProfileScreen extends React.Component {
         <View style={styles.container}>
           <ImageBackground
             resizeMode="cover"
-            source={require('../../../assets/images/avatar.png')}
+            source={{uri: (this.props.user && this.props.user.profileImg) ? this.props.user.profileImg : placeholderImage} }
             style={[styles.section, styles.header]}
           >
+
+          {this.state.userIsOwner && (
+              <Icon
+                style={[styles.demoIcon, { opacity: 1, position: 'absolute', top:10, right: 10 }]}
+                name="camera"
+                size={25}
+                color="#111111"
+                onPress={() => this.selectImage()}
+              />
+          )}
+
             <View style={{ flex: 1, justifyContent: 'center' }}>
               <Text style={styles.title}>{this.props.user.firstName} {this.props.user.lastName}</Text>
               <View>
                 <Text style={styles.position}>{this.props.user.alias}</Text>
               </View>
             </View>
+
                 {this.state.userIsOwner && (
                     <View style={{ flexDirection: 'row' }}>
                       <Button
@@ -64,31 +86,39 @@ export default class ProfileScreen extends React.Component {
                 )}
 
           </ImageBackground>
+          {!!(this.props.user.martialArts && this.props.user.martialArts.length) && (
           <View style={styles.section}>
             <RadioGroup
               underline
               style={styles.martialArtRadio}
-              items={this.state.martialArtNames}
-              selectedIndex={0}
-              onChange={index => this.setMartialArt(index)}
+              items={this.props.user.martialArts.map(ma => ma.name)}
+              selectedIndex={this.state.selectedIndex}
+              onChange={index => this.setState({selectedIndex: index})}
             />
 
             <View style={{ flex: 1 }}>
               <View style={styles.infoRow}>
                     <Text style={styles.itemLabel}>Academy</Text>
-                    {this.getStudentAcademies(this.state.selectedMartialArt).map(academy =>
-                        <Text>{academy.name} {academy.subcategory || ''}</Text>
+                    {this.getStudentAcademies(this.props.user.martialArts[this.state.selectedIndex]).map(academy =>
+                        <Text key={academy._id}>{academy.name} {academy.subcategory || ''}</Text>
                     )}
               </View>
               <View style={styles.hr} />
 
               <View style={styles.infoRow}>
                 <Text style={styles.itemLabel}>Level </Text>
-                <Text>{this.state.selectedMartialArt.level}</Text>
+                <Text>{this.props.user.martialArts[this.state.selectedIndex].level}</Text>
+              </View>
+              <View style={styles.hr} />
+
+              <View style={styles.infoRow}>
+                <Text style={styles.itemLabel}>Started </Text>
+                <Text>{this.props.user.martialArts[this.state.selectedIndex].startDate ? moment(this.props.user.martialArts[this.state.selectedIndex].startDate).format("MMMM YYYY") : ''}</Text>
               </View>
               <View style={styles.hr} />
             </View>
           </View>
+          )}
         </View>
       );
     }
