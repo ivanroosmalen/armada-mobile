@@ -14,8 +14,8 @@ export default class ProfileScreen extends React.Component {
 
   state = {
       martialArts: [],
-      userIsOwner: this.props.user._id === this.props.loggedInUser._id,
       selectedIndex: 0,
+      userIsOwner: false,
       placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg'
   }
 
@@ -34,7 +34,7 @@ export default class ProfileScreen extends React.Component {
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
-                await s3Service.uploadImage(file, uploadUrl.split('?')[0]);
+                await s3Service.uploadImage(file, uploadUrl);
             }
 
             await this.props.getUser(this.props.route.params.id);
@@ -42,20 +42,26 @@ export default class ProfileScreen extends React.Component {
         })
   }
 
-  async componentDidMount() {
+  async componentWillMount() {
     await this.props.getUser(this.props.route.params.id);
+    this.setState({
+        userIsOwner: this.props.route.params.id === this.props.loggedInUser._id
+    })
   }
 
   render() {
+      let imageUri = (this.props.user && this.props.user.profileImg) ? this.props.user.profileImg : this.state.placeholderImage;
+      let userIsOwner = this.state.userIsOwner || false;
+      let user = this.props.user || {};
       return (
         <View style={styles.container}>
           <ImageBackground
             resizeMode="cover"
-            source={{uri: (this.props.user && this.props.user.profileImg) ? this.props.user.profileImg : placeholderImage} }
+            source={{uri: imageUri} }
             style={[styles.section, styles.header]}
           >
 
-          {this.state.userIsOwner && (
+          {userIsOwner && (
               <Icon
                 style={[styles.demoIcon, { opacity: 1, position: 'absolute', top:10, right: 10 }]}
                 name="camera"
@@ -66,13 +72,13 @@ export default class ProfileScreen extends React.Component {
           )}
 
             <View style={{ flex: 1, justifyContent: 'center' }}>
-              <Text style={styles.title}>{this.props.user.firstName} {this.props.user.lastName}</Text>
+              <Text style={styles.alias}>{user.alias}</Text>
               <View>
-                <Text style={styles.position}>{this.props.user.alias}</Text>
+                <Text style={styles.name}>{user.firstName} {user.lastName}</Text>
               </View>
             </View>
 
-                {this.state.userIsOwner && (
+                {userIsOwner && (
                     <View style={{ flexDirection: 'row' }}>
                       <Button
                         secondary
@@ -86,12 +92,12 @@ export default class ProfileScreen extends React.Component {
                 )}
 
           </ImageBackground>
-          {!!(this.props.user.martialArts && this.props.user.martialArts.length) && (
+          {!!(user.martialArts && user.martialArts.length) && (
           <View style={styles.section}>
             <RadioGroup
               underline
               style={styles.martialArtRadio}
-              items={this.props.user.martialArts.map(ma => ma.name)}
+              items={user.martialArts.map(ma => ma.name)}
               selectedIndex={this.state.selectedIndex}
               onChange={index => this.setState({selectedIndex: index})}
             />
@@ -99,7 +105,7 @@ export default class ProfileScreen extends React.Component {
             <View style={{ flex: 1 }}>
               <View style={styles.infoRow}>
                     <Text style={styles.itemLabel}>Academy</Text>
-                    {this.getStudentAcademies(this.props.user.martialArts[this.state.selectedIndex]).map(academy =>
+                    {this.getStudentAcademies(user.martialArts[this.state.selectedIndex]).map(academy =>
                         <Text key={academy._id}>{academy.name} {academy.subcategory || ''}</Text>
                     )}
               </View>
@@ -107,17 +113,21 @@ export default class ProfileScreen extends React.Component {
 
               <View style={styles.infoRow}>
                 <Text style={styles.itemLabel}>Level </Text>
-                <Text>{this.props.user.martialArts[this.state.selectedIndex].level}</Text>
+                <Text>{user.martialArts[this.state.selectedIndex].level}</Text>
               </View>
               <View style={styles.hr} />
 
               <View style={styles.infoRow}>
                 <Text style={styles.itemLabel}>Started </Text>
-                <Text>{this.props.user.martialArts[this.state.selectedIndex].startDate ? moment(this.props.user.martialArts[this.state.selectedIndex].startDate).format("MMMM YYYY") : ''}</Text>
+                <Text>{user.martialArts[this.state.selectedIndex].startDate ? moment(user.martialArts[this.state.selectedIndex].startDate).format("MMMM YYYY") : ''}</Text>
               </View>
               <View style={styles.hr} />
             </View>
           </View>
+          )}
+
+          {!(user.martialArts && user.martialArts.length) && (
+            <Text style={styles.itemLabel, styles.noData}>No profile data </Text>
           )}
         </View>
       );
@@ -141,12 +151,19 @@ const styles = StyleSheet.create({
     width: 100,
     fontWeight: 'bold',
   },
-  title: {
+  alias: {
     color: colors.white,
     fontFamily: fonts.primaryBold,
     fontSize: 25,
     letterSpacing: 0.04,
     marginBottom: 10,
+    backgroundColor: 'rgba(65, 131, 215, 0.6)',
+    alignSelf: 'flex-start',
+    borderRadius: 15,
+    borderColor: 'rgb(65, 131, 215)',
+    paddingLeft: 10,
+    paddingRight: 10,
+    height: 40
   },
   lightText: {
     color: colors.white,
@@ -184,13 +201,20 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    height: 250,
   },
-  position: {
+  name: {
     color: colors.white,
     fontFamily: fonts.primaryLight,
     fontSize: 16,
     marginBottom: 3,
+    backgroundColor: 'rgba(65, 131, 215, 0.6)',
+    alignSelf: 'flex-start',
+    borderRadius: 15,
+    borderColor: 'rgb(65, 131, 215)',
+    paddingLeft: 10,
+    paddingRight: 10,
+    height: 25
   },
   company: {
     color: colors.white,
@@ -214,5 +238,8 @@ const styles = StyleSheet.create({
   },
   martialArtRadio: {
     flex: 0.20
+  },
+  noData: {
+    height: 400
   }
 });

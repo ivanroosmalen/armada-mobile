@@ -14,18 +14,12 @@ import { updateThumbnailImage } from '../../redux/users/actions';
 import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
 
-const iconHome = require('../../../assets/images/drawer/home.png');
-const iconCalendar = require('../../../assets/images/drawer/calendar.png');
-const iconGrids = require('../../../assets/images/drawer/grids.png');
-const iconPages = require('../../../assets/images/drawer/pages.png');
-const iconComponents = require('../../../assets/images/drawer/components.png');
-const iconSettings = require('../../../assets/images/drawer/settings.png');
-const placeholderImage = require('../../../assets/images/drawer/user.png');
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const drawerData = [
   {
     name: 'Home',
-    icon: iconHome,
+    icon: 'home',
   }
 ];
 
@@ -45,8 +39,7 @@ async function selectImage() {
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
-                let url = uploadUrl.split('?')[0];
-                await s3Service.uploadImage(file, url);
+                await s3Service.uploadImage(file, uploadUrl);
 
                 loggedInUser.thumbnailImg = url;
                 await store.dispatch({type: 'LOGGED_IN_USER', data: loggedInUser});
@@ -59,6 +52,8 @@ function CustomDrawerContent(props) {
   const state = store.getState();
   let currentUser = state.users.loggedInUser;
   let placeholderImage = 'https://armada-user-images.s3.amazonaws.com/default/thumbnail.jpg'
+
+  if(currentUser.)
 
   return (
     <DrawerContentScrollView {...props} style={{padding: 0}}>
@@ -74,28 +69,13 @@ function CustomDrawerContent(props) {
                       source={{ uri: state.users.loggedInUser.thumbnailImg || placeholderImage }}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => props.navigation.navigate('Profile')}>
-                    <View style={{ paddingLeft: 15 }}>
-                      <Text style={styles.userName}>{currentUser.alias}</Text>
+                <TouchableOpacity onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}>
+                    <View style={{ paddingLeft: 15, alignSelf: 'stretch' }}>
+                      <Text style={styles.userName}>{currentUser.alias || 'Edit profile'}</Text>
                     </View>
                 </TouchableOpacity>
               </View>
           </View>)} />
-
-        <DrawerItem
-          key={`account`}
-          label={() => (
-            <View
-              style={styles.menuLabelFlex}>
-                <Image
-                  style={{ width: 20, height: 20}}
-                  source={iconSettings}
-                />
-              <Text style={styles.menuTitle}>Account</Text>
-            </View>
-          )}
-          onPress={() => props.navigation.navigate('Account')}
-        />
 
           <View style={styles.divider} />
           </View>
@@ -107,21 +87,50 @@ function CustomDrawerContent(props) {
           label={() => (
             <View
               style={styles.menuLabelFlex}>
-              <Image
-                style={{ width: 20, height: 20}}
-                source={item.icon}
-              />
+                    <Icon
+                          name={item.icon}
+                          style={{
+                            fontSize: 20,
+                            color: 'white'
+                          }}
+                        />
               <Text style={styles.menuTitle}>{item.name}</Text>
             </View>
           )}
           onPress={() => props.navigation.navigate(item.name)}
-        />        
+        />
       ))}
       <View style={styles.divider} />
       {currentUser && (
+        <View>
+        <DrawerItem
+          key={`account`}
+          label={() => (
+            <View
+              style={styles.menuLabelFlex}>
+                <Icon
+                          name="account-edit"
+                          style={{
+                            fontSize: 20,
+                            color: 'white'
+                          }}
+                        />
+              <Text style={styles.menuTitle}>Account</Text>
+            </View>
+          )}
+          onPress={() => props.navigation.navigate('Account')}
+        />
+
           <DrawerItem
             label={() => (
               <View style={styles.menuLabelFlex}>
+                    <Icon
+                          name="logout"
+                          style={{
+                            fontSize: 20,
+                            color: 'white'
+                          }}
+                        />
                 <Text style={styles.menuTitle}>Logout</Text>
               </View>
             )}
@@ -130,16 +139,20 @@ function CustomDrawerContent(props) {
                 }
             }
           />
+          </View>
       )}
 
       {!currentUser && (
                 <DrawerItem
                   label={() => (
                     <View style={styles.menuLabelFlex}>
-                      <Image
-                        style={{ width: 20, height: 20}}
-                        source={iconSettings}
-                      />
+                        <Icon
+                          name="login"
+                          style={{
+                            fontSize: 20,
+                            color: 'white'
+                          }}
+                        />
                       <Text style={styles.menuTitle}>Login / Register</Text>
                     </View>
                   )}

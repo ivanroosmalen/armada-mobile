@@ -8,7 +8,7 @@ const LOGGED_IN_USER = 'LOGGED_IN_USER';
 
 export function list(params, options) {
   return async function(dispatch) {
-    let users = await userService.list(params, options);
+    let response = await userService.list(params, options);
     dispatch({type: USERS, data: response.data.entity});
   }
 }

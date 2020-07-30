@@ -16,6 +16,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MonthPicker from 'react-native-month-year-picker';
 import moment from 'moment';
 import { RadioGroup, Dropdown } from '../../components';
+import MatComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
@@ -136,9 +137,10 @@ export default class ProfileEditScreen extends React.Component {
       }
 
     removeMartialArt = async (index) => {
+          console.log(index)
           this.state.editingUser.martialArts.splice(index, 1);
           this.state.selectedMANames.splice(index, 1);
-
+          console.log(this.state.selectedMANames)
           this.setState({
             editingUser: this.state.editingUser,
             selectedMANames: this.state.selectedMANames,
@@ -264,14 +266,15 @@ export default class ProfileEditScreen extends React.Component {
                               placeholder={'select a martial art'}
                               onSelect={(index) => {this.setState({selectedIndex: index});}}
                           />
-                          <Button
-                            bgColor={colors.secondary}
-                            textColor={colors.white}
-                            secondary
-                            rounded
-                            caption={ 'Add' }
-                            onPress={() => this.addNewMartialArt(this.state.selectedIndex)}
-                          />
+
+                        <MatComIcon
+                          name="plus-circle"
+                          style={{
+                            fontSize: 35,
+                          }}
+                          onPress={() => this.addNewMartialArt(this.state.selectedIndex)}
+                        />
+
                         </View>
 
                         {!!(this.state.editingUser.martialArts && this.state.editingUser.martialArts.length) &&
@@ -318,15 +321,11 @@ export default class ProfileEditScreen extends React.Component {
                                               />
                                             )}
 
-                              <Button
-                                bgColor={colors.secondary}
-                                textColor={colors.white}
-                                secondary
-                                rounded
-                                caption={ 'Remove' }
-                                style={styles.removeButton}
-                                onPress={() => this.removeMartialArt(this.state.selectedMAIndex)}
-                              />
+                                <MatComIcon
+                                  name="minus-circle"
+                                  style={styles.removeButton}
+                                  onPress={() => this.removeMartialArt(this.state.selectedMAIndex)}
+                                />
                             </View>
                         }
 
@@ -349,7 +348,7 @@ export default class ProfileEditScreen extends React.Component {
                              bottom: 10,
                              right: 10,
                              }}
-                            caption={ 'Submit' }
+                            caption={ 'Save' }
                             onPress={this.submit}
                           />
                   </Animated.View>
@@ -439,7 +438,7 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   removeButton: {
-    width: 150,
+    fontSize: 35,
     alignSelf: 'flex-end'
 
 

@@ -8,6 +8,7 @@ import charts from '../modules/charts/ChartsState';
 import chat from '../modules/chat/ChatState';
 import posts from '../modules/blog/PostsState'
 import users from './users/user-reducers';
+import academies from './academies/academy-reducers';
 import martialArts from './martialArts/martialArt-reducers';
 
 export default combineReducers({
@@ -19,5 +20,6 @@ export default combineReducers({
   chat,
   posts,
   users,
-  martialArts
+  martialArts,
+  academies
 });

@@ -3,16 +3,15 @@ import { Buffer } from 'buffer';
 
 class S3Service extends BaseService {
 
-    async uploadImage(file, signedUrl) {
-
+    async uploadImage(file, uploadUrl) {
+            let signedUrl = uploadUrl.split('?')[0];
             const httpConfig = {
                 method: 'PUT',
-                url: signedUrl,
+                url: uploadUrl,
                 data: Buffer.from(file.data.replace(/^data:image\/\w+;base64,/, ""),'base64'),
                 headers: {
-                     'Content-Type': 'multipart-formdata',
-                     'X-Amz-ACL': 'public-read',
-                     'Content-Encoding': 'base64'
+                    'Content-Type': file.type,
+                    'x-amz-acl': 'public-read'
                 }
             };
 

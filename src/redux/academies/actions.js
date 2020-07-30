@@ -1,40 +1,47 @@
 import axios from 'axios';
-import BaseService from '../../http/base-service.js';
+import AcademyService from '../../http/academy-service.js';
 
-const service = new BaseService('academies');
+const service = new AcademyService('academies');
 const ACADEMIES = 'ACADEMIES';
 const ACADEMY = 'ACADEMY';
 
-export function list() {
+export function list(params, options) {
   return async function(dispatch) {
-    let academies = await service.list();
-    dispatch({type: ACADEMIES, data: academies});
+    let response = await service.list(params, options);
+    dispatch({type: ACADEMIES, data: response.data.entity});
   }
 }
 
-export function get(id) {
+export function get(id, params, options) {
   return async function(dispatch) {
-    let academy = await service.get(id);
-    dispatch({type: ACADEMY, data: academy});
+    let response = await service.get(id, params, options);
+    dispatch({type: ACADEMY, data: response.data.entity});
   }
 }
 
-export function create(params) {
+export function create(entity, options) {
   return async function(dispatch) {
-    let response = await service.create(params);
-    get(response.id);
+    let response = await service.create(entity, options);
+    dispatch(list())
+    return response.data.entity;
   }
 }
 
-export function update(params) {
+export function update(id, entity, options) {
   return async function(dispatch) {
-    let response = await service.update(params);
-    get(response.id);
+    let response = await service.update(id, entity, options);
+    dispatch({type: ACADEMY, data: response.data.entity});
   }
 }
 
-export function remove(params) {
+export function remove(id, options) {
   return async function(dispatch) {
-    await service.remove(params);
+    await service.remove(id, options);
+  }
+}
+
+export function updateProfileImage(id, data, options = {}) {
+  return async function(dispatch) {
+    return service.updateProfileImage(id, data, options);
   }
 }
