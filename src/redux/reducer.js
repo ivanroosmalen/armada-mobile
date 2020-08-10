@@ -10,6 +10,8 @@ import posts from '../modules/blog/PostsState'
 import users from './users/user-reducers';
 import academies from './academies/academy-reducers';
 import martialArts from './martialArts/martialArt-reducers';
+import scheduleItems from './scheduleItems/scheduleItem-reducers';
+import classes from './classes/class-reducers';
 
 export default combineReducers({
   // ## Generator Reducers
@@ -21,5 +23,7 @@ export default combineReducers({
   posts,
   users,
   martialArts,
-  academies
+  academies,
+  scheduleItems,
+  classes
 });

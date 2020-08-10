@@ -6,8 +6,12 @@ import AcademyScreen from '../academies/AcademyViewContainer';
 import AcademyEditScreen from '../academies/AcademyEditViewContainer';
 import AcademyCreateScreen from '../academies/AcademyCreateViewContainer';
 import AcademyListScreen from '../academies/AcademyListViewContainer';
+import UserAcademiesScreen from '../academies/UserAcademiesViewContainer';
 import ProfileScreen from '../profile/ProfileViewContainer';
 import ProfileEditScreen from '../profile/ProfileEditViewContainer';
+import ScheduleScreen from '../schedule/ScheduleViewContainer';
+import ClassEditScreen from '../classes/ClassEditViewContainer';
+import ClassScreen from '../classes/ClassViewContainer';
 import UpdatePasswordScreen from '../auth/UpdatePasswordContainer';
 import ForgotPasswordScreen from '../auth/ForgotPasswordContainer';
 import GalleryScreen from '../gallery/GalleryViewContainer';
@@ -104,6 +108,42 @@ const StackNavigationData = [
     },
   },
   {
+    name: 'Schedule',
+    displayName: 'Schedule',
+    component: ScheduleScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    }
+  },
+  {
+    name: 'Class',
+    displayName: 'Class',
+    component: ClassScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    }
+  },
+  {
+    name: 'ClassEdit',
+    displayName: 'Edit Class',
+    component: ClassEditScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    }
+  },
+  {
     name: 'Academy',
     displayName: 'Academy',
     component: AcademyScreen,
@@ -115,6 +155,18 @@ const StackNavigationData = [
       fontSize: 18,
     },
   },
+  {
+        name: 'UserAcademies',
+        displayName: 'My Academies',
+        component: UserAcademiesScreen,
+        headerLeft: headerLeftComponent,
+        headerBackground: { source: headerBackground },
+        headerTitleStyle: {
+          fontFamily: fonts.primaryRegular,
+          color: colors.white,
+          fontSize: 18,
+        },
+      },
   {
       name: 'AcademyList',
       displayName: 'Academies',

@@ -89,15 +89,24 @@ export default class AcademyListScreen extends React.Component {
   }
 
   async componentDidMount() {
-    let location = await GetLocation.getCurrentPosition({
-        enableHighAccuracy: true,
-        timeout: 15000,
-    })
+    let location = {};
+    try {
+        location = await GetLocation.getCurrentPosition({
+            enableHighAccuracy: true,
+            timeout: 1000,
+        })
+    } catch(e) {
+    }
 
-    await this.props.getAcademies({
-        currentLat: location.latitude,
-        currentLng: location.longitude
-    });
+    location.latitude = location.latitude || settings.defaultLat;
+    location.longitude = location.longitude  || settings.defaultLng
+
+    let params = {
+      currentLat: location.latitude,
+      currentLng: location.longitude
+    }
+
+    await this.props.getAcademies(params);
 
     this.setState({
         location,
@@ -110,6 +119,7 @@ export default class AcademyListScreen extends React.Component {
     return (
        <AcademyElement
             academy={item}
+            key={item._id}
        />
 
     );

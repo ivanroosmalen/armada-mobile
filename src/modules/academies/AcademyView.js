@@ -47,7 +47,10 @@ export default class AcademyScreen extends React.Component {
   }
 
   async componentDidMount() {
-    await this.props.getAcademy(this.props.route.params.id);
+    await Promise.all([
+        this.props.getAcademy(this.props.route.params.id),
+        this.props.list({academyId: this.props.route.params.id, entityType: 'class'})
+    ])
 
     await this.setState({
         userIsOwner: !!(this.props.academy && this.props.academy.owners && this.props.academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
@@ -121,18 +124,44 @@ export default class AcademyScreen extends React.Component {
 
               <View style={styles.expandingRow}>
                     <Text style={styles.itemLabel}>Next class</Text>
-                    <View style={styles.scheduleContent}>
-                        <Text style={styles.textContent}>
-                            {'Monday'}
-                        </Text>
-                        <Button
-                            secondary
-                            rounded
-                            small
-                            style={{width: 150}}
-                            caption="Schedule"
-                            onPress={() => this.props.navigation.navigate('Calendar', { id: this.props.academy._id })}
-                          />
+                    <View>
+                        {!!this.props.classes && !!this.props.classes.length && (
+                            <View style={styles.scheduleContent}>
+                                <Text style={styles.textContent}>
+                                    {'Monday'}
+                                </Text>
+                                <Button
+                                    secondary
+                                    rounded
+                                    small
+                                    style={{width: 150}}
+                                    caption="Schedule"
+                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
+                                  />
+                            </View>
+                        )}
+
+                        {!this.props.classes || !this.props.classes.length && (
+                            <View style={styles.scheduleContent}>
+                                <Text style={styles.textContent}>
+                                    {'No schedule yet'}
+                                </Text>
+
+                                {!!this.state.userIsOwner && (
+                                    <Button
+                                        secondary
+                                        rounded
+                                        small
+                                        style={{width: 150}}
+                                        caption="Schedule"
+                                        onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
+                                      />
+
+                                )}
+
+                            </View>
+                        )}
+
                     </View>
               </View>
 

@@ -109,7 +109,7 @@ export default class AcademyEditScreen extends React.Component {
                     academyId = entity._id
                 }
 
-                this.props.navigation.navigate('Academy', { id: academyId })
+                this.props.navigation.goBack();
             }
       }
 

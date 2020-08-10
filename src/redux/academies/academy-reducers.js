@@ -10,6 +10,9 @@ const martialArtsReducer = (state = academiesState, action) => {
         case 'ACADEMY':
             state = { ...state, academy: action.data };
             break;
+        case 'USER_ACADEMIES':
+            state = { ...state, userAcademies: action.data };
+            break;
         default:
           break
     }

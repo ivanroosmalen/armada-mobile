@@ -42,7 +42,7 @@ export default class ProfileScreen extends React.Component {
         })
   }
 
-  async componentWillMount() {
+  async componentDidMount() {
     await this.props.getUser(this.props.route.params.id);
     this.setState({
         userIsOwner: this.props.route.params.id === this.props.loggedInUser._id

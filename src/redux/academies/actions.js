@@ -1,9 +1,9 @@
-import axios from 'axios';
 import AcademyService from '../../http/academy-service.js';
 
 const service = new AcademyService('academies');
 const ACADEMIES = 'ACADEMIES';
 const ACADEMY = 'ACADEMY';
+const USER_ACADEMIES = 'USER_ACADEMIES';
 
 export function list(params, options) {
   return async function(dispatch) {
@@ -43,5 +43,12 @@ export function remove(id, options) {
 export function updateProfileImage(id, data, options = {}) {
   return async function(dispatch) {
     return service.updateProfileImage(id, data, options);
+  }
+}
+
+export function getUserAcademies(id, params, options) {
+  return async function(dispatch) {
+    let response = await service.getUserAcademies(id, params, options);
+    dispatch({type: USER_ACADEMIES, data: response.data.entity});
   }
 }

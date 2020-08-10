@@ -109,7 +109,7 @@ export default class ProfileEditScreen extends React.Component {
       submit = async () => {
             if(this.validate()) {
                 await this.props.updateUser(this.props.loggedInUser._id, this.state.editingUser);
-                this.props.navigation.navigate('Profile', { id: this.props.loggedInUser._id })
+                this.props.navigation.goBack();
             }
       }
 

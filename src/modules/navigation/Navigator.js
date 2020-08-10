@@ -16,13 +16,6 @@ const s3Service = new S3Service();
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const drawerData = [
-  {
-    name: 'Home',
-    icon: 'home',
-  }
-];
-
 const Drawer = createDrawerNavigator();
 
 async function selectImage() {
@@ -53,8 +46,6 @@ function CustomDrawerContent(props) {
   let currentUser = state.users.loggedInUser;
   let placeholderImage = 'https://armada-user-images.s3.amazonaws.com/default/thumbnail.jpg'
 
-  if(currentUser.)
-
   return (
     <DrawerContentScrollView {...props} style={{padding: 0}}>
       {currentUser && currentUser._id && (
@@ -81,25 +72,46 @@ function CustomDrawerContent(props) {
           </View>
       )}
 
-      {drawerData.map((item, idx) => (
         <DrawerItem
-          key={`drawer_item-${idx+1}`}
+          key={`account`}
           label={() => (
             <View
               style={styles.menuLabelFlex}>
-                    <Icon
-                          name={item.icon}
+                <Icon
+                          name="home"
                           style={{
                             fontSize: 20,
                             color: 'white'
                           }}
                         />
-              <Text style={styles.menuTitle}>{item.name}</Text>
+              <Text style={styles.menuTitle}>Home</Text>
             </View>
           )}
-          onPress={() => props.navigation.navigate(item.name)}
+          onPress={() => props.navigation.navigate('Home')}
         />
-      ))}
+
+      {currentUser && (
+        <View>
+            <DrawerItem
+              key={`account`}
+              label={() => (
+                <View
+                  style={styles.menuLabelFlex}>
+                    <Icon
+                              name="mixed-martial-arts"
+                              style={{
+                                fontSize: 20,
+                                color: 'white'
+                              }}
+                            />
+                  <Text style={styles.menuTitle}>My Academies</Text>
+                </View>
+              )}
+              onPress={() => props.navigation.navigate('UserAcademies', { id: currentUser._id })}
+            />
+        </View>
+      )}
+
       <View style={styles.divider} />
       {currentUser && (
         <View>
