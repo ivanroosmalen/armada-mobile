@@ -19,6 +19,7 @@ import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
 import { RadioGroup, GridRow, Button } from '../../components';
 import UserElement from '../profile/UserElement';
+import moment from 'moment';
 
 export default class AcademyScreen extends React.Component {
 
@@ -49,7 +50,11 @@ export default class AcademyScreen extends React.Component {
   async componentDidMount() {
     await Promise.all([
         this.props.getAcademy(this.props.route.params.id),
-        this.props.list({academyId: this.props.route.params.id, entityType: 'class'})
+        this.props.list({
+            academyId: this.props.route.params.id,
+            startDate: moment().format('YYYY-MM-DD'),
+            endDate: moment().add(31, 'days').format('YYYY-MM-DD')
+        })
     ])
 
     await this.setState({
@@ -68,6 +73,7 @@ export default class AcademyScreen extends React.Component {
   };
   render() {
       let academy = this.props.academy;
+      let classes = this.props.classes;
       return (
         <View style={styles.container}>
           <ImageBackground
@@ -125,10 +131,10 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.expandingRow}>
                     <Text style={styles.itemLabel}>Next class</Text>
                     <View>
-                        {!!this.props.classes && !!this.props.classes.length && (
+                        {!!classes && !!classes.length && (
                             <View style={styles.scheduleContent}>
                                 <Text style={styles.textContent}>
-                                    {'Monday'}
+                                    {moment(classes.startDate).format('dddd DD MMM') }
                                 </Text>
                                 <Button
                                     secondary
@@ -141,7 +147,7 @@ export default class AcademyScreen extends React.Component {
                             </View>
                         )}
 
-                        {!this.props.classes || !this.props.classes.length && (
+                        {!classes || !classes.length && (
                             <View style={styles.scheduleContent}>
                                 <Text style={styles.textContent}>
                                     {'No schedule yet'}
@@ -194,7 +200,7 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>Students ({academy && academy.students && academy.students.length})</Text>
+                    <Text style={styles.itemLabel}>Members ({academy && academy.students && academy.students.length})</Text>
 
                     <FlatList
                           horizontal

@@ -33,10 +33,6 @@ export default class ClassEditScreen extends React.Component {
         },
         isValid: false,
         editingClass: { instructors: [], schedule: {} },
-        martialArtIndex: 0,
-        locationIndex: 0,
-        instructorIndex: 0,
-        intervalIndex: 1,
         isStartDatePickerVisible: false,
         isEndDatePickerVisible: false,
         intervals: ['daily', 'weekly', 'monthly', 'yearly'],
@@ -54,8 +50,7 @@ export default class ClassEditScreen extends React.Component {
           this.state.editingClass.martialArt = this.props.academy.martialArts[index].name;
 
           this.setState({
-              editingClass: this.state.editingClass,
-              martialArtIndex: index
+              editingClass: this.state.editingClass
           })
         }
 
@@ -63,8 +58,7 @@ export default class ClassEditScreen extends React.Component {
           this.state.editingClass.location = this.props.academy.locations[index];
 
           this.setState({
-              editingClass: this.state.editingClass,
-              locationIndex: index
+              editingClass: this.state.editingClass
           })
         }
 
@@ -81,8 +75,7 @@ export default class ClassEditScreen extends React.Component {
           this.state.editingClass.instructors.push(inst);
 
           this.setState({
-              editingClass: this.state.editingClass,
-              instructorIndex: index
+              editingClass: this.state.editingClass
           })
         }
 
@@ -92,8 +85,7 @@ export default class ClassEditScreen extends React.Component {
           this.state.editingClass.schedule.interval = interval;
 
           this.setState({
-              editingClass: this.state.editingClass,
-              intervalIndex: index
+              editingClass: this.state.editingClass
           })
         }
 
@@ -134,16 +126,22 @@ export default class ClassEditScreen extends React.Component {
 
       submit = async () => {
             if(this.validate()) {
-                let classId = '';
-                if(this.props.route.params && this.props.route.params.id) {
-                    await this.props.updateClass(this.props.class._id, this.state.editingClass);
-                    classId = this.props.class._id
+                let entity;
+                let isCreating = !(this.props.class && this.props.class._id);
+
+                if(this.state.editingClass._id) {
+                    entity = await this.props.updateClass(this.state.editingClass._id, this.state.editingClass);
                 } else {
-                    let entity = await this.props.createClass(this.state.editingClass);
-                    classId = entity._id
+                    entity = await this.props.createClass(this.state.editingClass);
                 }
 
-                this.props.navigation.goBack();
+                if(isCreating) {
+                    this.props.navigation.pop(1);
+                } else {
+                    this.props.navigation.pop(2);
+                }
+
+                this.props.navigation.navigate('Class', { id: entity._id, academyId: entity.academyId, startDate: entity.schedule.startDate, endDate: entity.schedule.endDate })
             }
       }
 
@@ -181,13 +179,25 @@ export default class ClassEditScreen extends React.Component {
           schedule: {
               startDate: new Date(),
               endDate: new Date(),
-              interval: this.state.intervals[0]
+              interval: this.state.intervals[1]
           },
           martialArt: this.props.academy.martialArts && this.props.academy.martialArts.length && this.props.academy.martialArts[0].name,
-          location: this.props.academy.locations && this.props.academy.locations.length && this.props.academy.locations[0],
-          academyId: this.props.academy._id
+          location: this.props.academy.locations && this.props.academy.locations.length && this.props.academy.locations[0]
         }
         let editingClass = this.props.class || defaults;
+        editingClass.academyId = this.props.academy._id;
+
+        if(this.props.route.params.singleItem) {
+            editingClass.parentId = editingClass._id;
+            editingClass._id = undefined;
+            editingClass.schedule.recurring = false;
+
+            if(this.props.route.params.startDate && this.props.route.params.endDate) {
+                editingClass.schedule.startDate = moment(this.props.route.params.startDate).toDate();
+                editingClass.schedule.endDate = moment(this.props.route.params.endDate).toDate();
+                editingClass.excludeDate = moment(this.props.route.params.startDate).toDate();
+            }
+        }
 
         this.setState({
             editingClass,
@@ -257,6 +267,7 @@ export default class ClassEditScreen extends React.Component {
       let locationIndex = -1;
       let instructors = [];
       let instructorIndex = -1;
+      let intervalIndex = -1;
       this.props.academy && this.props.academy.martialArts && this.props.academy.martialArts.forEach((ma, index) => {
         martialArts.push(ma.name);
 
@@ -267,7 +278,6 @@ export default class ClassEditScreen extends React.Component {
 
       this.props.academy && this.props.academy.locations && this.props.academy.locations.forEach((loc, index) => {
         locations.push(loc.address);
-
         if(editingClass.location && loc.address === editingClass.location.address) {
             locationIndex = index;
         }
@@ -276,10 +286,16 @@ export default class ClassEditScreen extends React.Component {
       this.props.academy && this.props.academy.instructors && this.props.academy.instructors.forEach((inst, index) => {
         instructors.push(inst.alias);
 
-        if(editingClass.instructor && inst.alias === editingClass.instructor.alias) {
+        if(editingClass.instructors && editingClass.instructors.length && inst.alias === editingClass.instructors[0].alias) {
             instructorIndex = index;
         }
       });
+
+      if(editingClass.schedule.interval) {
+            intervalIndex = this.state.intervals.indexOf(editingClass.schedule.interval);
+      }
+
+      let classSize = (this.state.editingClass.classSize !== null && this.state.editingClass.classSize !== undefined) ? this.state.editingClass.classSize.toString() : '';
 
       return (
 
@@ -310,11 +326,19 @@ export default class ClassEditScreen extends React.Component {
                       numberOfLines={6}
                     />
 
+                    <TextInput
+                      placeholder="Class size (empty for unlimited)"
+                      style={styles.textInput}
+                      value={classSize}
+                      onChangeText={val => this.onChangeText('classSize', val)}
+                      keyboardType={'numeric'}
+                    />
+
                     <View style={{alignSelf: 'stretch'}}>
                         <Dropdown
                             style={{ backgroundColor: colors.white }}
                             items={martialArts}
-                            selectedIndex={this.state.martialArtIndex}
+                            selectedIndex={martialArtIndex}
                             placeholder={'select a martial art'}
                             onSelect={(index) => { this.onMartialArtSelected(index) }}
                         />
@@ -322,7 +346,7 @@ export default class ClassEditScreen extends React.Component {
                         <Dropdown
                             style={{ backgroundColor: colors.white }}
                             items={locations}
-                            selectedIndex={this.state.locationIndex}
+                            selectedIndex={locationIndex}
                             placeholder={'select a location'}
                             onSelect={(index) => { this.onLocationSelected(index) }}
                         />
@@ -330,7 +354,7 @@ export default class ClassEditScreen extends React.Component {
                         <Dropdown
                             style={{ backgroundColor: colors.white }}
                             items={instructors}
-                            selectedIndex={this.state.instructorIndex}
+                            selectedIndex={instructorIndex}
                             placeholder={'select an instructor'}
                             onSelect={(index) => { this.onInstructorSelected(index) }}
                         />
@@ -392,7 +416,7 @@ export default class ClassEditScreen extends React.Component {
                             <Dropdown
                                 style={{ backgroundColor: colors.white }}
                                 items={this.state.intervals}
-                                selectedIndex={this.state.intervalIndex}
+                                selectedIndex={intervalIndex}
                                 placeholder={'select an interval'}
                                 onSelect={this.onIntervalSelected}
                             />

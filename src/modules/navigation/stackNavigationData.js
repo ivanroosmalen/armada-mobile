@@ -10,6 +10,7 @@ import UserAcademiesScreen from '../academies/UserAcademiesViewContainer';
 import ProfileScreen from '../profile/ProfileViewContainer';
 import ProfileEditScreen from '../profile/ProfileEditViewContainer';
 import ScheduleScreen from '../schedule/ScheduleViewContainer';
+import UserScheduleScreen from '../schedule/UserScheduleViewContainer';
 import ClassEditScreen from '../classes/ClassEditViewContainer';
 import ClassScreen from '../classes/ClassViewContainer';
 import UpdatePasswordScreen from '../auth/UpdatePasswordContainer';
@@ -119,6 +120,18 @@ const StackNavigationData = [
       fontSize: 18,
     }
   },
+  {
+        name: 'UserSchedule',
+        displayName: 'My Schedule',
+        component: UserScheduleScreen,
+        headerLeft: headerLeftComponent,
+        headerBackground: { source: headerBackground },
+        headerTitleStyle: {
+          fontFamily: fonts.primaryRegular,
+          color: colors.white,
+          fontSize: 18,
+        },
+      },
   {
     name: 'Class',
     displayName: 'Class',

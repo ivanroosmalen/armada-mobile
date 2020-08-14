@@ -55,6 +55,7 @@
     "react-native-render-html": "^4.2.0",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.4.0",
+    "react-native-simple-toast": "^1.1.2",
     "react-native-snap-carousel": "^3.7.5",
     "react-native-svg": "^9.3.1",
     "react-native-svg-charts": "^5.3.0",

@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-let classState = { classes: [], class: null };
+let classState = { classes: [], class: null, queryParams: {} };
 
 const classReducer = (state = classState, action) => {
      switch (action.type) {
@@ -9,6 +9,9 @@ const classReducer = (state = classState, action) => {
            break;
         case 'CLASS':
            state = { ...state, class: action.data };
+           break;
+         case 'QUERY_PARAMS':
+           state = { ...state, queryParams: action.data };
            break;
         default:
           break

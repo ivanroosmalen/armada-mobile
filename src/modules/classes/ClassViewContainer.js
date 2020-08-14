@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import ClassView from './ClassView';
 import { get as getAcademy }  from '../../redux/academies/actions.js'
-import { get, update, create, attend, unattend } from '../../redux/classes/actions.js'
+import { get, update, create, remove, attend, unattend } from '../../redux/classes/actions.js'
 
 export default compose(
   connect(
@@ -18,5 +18,7 @@ export default compose(
       getClass: (id) => dispatch(get(id)),
       attend: (data) => dispatch(attend(data)),
       unattend: (data) => dispatch(unattend(data)),
+      removeClass: (id) => dispatch(remove(id)),
+      updateClass: (id, entity) => dispatch(update(id, entity)),
     })
   ))(ClassView);

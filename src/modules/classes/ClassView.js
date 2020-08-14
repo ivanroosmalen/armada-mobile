@@ -22,7 +22,10 @@ import UserElement from '../profile/UserElement';
 export default class ClassScreen extends React.Component {
 
   state = {
-    dialogVisible: false
+    editDialogVisible: false,
+    deleteDialogVisible: false,
+    deleteConfirmationDialogVisible: false,
+    deleteSingleItem: true
   }
 
   async componentDidMount() {
@@ -33,16 +36,62 @@ export default class ClassScreen extends React.Component {
   }
 
   onEditPressed() {
-    if(this.props.class.recurring) {
-        this.setState({ dialogVisible: true });
+    if(this.props.class.schedule.recurring) {
+        this.setState({ editDialogVisible: true });
     } else {
         this.props.navigation.navigate('ClassEdit', { id: this.props.class._id, academyId: this.props.academy._id })
     }
   }
 
   onDetailedEditPressed(singleItem) {
-        this.setState({ dialogVisible: false });
-        this.props.navigation.navigate('ClassEdit', { id: this.props.class._id, academyId: this.props.academy._id, singleItem })
+        this.setState({ editDialogVisible: false });
+        this.props.navigation.navigate('ClassEdit', {
+             id: this.props.class._id,
+             academyId: this.props.academy._id,
+             startDate: this.props.route.params.startDate,
+             endDate: this.props.route.params.endDate,
+             singleItem
+         })
+    }
+
+  onDeletePressed() {
+    if(this.props.class.schedule.recurring) {
+        this.setState({ deleteDialogVisible: true });
+    } else {
+        this.setState({ deleteConfirmationDialogVisible: true });
+    }
+  }
+
+    onDetailedRemovePressed(singleItem) {
+        this.setState({
+            deleteDialogVisible: false,
+            deleteConfirmationDialogVisible: true,
+            deleteSingleItem: singleItem
+        });
+    }
+
+    async onDeleteConfirmationPressed(confirm) {
+        let state = {
+            deleteConfirmationDialogVisible: false,
+        };
+
+        if(confirm) {
+            if(!this.props.class.schedule.recurring || !this.state.deleteSingleItem) {
+                await this.props.removeClass(this.props.class._id);
+            } else {
+                let classObj = this.props.class;
+                classObj.schedule.excludes = classObj.schedule.excludes || [];
+                classObj.schedule.excludes.push(moment(this.props.route.params.startDate).toDate())
+
+                await this.props.updateClass(this.props.class._id, classObj);
+            }
+
+            this.props.navigation.pop(1);
+        } else {
+            state.deleteSingleItem = false;
+        }
+
+        this.setState(state);
     }
 
   onAttendPressed() {
@@ -70,13 +119,18 @@ export default class ClassScreen extends React.Component {
   };
 
   render() {
-      let classObj = this.props.class || {};
+      let classObj = this.props.class || { schedule: {} };
       let startDate = this.props.route.params.startDate;
       let endDate = this.props.route.params.endDate;
 
       let userIsOwner = !!(this.props.academy && this.props.academy.owners && this.props.academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
       let userIsStudent = !!(this.props.academy && this.props.academy.students && this.props.academy.students.find(student => student._id === this.props.loggedInUser._id));
       let userIsAttending = !!(classObj.attendees && classObj.attendees.find(attendee => attendee._id === this.props.loggedInUser._id));
+      let classIsFull = classObj.attendees && classObj.attendees.length === classObj.classSize;
+
+      if(moment(classObj.schedule.startDate).valueOf() !== moment(startDate).valueOf()) {
+        classObj.attendees = [];
+      }
 
       return (
         <View style={styles.container}>
@@ -122,11 +176,12 @@ export default class ClassScreen extends React.Component {
                           data={classObj && classObj.instructors}
                           renderItem={this._getRenderItemFunction}
                       />
+
               </View>
               <View style={styles.hr} />
 
               <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>Attending ({classObj && classObj.attendees && classObj.attendees.length})</Text>
+                    <Text style={styles.itemLabel}>Attending ({classObj && classObj.attendees && classObj.attendees.length}{classIsFull && ' - full'})</Text>
 
                     <FlatList
                           horizontal
@@ -136,21 +191,8 @@ export default class ClassScreen extends React.Component {
                           renderItem={this._getRenderItemFunction}
                       />
               </View>
-
-            </ScrollView>
-          </View>
-                <View>
-                {userIsOwner && (
-                      <Button
-                        secondary
-                        rounded
-                        small
-                        style={ styles.editButton }
-                        caption="Edit"
-                        onPress={ () => (this.onEditPressed()) }
-                      />
-                )}
-                {!userIsAttending && userIsStudent && (
+              <View style={styles.attendContainer}>
+                {!userIsAttending && userIsStudent && !classIsFull && (
                       <Button
                         secondary
                         rounded
@@ -171,17 +213,42 @@ export default class ClassScreen extends React.Component {
                         onPress={ () => (this.onUnattendPressed()) }
                       />
                 )}
+              </View>
+            </ScrollView>
 
-                </View>
+          </View>
+                <View style={ styles.buttonContainer }>
+                    {userIsOwner && (
+                          <Button
+                            secondary
+                            rounded
+                            small
+                            style={ styles.actionButton }
+                            caption="Edit"
+                            onPress={ () => (this.onEditPressed()) }
+                          />
+                    )}
 
-                        <Modal isVisible={this.state.dialogVisible} onBackdropPress={() => (this.setState({ dialogVisible: false }))}>
+                    {userIsOwner && (
+                          <Button
+                            secondary
+                            rounded
+                            small
+                            style={ styles.actionButton }
+                            caption="Delete"
+                            onPress={ () => (this.onDeletePressed()) }
+                          />
+                    )}
+
+          </View>
+                        <Modal isVisible={this.state.editDialogVisible} onBackdropPress={() => (this.setState({ editDialogVisible: false }))}>
                             <View>
                               <Button
                                 secondary
                                 rounded
                                 small
                                 style={ styles.editDetailsButton }
-                                caption="Update all future events"
+                                caption="Update entire series"
                                 onPress={() => this.onDetailedEditPressed(false)}
                               />
 
@@ -191,7 +258,51 @@ export default class ClassScreen extends React.Component {
                                 small
                                 style={ styles.editDetailsButton }
                                 caption="Update this event"
-                                onPress={() => this.onDetailedEditPressed(false)}
+                                onPress={() => this.onDetailedEditPressed(true)}
+                              />
+                          </View>
+                        </Modal>
+
+                        <Modal isVisible={this.state.deleteDialogVisible} onBackdropPress={() => (this.setState({ deleteDialogVisible: false }))}>
+                            <View>
+                              <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.editDetailsButton }
+                                caption="Remove entire series"
+                                onPress={() => this.onDetailedRemovePressed(false)}
+                              />
+
+                              <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.editDetailsButton }
+                                caption="Remove this event"
+                                onPress={() => this.onDetailedRemovePressed(true)}
+                              />
+                          </View>
+                        </Modal>
+
+                        <Modal isVisible={this.state.deleteConfirmationDialogVisible} onBackdropPress={() => (this.onDeleteConfirmationPressed(false))}>
+                            <View>
+                              <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.editDetailsButton }
+                                caption="Confirm delete"
+                                onPress={() => this.onDeleteConfirmationPressed(true)}
+                              />
+
+                              <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.editDetailsButton }
+                                caption="Cancel"
+                                onPress={() => this.onDeleteConfirmationPressed(false)}
                               />
                           </View>
                         </Modal>
@@ -317,11 +428,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     marginTop: 15
   },
-  editButton: {
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 20
+  },
+  actionButton: {
     width: 150,
-    position: 'absolute',
-    bottom: 20,
-    right: 20
+//    position: 'absolute',
+//    bottom: 20,
+//    right: 20
   },
   attendButton: {
     width: 150,
@@ -333,6 +451,9 @@ const styles = StyleSheet.create({
     width: 300,
     marginTop: 30,
     alignSelf: 'center'
+  },
+  attendContainer: {
+    marginTop: 40
   }
 });
 

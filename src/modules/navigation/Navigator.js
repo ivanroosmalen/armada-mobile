@@ -109,6 +109,24 @@ function CustomDrawerContent(props) {
               )}
               onPress={() => props.navigation.navigate('UserAcademies', { id: currentUser._id })}
             />
+
+            <DrawerItem
+              key={`account`}
+              label={() => (
+                <View
+                  style={styles.menuLabelFlex}>
+                    <Icon
+                              name="calendar"
+                              style={{
+                                fontSize: 20,
+                                color: 'white'
+                              }}
+                            />
+                  <Text style={styles.menuTitle}>My Schedule</Text>
+                </View>
+              )}
+              onPress={() => props.navigation.navigate('UserSchedule', { id: currentUser._id })}
+            />
         </View>
       )}
 
