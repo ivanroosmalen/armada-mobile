@@ -1,12 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Button, Alert } from 'react-native';
-import { ExpandableCalendar, AgendaList, CalendarProvider, WeekCalendar, Agenda } from 'react-native-calendars';
+import { ExpandableCalendar, AgendaList, CalendarProvider, WeekCalendar, Agenda, LocaleConfig } from 'react-native-calendars';
 
 import { colors, fonts } from '../../styles';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 import Toast from 'react-native-simple-toast';
 import { useNavigation } from '@react-navigation/native';
+import { translate, setLocateConfig } from '../../translations/index.js';
 
   function renderEmptyDate() {
     return (
@@ -44,13 +44,15 @@ import { useNavigation } from '@react-navigation/native';
           </View>
           <Text style={styles.itemTitleText}>{item.description}</Text>
           <View style={styles.itemButtonContainer}>
-            <Button color={item.isAttending ? 'blue' : (item.isFull ? 'red' : 'grey')} title={`${item.numberOfAttendees} attending`} onPress={() => buttonPressed(item)}/>
+            <Button color={item.isAttending ? 'blue' : (item.isFull ? 'red' : 'grey')} title={`${item.numberOfAttendees} ${translate('attending')}`} onPress={() => buttonPressed(item)}/>
           </View>
         </TouchableOpacity>
       );
     }
 
 export default function ScheduleElement(props) {
+    setLocateConfig(LocaleConfig);
+
     const navigation = useNavigation();
 
     buttonPressed = (item) => {
@@ -62,7 +64,7 @@ export default function ScheduleElement(props) {
             props.unattend(data);
         } else {
             if(item.isFull) {
-                Toast.showWithGravity('Class is full', Toast.LONG, Toast.TOP);
+                Toast.showWithGravity(translate('classFull'), Toast.LONG, Toast.TOP);
                 return;
             }
 
@@ -132,12 +134,6 @@ export default function ScheduleElement(props) {
         />
       </CalendarProvider>
 
-          <Icon
-              name="plus-circle"
-              style={styles.addIcon}
-              onPress={() => props.navigation.navigate('ClassEdit', { academyId: props.route.params.id })}
-            />
-
       </View>
     );
 
@@ -189,14 +185,6 @@ const styles = StyleSheet.create({
     color: 'lightgrey',
     fontSize: 14
   },
-  addIcon: {
-        fontSize: 35,
-        position: 'absolute',
-        bottom: 15,
-        right: 15,
-        backgroundColor: 'white',
-        borderRadius: 20
-      },
   modalText: {
     fontSize: 30,
     color: 'white',

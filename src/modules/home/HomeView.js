@@ -10,23 +10,11 @@ import { fonts, colors } from '../../styles';
 import { Text } from '../../components/StyledText';
 
 export default function HomeScreen({ isExtended, setIsExtended }) {
-  // const rnsUrl = 'https://reactnativestarter.com';
-  // const handleClick = () => {
-  //   Linking.canOpenURL(rnsUrl).then(supported => {
-  //     if (supported) {
-  //       Linking.openURL(rnsUrl);
-  //     } else {
-  //       console.log(`Don't know how to open URI: ${rnsUrl}`);
-  //     }
-  //   });
-  // };
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require('../../../assets/images/background.png')}
-        style={styles.bgImage}
-        resizeMode="cover"
+      <View
+        style={styles.background}
       >
         <View style={styles.section}>
           <Text size={20} white>
@@ -52,7 +40,7 @@ export default function HomeScreen({ isExtended, setIsExtended }) {
 
           </Text>
         </View>
-      </ImageBackground>
+      </View>
     </View>
   );
 }
@@ -63,10 +51,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
   },
-  bgImage: {
+  background: {
     flex: 1,
     marginHorizontal: -20,
-    alignSelf: 'stretch'
+    alignSelf: 'stretch',
+    backgroundColor: colors.secondaryBackground
   },
   section: {
     flex: 1,

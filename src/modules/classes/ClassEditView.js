@@ -19,8 +19,7 @@ import { fonts, colors } from '../../styles';
 import { TextInput, Button, Dropdown } from '../../components';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import CheckBox from 'react-native-check-box'
-
-import isEmail from 'validator/lib/isEmail';
+import { translate } from '../../translations/index.js';
 
 export default class ClassEditScreen extends React.Component {
 
@@ -35,7 +34,22 @@ export default class ClassEditScreen extends React.Component {
         editingClass: { instructors: [], schedule: {} },
         isStartDatePickerVisible: false,
         isEndDatePickerVisible: false,
-        intervals: ['daily', 'weekly', 'monthly', 'yearly'],
+        intervals: [{
+                value: 'daily',
+                display: translate('daily')
+            },
+            {
+                value: 'weekly',
+                display: translate('weekly')
+            },
+            {
+                value: 'monthly',
+                display: translate('monthly')
+            },
+            {
+                value: 'yearly',
+                display: translate('yearly')
+            }],
       };
 
         onChangeText = async (key, val) => {
@@ -82,7 +96,7 @@ export default class ClassEditScreen extends React.Component {
         onIntervalSelected = (index) => {
           let interval = this.state.intervals[index];
 
-          this.state.editingClass.schedule.interval = interval;
+          this.state.editingClass.schedule.interval = interval.value;
 
           this.setState({
               editingClass: this.state.editingClass
@@ -179,7 +193,7 @@ export default class ClassEditScreen extends React.Component {
           schedule: {
               startDate: new Date(),
               endDate: new Date(),
-              interval: this.state.intervals[1]
+              interval: this.state.intervals[1].value
           },
           martialArt: this.props.academy.martialArts && this.props.academy.martialArts.length && this.props.academy.martialArts[0].name,
           location: this.props.academy.locations && this.props.academy.locations.length && this.props.academy.locations[0]
@@ -292,7 +306,12 @@ export default class ClassEditScreen extends React.Component {
       });
 
       if(editingClass.schedule.interval) {
-            intervalIndex = this.state.intervals.indexOf(editingClass.schedule.interval);
+            intervalIndex = 0;
+            this.state.intervals.forEach((interval, i) => {
+                if(interval.value === editingClass.schedule.interval) {
+                    intervalIndex = i;
+                }
+            });
       }
 
       let classSize = (this.state.editingClass.classSize !== null && this.state.editingClass.classSize !== undefined) ? this.state.editingClass.classSize.toString() : '';
@@ -311,14 +330,14 @@ export default class ClassEditScreen extends React.Component {
                   >
 
                     <TextInput
-                      placeholder="Name"
+                      placeholder={ translate('name') }
                       style={styles.textInput}
                       value={this.state.editingClass.name}
                       onChangeText={val => this.onChangeText('name', val)}
                     />
 
                     <TextInput
-                      placeholder="Description"
+                      placeholder={ translate('description') }
                       style={styles.textAreaInput}
                       value={this.state.editingClass.description}
                       onChangeText={val => this.onChangeText('description', val)}
@@ -327,7 +346,7 @@ export default class ClassEditScreen extends React.Component {
                     />
 
                     <TextInput
-                      placeholder="Class size (empty for unlimited)"
+                      placeholder={ translate('classSize') }
                       style={styles.textInput}
                       value={classSize}
                       onChangeText={val => this.onChangeText('classSize', val)}
@@ -339,7 +358,7 @@ export default class ClassEditScreen extends React.Component {
                             style={{ backgroundColor: colors.white }}
                             items={martialArts}
                             selectedIndex={martialArtIndex}
-                            placeholder={'select a martial art'}
+                            placeholder={ translate('selectMartialArt') }
                             onSelect={(index) => { this.onMartialArtSelected(index) }}
                         />
 
@@ -347,7 +366,7 @@ export default class ClassEditScreen extends React.Component {
                             style={{ backgroundColor: colors.white }}
                             items={locations}
                             selectedIndex={locationIndex}
-                            placeholder={'select a location'}
+                            placeholder={ translate('selectLocation') }
                             onSelect={(index) => { this.onLocationSelected(index) }}
                         />
 
@@ -355,7 +374,7 @@ export default class ClassEditScreen extends React.Component {
                             style={{ backgroundColor: colors.white }}
                             items={instructors}
                             selectedIndex={instructorIndex}
-                            placeholder={'select an instructor'}
+                            placeholder={ translate('selectInstructor') }
                             onSelect={(index) => { this.onInstructorSelected(index) }}
                         />
 
@@ -408,16 +427,16 @@ export default class ClassEditScreen extends React.Component {
                             isChecked={!!this.state.editingClass.schedule.recurring}
                         />
 
-                        <Text style={{color: 'black'}}> Recurring </Text>
+                        <Text style={{color: 'black'}}> { translate('recurring') } </Text>
                     </View>
 
                     {!!this.state.editingClass.schedule.recurring && (
                         <View  style={{alignSelf: 'stretch'}}>
                             <Dropdown
                                 style={{ backgroundColor: colors.white }}
-                                items={this.state.intervals}
+                                items={this.state.intervals.map(interval => interval.display)}
                                 selectedIndex={intervalIndex}
-                                placeholder={'select an interval'}
+                                placeholder={ translate('selectInterval') }
                                 onSelect={this.onIntervalSelected}
                             />
                         </View>
@@ -442,7 +461,7 @@ export default class ClassEditScreen extends React.Component {
                              bottom: 10,
                              right: 10,
                              }}
-                            caption={ 'Save' }
+                            caption={ translate('save') }
                             onPress={this.submit}
                           />
                   </Animated.View>

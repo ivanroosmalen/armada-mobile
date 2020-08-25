@@ -13,7 +13,6 @@ class UserScheduleScreen extends React.Component {
     let academies = this.props.userAcademies || {};
     let academyIds = [];
     academies.owner && academies.owner.forEach(academy => {
-        console.log(academy)
         academyIds.push(academy._id)
     });
 

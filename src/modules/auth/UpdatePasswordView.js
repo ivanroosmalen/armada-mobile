@@ -13,6 +13,7 @@ import {
 
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
+import { translate } from '../../translations/index.js';
 
 export default class UpdatePasswordScreen extends React.Component {
 
@@ -46,14 +47,14 @@ export default class UpdatePasswordScreen extends React.Component {
         this.state.isValid = true;
 
         if(!this.state.entity.oldPassword) {
-            this.state.errors.oldPasswordError = 'You must provide a valid old password';
+            this.state.errors.oldPasswordError = translate('provideOldPassword');
             this.state.isValid = false;
         } else {
             this.state.errors.oldPasswordError = '';
         }
 
         if(!this.state.entity.newPassword) {
-            this.state.errors.newPasswordError = 'You must provide a valid new password';
+            this.state.errors.newPasswordError = translate('provideNewPassword');
             this.state.isValid = false;
         } else {
             this.state.errors.newPasswordError = '';
@@ -72,7 +73,7 @@ export default class UpdatePasswordScreen extends React.Component {
                 if(response.status === 200) {
                     this.props.navigation.navigate('Home');
                 } else {
-                    this.state.errors.pageError = 'Could not update password';
+                    this.state.errors.pageError = translate('unableUpdatePassword');
                 }
         }
   }
@@ -127,10 +128,8 @@ export default class UpdatePasswordScreen extends React.Component {
 
   render() {
     return (
-      <ImageBackground
-        source={require('../../../assets/images/background.png')}
-        style={styles.backgroundImage}
-        resizeMode="cover"
+      <View
+        style={styles.background}
       >
         <View style={styles.container}>
           <View style={[styles.section, { paddingTop: 30 }]}>
@@ -141,7 +140,7 @@ export default class UpdatePasswordScreen extends React.Component {
                 this.state.isKeyboardVisible && { height: 90 },
                 this.fadeIn(0),
               ]}
-              source={require('../../../assets/images/white-logo.png')}
+              source={require('../../../assets/images/armada-logo-notext.png')}
             />
           </View>
 
@@ -150,7 +149,7 @@ export default class UpdatePasswordScreen extends React.Component {
           >
 
             <TextInput
-              placeholder="Old password"
+              placeholder={ translate('oldPassword') }
               secureTextEntry
               style={styles.textInput}
               onChangeText={val => this.onChangeText('oldPassword', val)}
@@ -161,7 +160,7 @@ export default class UpdatePasswordScreen extends React.Component {
             </Text>
 
             <TextInput
-              placeholder="New password"
+              placeholder={ translate('newPassword') }
               secureTextEntry
               style={styles.textInput}
               onChangeText={val => this.onChangeText('newPassword', val)}
@@ -178,18 +177,18 @@ export default class UpdatePasswordScreen extends React.Component {
                     {this.state.errors.pageError}
               </Text>
               <Button
-                bgColor="white"
-                textColor={colors.primary}
+                bgColor={ colors.primaryText }
+                textColor={ colors.primaryBackground }
                 secondary
                 rounded
                 style={{ alignSelf: 'stretch', marginBottom: 10 }}
-                caption={'Save'}
+                caption={ translate('save') }
                 onPress={this.submit}
               />
             </Animated.View>
           </Animated.View>
         </View>
-      </ImageBackground>
+      </View>
     );
   }
 }
@@ -201,8 +200,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 30,
   },
-  backgroundImage: {
+  background: {
     flex: 1,
+    backgroundColor: colors.primaryBackground
   },
   section: {
     flex: 1,
@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
   textInput: {
     alignSelf: 'stretch',
     marginTop: 20,
+    color: colors.primaryText
   },
   logo: {
     height: 150,

@@ -1,48 +1,41 @@
 import HomeScreen from '../home/HomeViewContainer';
 import AcademyListScreen from '../academies/AcademyListViewContainer';
-import CalendarScreen from '../calendar/CalendarViewContainer';
-import GridsScreen from '../grids/GridsViewContainer';
-import PagesScreen from '../pages/PagesViewContainer';
-import ComponentsScreen from '../components/ComponentsViewContainer';
+import { TouchableOpacity, Image } from 'react-native';
 
-const iconHome = require('../../../assets/images/tabbar/home.png');
-const iconCalendar = require('../../../assets/images/tabbar/calendar.png');
-const iconGrids = require('../../../assets/images/tabbar/grids.png');
-const iconPages = require('../../../assets/images/tabbar/pages.png');
-const iconComponents = require('../../../assets/images/tabbar/components.png');
+const headerLeftComponent = (props) => {
+        return (
+            <TouchableOpacity
+              onPress={props.onPress}
+              style={{
+                paddingLeft: 20,
+                width: 40
+              }}
+            >
+              <Image
+                source={require('../../../assets/images/icons/arrow-back.png')}
+                resizeMode="contain"
+                style={{
+                  height: 20,
+                  color: 'white'
+                }}
+              />
+            </TouchableOpacity>
+          )
+    }
 
 const tabNavigationData = [
   {
-    name: 'Home',
+    name: 'home',
     component: HomeScreen,
-    icon: iconHome,
+    icon: 'home',
+    headerLeft: null,
   },
   {
-      name: 'Academies',
-      displayName: 'Academies',
+      name: 'academies',
       component: AcademyListScreen,
-      icon: iconCalendar,
-    },
-  {
-    name: 'Calendar',
-    component: CalendarScreen,
-    icon: iconCalendar,
-  },
-  {
-    name: 'Grids',
-    component: GridsScreen,
-    icon: iconGrids,
-  },
-  {
-    name: 'Pages',
-    component: PagesScreen,
-    icon: iconPages,
-  },
-  {
-    name: 'Components',
-    component: ComponentsScreen,
-    icon: iconComponents,
-  },
+      icon: 'mixed-martial-arts',
+      headerLeft: headerLeftComponent,
+    }
 ];
 
 export default tabNavigationData;

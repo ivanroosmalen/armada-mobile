@@ -63,7 +63,7 @@ export default function RNSRadioGroup({
                 <View
                   style={{
                     height: 5,
-                    borderBottomColor: colors.primary,
+                    borderBottomColor: colors.secondaryText,
                     borderBottomWidth: 3,
                     position: 'absolute',
                   }}
@@ -80,9 +80,10 @@ const styles = {
   container: {
     flex: 1,
     flexDirection: 'row',
-    borderColor: colors.primary,
+    borderColor: colors.secondaryText,
     borderWidth: 1,
     borderRadius: 5,
+    backgroundColor: colors.terciaryBackground
   },
   underline: {
     borderWidth: 0,
@@ -95,25 +96,25 @@ const styles = {
   },
   itemUnderline: {
     borderBottomWidth: 0.5,
-    borderBottomColor: '#e3e3e3',
+    borderBottomColor: colors.quaternaryText,
   },
   itemActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryBackground,
   },
   itemActiveUnderline: {
     borderBottomWidth: 2,
-    borderBottomColor: colors.primary,
+    borderBottomColor: colors.secondaryText,
   },
   text: {
-    color: colors.primary,
+    color: colors.secondaryText,
   },
   textUnderline: {
-    color: '#a6a6a6',
+    color: colors.quaternaryText,
   },
   textActive: {
-    color: colors.white,
+    color: colors.secondaryText,
   },
   textActiveUnderline: {
-    color: colors.primary,
+    color: colors.secondaryText,
   },
 };

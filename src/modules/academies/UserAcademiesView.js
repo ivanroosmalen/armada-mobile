@@ -17,6 +17,7 @@ import { RadioGroup } from '../../components';
 import settings from '../../settings.js';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { translate } from '../../translations/index.js';
 
 import AcademyElement from './AcademyElement';
 
@@ -28,15 +29,15 @@ export default class UserAcademiesScreen extends React.Component {
     academyTypeObjs: [
         {
           key: 'student',
-          displayName: 'Student at'
+          displayName: translate('studentAt')
         },
         {
           key: 'instructor',
-          displayName: 'Instructor at'
+          displayName: translate('instructorAt')
         },
         {
           key: 'owner',
-          displayName: 'Owner at'
+          displayName: translate('ownerAt')
         }
     ],
     selectedIndex: 0
@@ -88,17 +89,17 @@ export default class UserAcademiesScreen extends React.Component {
             {!academyTypes.length && (
                 <View>
                 <Text style={styles.noData}>
-                    {'Create your academy'}
+                    {translate('createAcademy')}
                 </Text>
 
                 {!!this.props.loggedInUser && (
-                <Icon
-                    name="plus-circle"
-                    style={styles.addIconEmpty}
-                    onPress={() => this.props.navigation.navigate('AcademyCreate')}
-                  />
-                )}
-
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('AcademyCreate')} style={ styles.addButtonEmpty }>
+                    <Icon
+                        name="plus-circle"
+                        style={styles.addIconEmpty}
+                      />
+                </TouchableOpacity>
+                    )}
                 </View>
             )}
 
@@ -122,11 +123,12 @@ export default class UserAcademiesScreen extends React.Component {
                 />
 
                 {!!this.props.loggedInUser && (
-                <Icon
-                    name="plus-circle"
-                    style={styles.addIcon}
-                    onPress={() => this.props.navigation.navigate('AcademyCreate')}
-                  />
+                    <TouchableOpacity onPress={() => this.props.navigation.navigate('AcademyCreate')} style={ styles.addButton }>
+                        <Icon
+                            name="plus-circle"
+                            style={styles.addIcon}
+                          />
+                    </TouchableOpacity>
                 )}
                 </View>
             )}
@@ -151,17 +153,25 @@ const styles = StyleSheet.create({
   },
   addIcon: {
     fontSize: 35,
+    backgroundColor: colors.iconBackground,
+    color: colors.secondaryIcon,
+    borderRadius: 20
+  },
+  addButton: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: 'white',
+    bottom: 12,
+    right: 12,
     borderRadius: 20
   },
   addIconEmpty: {
     fontSize: 35,
-    backgroundColor: 'white',
+    backgroundColor: colors.iconBackground,
+    color: colors.secondaryIcon,
     borderRadius: 20,
     alignSelf: 'center'
+  },
+  addButtonEmpty: {
+    borderRadius: 20
   },
   noData: {
     fontSize: 20,

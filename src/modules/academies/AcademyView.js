@@ -7,6 +7,7 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  TouchableHighlight,
   Image,
   Dimensions,
   ImageBackground
@@ -14,18 +15,22 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
 import ImagePicker from 'react-native-image-picker'
-import Icon from 'react-native-vector-icons/Entypo';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
 import { RadioGroup, GridRow, Button } from '../../components';
+import ModalDropdown from 'react-native-modal-dropdown';
 import UserElement from '../profile/UserElement';
 import moment from 'moment';
+import Modal from 'react-native-modal';
+import { translate } from '../../translations/index.js';
 
 export default class AcademyScreen extends React.Component {
 
   state = {
-      userIsOwner: false,
-      placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg'
+      placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg',
+      cancelMembershipDialog: false,
+      menuEntities:[]
   }
 
   async selectImage() {
@@ -47,6 +52,39 @@ export default class AcademyScreen extends React.Component {
         })
   }
 
+  menuOptionSelected(menuEntity) {
+        switch(menuEntity) {
+            case 'edit':
+                this.props.navigation.navigate('AcademyEdit', { id: this.props.academy._id });
+            break;
+            case 'updateImage':
+                this.selectImage();
+            break;
+            case 'join':
+                this.createAcademyRequest()
+            break;
+            case 'cancelRequest':
+                this.removeAcademyRequest()
+            break;
+            case 'cancelMembership':
+                this.setState({ cancelMembershipDialog: true })
+            break;
+        }
+  }
+
+  async createAcademyRequest() {
+    this.props.createAcademyRequest({ academy: { _id: this.props.academy._id, name: this.props.academy.name } });
+  }
+
+  async removeAcademyRequest() {
+    this.props.removeAcademyRequest(this.props.academyRequest._id);
+  }
+
+  async cancelMembership() {
+    this.props.cancelMembership(this.props.academy._id);
+    this.setState({ cancelMembershipDialog: false })
+  }
+
   async componentDidMount() {
     await Promise.all([
         this.props.getAcademy(this.props.route.params.id),
@@ -54,12 +92,9 @@ export default class AcademyScreen extends React.Component {
             academyId: this.props.route.params.id,
             startDate: moment().format('YYYY-MM-DD'),
             endDate: moment().add(31, 'days').format('YYYY-MM-DD')
-        })
+        }),
+        this.props.getByAcademyId(this.props.route.params.id, { complete: false, approved: false })
     ])
-
-    await this.setState({
-        userIsOwner: !!(this.props.academy && this.props.academy.owners && this.props.academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
-    })
   }
 
   _getRenderItemFunction = ({ item }) => {
@@ -74,6 +109,47 @@ export default class AcademyScreen extends React.Component {
   render() {
       let academy = this.props.academy;
       let classes = this.props.classes;
+      if(classes) {
+          classes.sort((a, b) => {
+            if(!a.schedule) return -1;
+            if(!b.schedule) return 1;
+
+           return moment(a.schedule.startDate) > moment(b.schedule.startDate) ? 1 : -1
+          })
+      }
+
+      let academyRequest = this.props.academyRequest;
+
+      let isLoggedIn = this.props.loggedInUser;
+      let isStudent = this.props.loggedInUser && academy.students && !!academy.students.find(student => (student._id === this.props.loggedInUser._id));
+      let userIsOwner = !!(academy && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
+
+      menuOptions = [];
+      menuEntities = [];
+
+      if(userIsOwner) {
+        menuOptions.push(translate('edit'));
+        menuEntities.push('edit');
+
+        menuOptions.push(translate('updateAcademyImage'));
+        menuEntities.push('updateImage');
+      }
+
+      if(!userIsOwner && !isStudent && !academyRequest) {
+        menuOptions.push(translate('join'));
+        menuEntities.push('join');
+      }
+
+      if(!userIsOwner && academyRequest) {
+        menuOptions.push(translate('cancelRequest'));
+        menuEntities.push('cancelRequest');
+      }
+
+      if(!userIsOwner && isStudent) {
+        menuOptions.push(translate('cancelMembership'));
+        menuEntities.push('cancelMembership');
+      }
+
       return (
         <View style={styles.container}>
           <ImageBackground
@@ -82,41 +158,44 @@ export default class AcademyScreen extends React.Component {
             style={[styles.section, styles.header]}
           >
 
-          {this.state.userIsOwner && (
-              <Icon
-                style={[styles.demoIcon, { opacity: 1, position: 'absolute', top:10, right: 10 }]}
-                name="camera"
-                size={25}
-                color="#111111"
-                onPress={() => this.selectImage()}
-              />
-          )}
-
-            <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
               <Text style={styles.title}>{academy && academy.name}</Text>
             </View>
 
-            <View style={{ flexDirection: 'row' }}>
-                {this.state.userIsOwner && (
-
-                      <Button
-                        secondary
-                        rounded
-                        small
-                        caption="Edit"
-                        onPress={() => this.props.navigation.navigate('AcademyEdit', { id: this.props.academy._id })}
+          {isLoggedIn && (
+              <View style={ styles.optionsMenu }>
+                  <TouchableOpacity onPress={() => this.optionsMenu.show()}>
+                      <Icon
+                        name="dots-horizontal"
+                        size={25}
+                        color={colors.secondaryIcon}
                       />
+                  </TouchableOpacity>
 
-                )}
-            </View>
+                  <ModalDropdown ref={(el) => {this.optionsMenu = el}}
+                          options={ menuOptions }
+                          renderRow={text => (
+                            <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText }}>
+                              <Text>{text}</Text>
+                            </View>
+                          )}
+                          dropdownStyle={{ height: menuEntities.length * 40 }}
+                          onSelect={(index) => this.menuOptionSelected(menuEntities[index])}
+                        >
+                    <View>
+                      <Text>
+                      </Text>
+                    </View>
+                   </ModalDropdown>
 
-
+              </View>
+          )}
           </ImageBackground>
 
           <View style={styles.section}>
             <ScrollView>
               <View style={styles.expandingRow}>
-                    <Text style={styles.itemLabel}>Styles</Text>
+                    <Text style={styles.itemLabel}>{ translate('styles') }</Text>
                     <View style={styles.multilineText}>
                         {academy && academy.martialArts && academy.martialArts.map(ma =>
                         <Text style={styles.textContent}>
@@ -129,40 +208,43 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.expandingRow}>
-                    <Text style={styles.itemLabel}>Next class</Text>
+                    <Text style={styles.itemLabel}>{ translate('nextClass') }</Text>
                     <View>
                         {!!classes && !!classes.length && (
                             <View style={styles.scheduleContent}>
                                 <Text style={styles.textContent}>
-                                    {moment(classes.startDate).format('dddd DD MMM') }
+                                    {moment(classes[0].schedule.startDate).format('dddd DD MMM') }
                                 </Text>
-                                <Button
-                                    secondary
-                                    rounded
-                                    small
-                                    style={{width: 150}}
-                                    caption="Schedule"
+
+                                <TouchableOpacity
                                     onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
+                                >
+                                  <Icon
+                                    name="calendar"
+                                    size={30}
+                                    color={colors.secondaryIcon}
                                   />
+                                </TouchableOpacity>
+
                             </View>
                         )}
 
                         {!classes || !classes.length && (
                             <View style={styles.scheduleContent}>
                                 <Text style={styles.textContent}>
-                                    {'No schedule yet'}
+                                    { translate('noSchedule') }
                                 </Text>
 
-                                {!!this.state.userIsOwner && (
-                                    <Button
-                                        secondary
-                                        rounded
-                                        small
-                                        style={{width: 150}}
-                                        caption="Schedule"
-                                        onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
-                                      />
-
+                                {!!userIsOwner && (
+                                <TouchableOpacity
+                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
+                                >
+                                  <Icon
+                                    name="calendar"
+                                    size={30}
+                                    color={colors.secondaryIcon}
+                                  />
+                                </TouchableOpacity>
                                 )}
 
                             </View>
@@ -174,7 +256,7 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.expandingRow}>
-                    <Text style={styles.itemLabel}>Locations</Text>
+                    <Text style={styles.itemLabel}>{ translate('locations') }</Text>
                     <View style={styles.multilineText}>
                     {academy && academy.locations && academy.locations.map(location => (
                         <Text style={styles.textContent}>
@@ -187,7 +269,7 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>Instructors ({academy && academy.instructors && academy.instructors.length})</Text>
+                    <Text style={styles.itemLabel}>{ translate('instructors') } ({academy && academy.instructors && academy.instructors.length})</Text>
 
                     <FlatList
                           horizontal
@@ -200,7 +282,7 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>Members ({academy && academy.students && academy.students.length})</Text>
+                    <Text style={styles.itemLabel}>{ translate('members') } ({academy && academy.students && academy.students.length})</Text>
 
                     <FlatList
                           horizontal
@@ -213,6 +295,28 @@ export default class AcademyScreen extends React.Component {
 
             </ScrollView>
           </View>
+
+                        <Modal isVisible={this.state.cancelMembershipDialog} onBackdropPress={() => (this.setState({ cancelMembershipDialog: false }))}>
+                            <View>
+                              <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.cancelMembershipButton }
+                                caption={ translate('confirm') }
+                                onPress={() => this.cancelMembership()}
+                              />
+
+                              <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.cancelMembershipButton }
+                                caption={ translate('cancel') }
+                                onPress={() => this.setState({ cancelMembershipDialog: false })}
+                              />
+                          </View>
+                        </Modal>
 
         </View>
       );
@@ -231,6 +335,7 @@ const styles = StyleSheet.create({
   section: {
     flex: 4,
     position: 'relative',
+    backgroundColor: colors.secondaryBackground
   },
 
   itemLabel: {
@@ -238,15 +343,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     position: 'absolute',
     top: 10,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    color: colors.terciaryText
   },
   title: {
-    color: colors.white,
+    color: colors.primaryText,
     fontFamily: fonts.primaryBold,
     fontSize: 25,
     letterSpacing: 0.04,
-    marginBottom: 10,
-    backgroundColor: 'rgba(65, 131, 215, 0.6)',
+    backgroundColor: colors.primaryBackgroundTransparent,
     alignSelf: 'flex-start',
     borderRadius: 15,
     borderColor: 'rgb(65, 131, 215)',
@@ -275,7 +380,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
   },
   textContent: {
-    paddingTop: 10
+    paddingTop: 10,
+    color: colors.black
   },
   userRow: {
       alignItems: 'center',
@@ -304,6 +410,25 @@ const styles = StyleSheet.create({
   imageContainer: {
     backgroundColor: colors.white,
     marginTop: 15
+  },
+  cancelMembershipButton: {
+    width: 300,
+    marginTop: 30,
+    alignSelf: 'center'
+  },
+  optionsMenu: {
+    opacity: 1,
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    color: colors.secondaryIcon,
+    backgroundColor: colors.iconBackground,
+    borderRadius: 30,
+    width: 28,
+    height: 28,
+    textAlign: 'center',
+    alignItems: 'center',
+    zIndex: 100
   }
 });
 

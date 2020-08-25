@@ -1,10 +1,12 @@
 import UserService from '../../http/user-service.js';
 import { store } from '../store.js';
+import AsyncStorage from '@react-native-community/async-storage';
 const userService = new UserService('users');
 const USERS = 'USERS';
 const USER = 'USER';
 const JWT = 'JWT';
 const LOGGED_IN_USER = 'LOGGED_IN_USER';
+const TRANSLATIONS = 'TRANSLATIONS';
 
 export function list(params, options) {
   return async function(dispatch) {
@@ -23,7 +25,7 @@ export function get(id, params, options) {
 export function create(entity, options) {
   return async function (dispatch) {
     let response = await userService.create(entity, options);
-    await get(response.data.entity._id);
+    await dispatch(get(response.data.entity._id));
   }
 }
 
@@ -43,8 +45,12 @@ export function remove(id, options) {
 export function login(entity) {
   return async function(dispatch) {
     let response = await userService.login(entity);
-    dispatch({type: JWT, data: response && response.data && response.data.entity && response.data.entity.jwt});
-    dispatch({type: LOGGED_IN_USER, data: response && response.data && response.data.entity && response.data.entity.user});
+    let jwt = response && response.data && response.data.entity && response.data.entity.jwt;
+    let user = response && response.data && response.data.entity && response.data.entity.user;
+
+    await dispatch(setLoggedInUser(user));
+    await dispatch(setJwt(jwt));
+
     return response;
   }
 }
@@ -57,10 +63,32 @@ export function logout(entity) {
         userService.logout();
     }
 
-    dispatch({type: JWT, data: null});
-    dispatch({type: LOGGED_IN_USER, data: null});
+    await dispatch(setLoggedInUser(null));
+    await dispatch(setJwt(null));
   }
 }
+
+  export function setLoggedInUser(user) {
+   return async function(dispatch) {
+     dispatch({type: LOGGED_IN_USER, data: user});
+     try {
+       await AsyncStorage.setItem('loggedInUser', user ? JSON.stringify(user) : '');
+     } catch (err) {
+       console.error('Unable to set async storage');
+     }
+   }
+ }
+
+ export function setJwt(jwt) {
+   return async function(dispatch) {
+     dispatch({type: JWT, data: jwt});
+     try {
+       await AsyncStorage.setItem('jwt', jwt || '');
+     } catch (err) {
+       console.error('Unable to set async storage');
+     }
+   }
+ }
 
 export function register(entity) {
   return async function(dispatch) {

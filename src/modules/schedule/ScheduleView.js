@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, Button, Alert } from 'react-n
 
 import { colors, fonts } from '../../styles';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import ScheduleElement from './ScheduleElement';
 
@@ -21,6 +22,12 @@ class ScheduleScreen extends React.Component {
     return (
       <View style={{flex: 1}}>
         <ScheduleElement classes={this.props.classes} loggedInUser={this.props.loggedInUser} attend={this.props.attend} unattend={this.props.unattend}/>
+
+        <Icon
+              name="plus-circle"
+              style={styles.addIcon}
+              onPress={() => this.props.navigation.navigate('ClassEdit', { academyId: this.props.route.params.id })}
+            />
       </View>
     );
   }
@@ -28,3 +35,14 @@ class ScheduleScreen extends React.Component {
 
 
 export default ScheduleScreen;
+
+const styles = StyleSheet.create({
+  addIcon: {
+        fontSize: 35,
+        position: 'absolute',
+        bottom: 15,
+        right: 15,
+        backgroundColor: 'white',
+        borderRadius: 20
+      }
+});

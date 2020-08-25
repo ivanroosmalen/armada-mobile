@@ -3,7 +3,8 @@ import { compose, lifecycle } from 'recompose';
 import { connect } from 'react-redux';
 
 import AcademyView from './AcademyView';
-import { get, updateProfileImage } from '../../redux/academies/actions.js'
+import { get, updateProfileImage, cancelMembership } from '../../redux/academies/actions.js';
+import { create, remove, getByAcademyId } from '../../redux/academyRequests/actions.js'
 import { list } from '../../redux/classes/actions.js'
 
 export default compose(
@@ -12,11 +13,16 @@ export default compose(
     return ({
       loggedInUser: state.users.loggedInUser,
       academy: state.academies.academy,
-      classes: state.classes.classes
+      classes: state.classes.classes,
+      academyRequest: state.academyRequests.academyRequest
     })},
     dispatch => ({
       getAcademy: (id) => dispatch(get(id)),
       updateProfileImage: (id, data) => dispatch(updateProfileImage(id, data)),
       list: (params) => dispatch(list(params)),
+      createAcademyRequest: (data) => dispatch(create(data)),
+      removeAcademyRequest: (id) => dispatch(remove(id)),
+      getByAcademyId: (id, params) => dispatch(getByAcademyId(id, params)),
+      cancelMembership: (id) => dispatch(cancelMembership(id))
     }),
   ))(AcademyView);

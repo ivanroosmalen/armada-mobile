@@ -16,6 +16,7 @@ import Modal from 'react-native-modal';
 import { colors, fonts } from '../../styles';
 import moment from 'moment';
 import { Button } from '../../components';
+import { translate } from '../../translations/index.js';
 
 import UserElement from '../profile/UserElement';
 
@@ -167,7 +168,7 @@ export default class ClassScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>Instructor</Text>
+                    <Text style={styles.itemLabel}>{ translate('instructor') }</Text>
 
                     <FlatList
                           horizontal
@@ -181,7 +182,7 @@ export default class ClassScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>Attending ({classObj && classObj.attendees && classObj.attendees.length}{classIsFull && ' - full'})</Text>
+                    <Text style={styles.itemLabel}>{ translate('attending') } ({classObj && classObj.attendees && classObj.attendees.length}{classIsFull && ' - full'})</Text>
 
                     <FlatList
                           horizontal
@@ -198,7 +199,7 @@ export default class ClassScreen extends React.Component {
                         rounded
                         small
                         style={ styles.attendButton }
-                        caption="Attend"
+                        caption={ translate('attend') }
                         onPress={ () => (this.onAttendPressed()) }
                       />
                 )}
@@ -209,7 +210,7 @@ export default class ClassScreen extends React.Component {
                         rounded
                         small
                         style={ styles.attendButton }
-                        caption="Unattend"
+                        caption={ translate('unattend') }
                         onPress={ () => (this.onUnattendPressed()) }
                       />
                 )}
@@ -224,7 +225,7 @@ export default class ClassScreen extends React.Component {
                             rounded
                             small
                             style={ styles.actionButton }
-                            caption="Edit"
+                            caption={ translate('edit') }
                             onPress={ () => (this.onEditPressed()) }
                           />
                     )}
@@ -235,7 +236,7 @@ export default class ClassScreen extends React.Component {
                             rounded
                             small
                             style={ styles.actionButton }
-                            caption="Delete"
+                            caption={ translate('delete') }
                             onPress={ () => (this.onDeletePressed()) }
                           />
                     )}
@@ -248,7 +249,7 @@ export default class ClassScreen extends React.Component {
                                 rounded
                                 small
                                 style={ styles.editDetailsButton }
-                                caption="Update entire series"
+                                caption={ translate('updateSeries') }
                                 onPress={() => this.onDetailedEditPressed(false)}
                               />
 
@@ -257,7 +258,7 @@ export default class ClassScreen extends React.Component {
                                 rounded
                                 small
                                 style={ styles.editDetailsButton }
-                                caption="Update this event"
+                                caption={ translate('updateEvent') }
                                 onPress={() => this.onDetailedEditPressed(true)}
                               />
                           </View>
@@ -270,7 +271,7 @@ export default class ClassScreen extends React.Component {
                                 rounded
                                 small
                                 style={ styles.editDetailsButton }
-                                caption="Remove entire series"
+                                caption={ translate('removeSeries') }
                                 onPress={() => this.onDetailedRemovePressed(false)}
                               />
 
@@ -279,7 +280,7 @@ export default class ClassScreen extends React.Component {
                                 rounded
                                 small
                                 style={ styles.editDetailsButton }
-                                caption="Remove this event"
+                                caption={ translate('removeEvent') }
                                 onPress={() => this.onDetailedRemovePressed(true)}
                               />
                           </View>
@@ -292,7 +293,7 @@ export default class ClassScreen extends React.Component {
                                 rounded
                                 small
                                 style={ styles.editDetailsButton }
-                                caption="Confirm delete"
+                                caption={ translate('confirmDelete') }
                                 onPress={() => this.onDeleteConfirmationPressed(true)}
                               />
 
@@ -301,7 +302,7 @@ export default class ClassScreen extends React.Component {
                                 rounded
                                 small
                                 style={ styles.editDetailsButton }
-                                caption="Cancel"
+                                caption={ translate('cancel') }
                                 onPress={() => this.onDeleteConfirmationPressed(false)}
                               />
                           </View>
@@ -437,12 +438,9 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     width: 150,
-//    position: 'absolute',
-//    bottom: 20,
-//    right: 20
   },
   attendButton: {
-    width: 150,
+    width: 180,
     position: 'absolute',
     bottom: 20,
     left: 20

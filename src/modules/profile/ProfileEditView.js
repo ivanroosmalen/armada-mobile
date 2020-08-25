@@ -16,7 +16,9 @@ import LinearGradient from 'react-native-linear-gradient';
 import MonthPicker from 'react-native-month-year-picker';
 import moment from 'moment';
 import { RadioGroup, Dropdown } from '../../components';
+import MultiSelect from 'react-native-multiple-select';
 import MatComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { translate } from '../../translations/index.js';
 
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
@@ -66,6 +68,22 @@ export default class ProfileEditScreen extends React.Component {
             }
           };
 
+          onSelectedMAs = selectedMAs => {
+            let martialArts = [];
+            selectedMAs.forEach(selectedMA => {
+                let existingMa = this.state.editingUser.martialArts.find(ma => {
+                    return ma.name === selectedMA
+                })
+
+                existingMa ? martialArts.push(existingMa) : martialArts.push({ name: selectedMA});
+            })
+            this.state.editingUser.martialArts = martialArts;
+            this.setState({
+                editingUser: this.state.editingUser,
+                selectedMANames: selectedMAs
+            });
+          };
+
         setMartialArt(index) {
             this.setState({
                 selectedMAIndex: index,
@@ -93,7 +111,7 @@ export default class ProfileEditScreen extends React.Component {
             this.state.isValid = true;
 
             if(!this.state.editingUser.alias) {
-                this.state.errors.aliasError = 'You must provide a valid alias';
+                this.state.errors.aliasError = translate('aliasError');
                 this.state.isValid = false;
             } else {
                 this.state.errors.aliasError = '';
@@ -113,42 +131,6 @@ export default class ProfileEditScreen extends React.Component {
             }
       }
 
-      addNewMartialArt = async (index) => {
-        if(this.state.editingUser.martialArts.find(ma => ma.name === this.state.martialArtList[index])) {
-            return; //MA already exists for user
-        }
-
-         let martialArt = this.props.martialArts.find(ma => {
-            return ma.name === this.state.martialArtList[index];
-         })
-
-         if(!martialArt) {
-            return;
-         }
-
-          this.state.selectedMANames.push(this.state.martialArtList[index]);
-
-          this.state.editingUser.martialArts.push(martialArt);
-          await this.setState({
-            editingUser: this.state.editingUser,
-            selectedMANames: this.state.selectedMANames
-          })
-
-      }
-
-    removeMartialArt = async (index) => {
-          console.log(index)
-          this.state.editingUser.martialArts.splice(index, 1);
-          this.state.selectedMANames.splice(index, 1);
-          console.log(this.state.selectedMANames)
-          this.setState({
-            editingUser: this.state.editingUser,
-            selectedMANames: this.state.selectedMANames,
-            selectedMAIndex: 0
-          })
-
-      }
-
       async getData() {
         return Promise.all([
             this.props.getMartialArts(),
@@ -159,7 +141,9 @@ export default class ProfileEditScreen extends React.Component {
       async componentDidMount() {
         await this.getData();
 
-        let martialArtList = this.props.martialArts && this.props.martialArts.map(ma => ma.name).sort()
+        let martialArtList = this.props.martialArts.sort((a, b) => {
+            return a.name < b.name ? -1 : 1;
+        });
         let user = this.props.user || {};
         let martialArts = user.martialArts || [];
         let martialArtNames = martialArts.map(ma => ma.name)
@@ -217,12 +201,14 @@ export default class ProfileEditScreen extends React.Component {
       }
 
   render() {
+        let editingUser = this.state.editingUser || {};
+        let martialArts = editingUser.martialArts;
+        let selectedMAs = editingUser.martialArts && editingUser.martialArts.map(ma => ma.name);
+
       return (
 
-        <ImageBackground
-                source={require('../../../assets/images/background.png')}
-                style={styles.backgroundImage}
-                resizeMode="cover"
+        <View
+                style={styles.background}
               >
                 <View style={styles.container}>
 
@@ -231,7 +217,7 @@ export default class ProfileEditScreen extends React.Component {
                   >
 
                     <TextInput
-                      placeholder="Alias"
+                      placeholder={ translate('alias') }
                       style={styles.textInput}
                       value={this.state.editingUser.alias}
                       onChangeText={val => this.onChangeText('alias', val)}
@@ -244,14 +230,14 @@ export default class ProfileEditScreen extends React.Component {
                     }
 
                     <TextInput
-                      placeholder="First Name"
+                      placeholder={ translate('firstName') }
                       style={styles.textInput}
                       value={this.state.editingUser.firstName}
                       onChangeText={val => this.onChangeText('firstName', val)}
                     />
 
                     <TextInput
-                      placeholder="Last Name"
+                      placeholder={ translate('lastName') }
                       style={styles.textInput}
                       value={this.state.editingUser.lastName}
                       onChangeText={val => this.onChangeText('lastName', val)}
@@ -259,21 +245,25 @@ export default class ProfileEditScreen extends React.Component {
 
 
                         <View style={styles.maHeader}>
-                          <Dropdown
-                              style={{ width: 200, alignSelf: 'flex-start', backgroundColor: colors.white }}
+                            <MultiSelect
                               items={this.state.martialArtList}
-                              selectedIndex={this.state.selectedIndex}
-                              placeholder={'select a martial art'}
-                              onSelect={(index) => {this.setState({selectedIndex: index});}}
-                          />
-
-                        <MatComIcon
-                          name="plus-circle"
-                          style={{
-                            fontSize: 35,
-                          }}
-                          onPress={() => this.addNewMartialArt(this.state.selectedIndex)}
-                        />
+                              uniqueKey="name"
+                              hideTags
+                              onSelectedItemsChange={this.onSelectedMAs}
+                              selectedItems={selectedMAs}
+                              selectText={ translate('selectMartialArts') }
+                              searchInputPlaceholderText={ translate('searchMartialArts') }
+                              selectedItemTextColor={colors.quaternaryText}
+                              selectedItemIconColor={colors.quaternaryText}
+                              itemTextColor={colors.terciaryText}
+                              displayKey="name"
+                              searchInputStyle={{ color: colors.terciaryText }}
+                              submitButtonColor={colors.terciaryText}
+                              textColor={colors.primaryText}
+                              submitButtonText={ translate('submit') }
+                              styleMainWrapper={ styles.multiSelect }
+                              styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
+                            />
 
                         </View>
 
@@ -288,7 +278,7 @@ export default class ProfileEditScreen extends React.Component {
                                     />
 
                                 <TextInput
-                                  placeholder="Level"
+                                  placeholder={ translate('level') }
                                   style={styles.textInput}
                                   value={this.state.editingUser.martialArts[this.state.selectedMAIndex].level}
                                   onChangeText={val => this.onChangeLevel(val)}
@@ -298,7 +288,7 @@ export default class ProfileEditScreen extends React.Component {
 
                                 <View style={styles.dateSection}>
                                       <Text style={styles.dateText}>
-                                        {this.state.editingUser.martialArts[this.state.selectedMAIndex].startDate ? moment(this.state.editingUser.martialArts[this.state.selectedMAIndex].startDate).format('MMMM YYYY') : 'Start Date'}
+                                        {this.state.editingUser.martialArts[this.state.selectedMAIndex].startDate ? moment(this.state.editingUser.martialArts[this.state.selectedMAIndex].startDate).format('MMMM YYYY') : translate('startDate') }
                                       </Text>
 
                                           <Image
@@ -320,12 +310,6 @@ export default class ProfileEditScreen extends React.Component {
                                                 enableAutoDarkMode={false}
                                               />
                                             )}
-
-                                <MatComIcon
-                                  name="minus-circle"
-                                  style={styles.removeButton}
-                                  onPress={() => this.removeMartialArt(this.state.selectedMAIndex)}
-                                />
                             </View>
                         }
 
@@ -339,21 +323,21 @@ export default class ProfileEditScreen extends React.Component {
                         </Animated.View>
 
                       <Button
-                            bgColor="white"
-                            textColor={colors.primary}
+                            bgColor={colors.iconBackground}
+                            textColor={colors.secondaryIcon}
                             secondary
                             rounded
                             style={{
                              position: 'absolute',
                              bottom: 10,
-                             right: 10,
+                             right: 10
                              }}
                             caption={ 'Save' }
                             onPress={this.submit}
                           />
                   </Animated.View>
                 </View>
-              </ImageBackground>
+              </View>
       );
     }
   }
@@ -365,8 +349,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 30,
   },
-  backgroundImage: {
+  background: {
     flex: 1,
+    backgroundColor: colors.primaryBackground,
+    color: colors.primaryText
   },
   section: {
     flex: 1,
@@ -390,21 +376,9 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     marginTop: 20,
   },
-  logo: {
-    height: 150,
-  },
-  socialLoginContainer: {
-    flexDirection: 'row',
+  multiSelect: {
     alignSelf: 'stretch',
-    marginTop: 15,
-    justifyContent: 'space-between',
-  },
-  socialButton: {
-    flex: 1,
-  },
-  socialButtonCenter: {
-    marginLeft: 10,
-    marginRight: 10,
+    width: '100%'
   },
   martialArtRadio: {
       backgroundColor: 'white'
@@ -440,7 +414,5 @@ const styles = StyleSheet.create({
   removeButton: {
     fontSize: 35,
     alignSelf: 'flex-end'
-
-
   }
 });

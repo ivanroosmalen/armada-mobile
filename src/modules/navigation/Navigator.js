@@ -9,7 +9,7 @@ import NavigatorView from './RootNavigation';
 import { store } from '../../redux/store.js';
 import { colors } from '../../styles';
 import ImagePicker from 'react-native-image-picker'
-
+import { translate } from '../../translations/index.js';
 import { updateThumbnailImage } from '../../redux/users/actions';
 import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
@@ -19,9 +19,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const Drawer = createDrawerNavigator();
 
 async function selectImage() {
-        const state = store.getState();
-        const loggedInUser = state.users.loggedInUser
-
         const options = {
           noData: false,
           mediaType: 'photo'
@@ -46,6 +43,11 @@ function CustomDrawerContent(props) {
   let currentUser = state.users.loggedInUser;
   let placeholderImage = 'https://armada-user-images.s3.amazonaws.com/default/thumbnail.jpg'
 
+  let userAcademies = state.academies.userAcademies;
+  let isAcademyOwner = !!(userAcademies && userAcademies.owner && userAcademies.owner.length)
+  let academyRequests = state.academyRequests.academyRequests;
+  let hasAcademyRequests = !!(academyRequests && academyRequests.length)
+
   return (
     <DrawerContentScrollView {...props} style={{padding: 0}}>
       {currentUser && currentUser._id && (
@@ -66,7 +68,9 @@ function CustomDrawerContent(props) {
                     </View>
                 </TouchableOpacity>
               </View>
-          </View>)} />
+          </View>)}
+          onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}
+          />
 
           <View style={styles.divider} />
           </View>
@@ -81,10 +85,10 @@ function CustomDrawerContent(props) {
                           name="home"
                           style={{
                             fontSize: 20,
-                            color: 'white'
+                            color: colors.primaryIcon
                           }}
                         />
-              <Text style={styles.menuTitle}>Home</Text>
+              <Text style={styles.menuTitle}>{ translate('home') || 'home' }</Text>
             </View>
           )}
           onPress={() => props.navigation.navigate('Home')}
@@ -101,10 +105,10 @@ function CustomDrawerContent(props) {
                               name="mixed-martial-arts"
                               style={{
                                 fontSize: 20,
-                                color: 'white'
+                                color: colors.primaryIcon
                               }}
                             />
-                  <Text style={styles.menuTitle}>My Academies</Text>
+                  <Text style={styles.menuTitle}>{ translate('myAcademies') || 'My Academies' }</Text>
                 </View>
               )}
               onPress={() => props.navigation.navigate('UserAcademies', { id: currentUser._id })}
@@ -119,14 +123,34 @@ function CustomDrawerContent(props) {
                               name="calendar"
                               style={{
                                 fontSize: 20,
-                                color: 'white'
+                                color: colors.primaryIcon
                               }}
                             />
-                  <Text style={styles.menuTitle}>My Schedule</Text>
+                  <Text style={styles.menuTitle}>{ translate('mySchedule') || 'My Schedule' }</Text>
                 </View>
               )}
               onPress={() => props.navigation.navigate('UserSchedule', { id: currentUser._id })}
             />
+
+            { isAcademyOwner && (
+            <DrawerItem
+              key={`account`}
+              label={() => (
+                <View
+                  style={styles.menuLabelFlex}>
+                    <Icon
+                              name="account-alert-outline"
+                              style={{
+                                fontSize: 20,
+                                color: hasAcademyRequests ? 'red': colors.primaryIcon
+                              }}
+                            />
+                  <Text style={{  marginLeft: 10, color: hasAcademyRequests ? 'red': 'white' }}>{ translate('membershipRequests')  || 'Membership Requests' }</Text>
+                </View>
+              )}
+              onPress={() => props.navigation.navigate('AcademyRequestList')}
+            />
+            )}
         </View>
       )}
 
@@ -142,10 +166,10 @@ function CustomDrawerContent(props) {
                           name="account-edit"
                           style={{
                             fontSize: 20,
-                            color: 'white'
+                            color: colors.primaryIcon
                           }}
                         />
-              <Text style={styles.menuTitle}>Account</Text>
+              <Text style={styles.menuTitle}>{ translate('account') || 'Account'}</Text>
             </View>
           )}
           onPress={() => props.navigation.navigate('Account')}
@@ -158,10 +182,10 @@ function CustomDrawerContent(props) {
                           name="logout"
                           style={{
                             fontSize: 20,
-                            color: 'white'
+                            color: colors.primaryIcon
                           }}
                         />
-                <Text style={styles.menuTitle}>Logout</Text>
+                <Text style={styles.menuTitle}>{ translate('logout') || 'Logout' }</Text>
               </View>
             )}
             onPress={() =>  {
@@ -180,10 +204,10 @@ function CustomDrawerContent(props) {
                           name="login"
                           style={{
                             fontSize: 20,
-                            color: 'white'
+                            color: colors.primaryIcon
                           }}
                         />
-                      <Text style={styles.menuTitle}>Login / Register</Text>
+                      <Text style={styles.menuTitle}>{ translate('loginRegister') || 'Login / Register' }</Text>
                     </View>
                   )}
                   onPress={() => props.navigation.navigate('Auth')}
@@ -199,6 +223,7 @@ export default function App(props) {
       drawerStyle={{
         backgroundColor: colors.drawer,
       }}
+      drawerPosition={ 'right' }
       drawerContent={props => <CustomDrawerContent {...props} />}
     >
       <Drawer.Screen name="Homes" component={NavigatorView} />

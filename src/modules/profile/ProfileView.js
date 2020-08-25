@@ -1,11 +1,13 @@
 import React from 'react';
-import { StyleSheet, View, Text, ImageBackground, Image } from 'react-native';
+import { StyleSheet, View, Text, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import ImagePicker from 'react-native-image-picker'
-import Icon from 'react-native-vector-icons/Entypo';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RadioGroup } from '../../components';
+import ModalDropdown from 'react-native-modal-dropdown';
 import moment from 'moment';
 import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
+import { translate } from '../../translations/index.js';
 
 import { Button } from '../../components';
 import { fonts, colors } from '../../styles';
@@ -16,11 +18,25 @@ export default class ProfileScreen extends React.Component {
       martialArts: [],
       selectedIndex: 0,
       userIsOwner: false,
-      placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg'
+      placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg',
+      menuOptions: [translate('edit'), translate('updateProfileImage')]
   }
 
   getStudentAcademies(martialArt = {}) {
     return martialArt.studentAcademies || [];
+  }
+
+  menuOptionSelected(index) {
+    if(this.state) {
+        switch(this.state.menuOptions[index]) {
+            case 'Edit':
+                this.props.navigation.navigate('ProfileEdit', { id: this.props.loggedInUser._id });
+            break;
+            case 'Update profile image':
+                this.selectImage();
+            break;
+        }
+    }
   }
 
   async selectImage() {
@@ -62,34 +78,43 @@ export default class ProfileScreen extends React.Component {
           >
 
           {userIsOwner && (
-              <Icon
-                style={[styles.demoIcon, { opacity: 1, position: 'absolute', top:10, right: 10 }]}
-                name="camera"
-                size={25}
-                color="#111111"
-                onPress={() => this.selectImage()}
-              />
+              <View style={ styles.optionsMenu }>
+                  <TouchableOpacity onPress={() => this.optionsMenu.show()}>
+                      <Icon
+                        name="dots-horizontal"
+                        size={25}
+                        color={colors.secondaryIcon}
+                      />
+                  </TouchableOpacity>
+
+                  <ModalDropdown ref={(el) => {this.optionsMenu = el}}
+                          options={ this.state.menuOptions }
+                          renderRow={text => (
+                            <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText }}>
+                              <Text>{text}</Text>
+                            </View>
+                          )}
+                          dropdownStyle={{ height: 80 }}
+                          onSelect={(index) => this.menuOptionSelected(index)}
+                        >
+                    <View>
+                      <Text>
+                      </Text>
+                    </View>
+                   </ModalDropdown>
+
+              </View>
           )}
 
-            <View style={{ flex: 1, justifyContent: 'center' }}>
+            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
               <Text style={styles.alias}>{user.alias}</Text>
+
+              {(user.firstName || user.lastName) && (
               <View>
                 <Text style={styles.name}>{user.firstName} {user.lastName}</Text>
               </View>
+              )}
             </View>
-
-                {userIsOwner && (
-                    <View style={{ flexDirection: 'row' }}>
-                      <Button
-                        secondary
-                        rounded
-                        small
-                        caption="Edit"
-                        onPress={() => this.props.navigation.navigate('ProfileEdit', { id: this.props.loggedInUser._id })}
-                      />
-
-                    </View>
-                )}
 
           </ImageBackground>
           {!!(user.martialArts && user.martialArts.length) && (
@@ -102,24 +127,18 @@ export default class ProfileScreen extends React.Component {
               onChange={index => this.setState({selectedIndex: index})}
             />
 
-            <View style={{ flex: 1 }}>
+            <View style={{ flex: 1, backgroundColor: colors.secondaryBackground }}>
+
+
               <View style={styles.infoRow}>
-                    <Text style={styles.itemLabel}>Academy</Text>
-                    {this.getStudentAcademies(user.martialArts[this.state.selectedIndex]).map(academy =>
-                        <Text key={academy._id}>{academy.name} {academy.subcategory || ''}</Text>
-                    )}
+                <Text style={styles.itemLabel}>{ translate('level') } </Text>
+                <Text style={ styles.itemValue }>{user.martialArts[this.state.selectedIndex].level}</Text>
               </View>
               <View style={styles.hr} />
 
               <View style={styles.infoRow}>
-                <Text style={styles.itemLabel}>Level </Text>
-                <Text>{user.martialArts[this.state.selectedIndex].level}</Text>
-              </View>
-              <View style={styles.hr} />
-
-              <View style={styles.infoRow}>
-                <Text style={styles.itemLabel}>Started </Text>
-                <Text>{user.martialArts[this.state.selectedIndex].startDate ? moment(user.martialArts[this.state.selectedIndex].startDate).format("MMMM YYYY") : ''}</Text>
+                <Text style={styles.itemLabel}>{ translate('started') } </Text>
+                <Text style={ styles.itemValue }>{user.martialArts[this.state.selectedIndex].startDate ? moment(user.martialArts[this.state.selectedIndex].startDate).format("MMMM YYYY") : ''}</Text>
               </View>
               <View style={styles.hr} />
             </View>
@@ -148,22 +167,41 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   itemLabel: {
-    width: 100,
+    width: 200,
     fontWeight: 'bold',
+    color: colors.terciaryText,
+    top: 10,
+    left: 20,
+    position: 'absolute'
+  },
+  itemValue: {
+    color: colors.black,
   },
   alias: {
-    color: colors.white,
+    color: colors.primaryText,
     fontFamily: fonts.primaryBold,
     fontSize: 25,
     letterSpacing: 0.04,
     marginBottom: 10,
-    backgroundColor: 'rgba(65, 131, 215, 0.6)',
+    backgroundColor: colors.primaryBackgroundTransparent,
+    alignSelf: 'flex-start',
+    borderRadius: 15,
+    paddingLeft: 10,
+    paddingRight: 10,
+    height: 40
+  },
+  name: {
+    color: colors.primaryText,
+    fontFamily: fonts.primaryLight,
+    fontSize: 16,
+    marginBottom: 3,
+    backgroundColor: colors.primaryBackgroundTransparent,
     alignSelf: 'flex-start',
     borderRadius: 15,
     borderColor: 'rgb(65, 131, 215)',
     paddingLeft: 10,
     paddingRight: 10,
-    height: 40
+    height: 25
   },
   lightText: {
     color: colors.white,
@@ -180,9 +218,9 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flex: 1,
-    alignItems: 'center',
     paddingHorizontal: 20,
-    flexDirection: 'row',
+    flexDirection: 'column',
+    justifyContent: 'center'
   },
   hr: {
     borderBottomColor: '#e3e3e3',
@@ -202,19 +240,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 250,
-  },
-  name: {
-    color: colors.white,
-    fontFamily: fonts.primaryLight,
-    fontSize: 16,
-    marginBottom: 3,
-    backgroundColor: 'rgba(65, 131, 215, 0.6)',
-    alignSelf: 'flex-start',
-    borderRadius: 15,
-    borderColor: 'rgb(65, 131, 215)',
-    paddingLeft: 10,
-    paddingRight: 10,
-    height: 25
   },
   company: {
     color: colors.white,
@@ -241,5 +266,19 @@ const styles = StyleSheet.create({
   },
   noData: {
     height: 400
+  },
+  optionsMenu: {
+    opacity: 1,
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    color: colors.secondaryIcon,
+    backgroundColor: colors.iconBackground,
+    borderRadius: 30,
+    width: 28,
+    height: 28,
+    textAlign: 'center',
+    alignItems: 'center',
+    zIndex: 100
   }
 });

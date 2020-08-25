@@ -21,8 +21,7 @@ import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
 import MultiSelect from 'react-native-multiple-select';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-
-import isEmail from 'validator/lib/isEmail';
+import { translate, i18n } from '../../translations/index.js';
 
 export default class AcademyEditScreen extends React.Component {
 
@@ -49,6 +48,13 @@ export default class AcademyEditScreen extends React.Component {
 
         onSelectedMAs = selectedMAs => {
             this.state.editingAcademy.martialArts = selectedMAs.map(selectedMA => ({ name: selectedMA }))
+            this.setState({
+                editingAcademy: this.state.editingAcademy
+            });
+          };
+
+          onSelectedInstructors = selectedInstructors => {
+            this.state.editingAcademy.instructors = this.state.editingAcademy.students.filter(student => selectedInstructors.indexOf(student._id) !== -1);
             this.setState({
                 editingAcademy: this.state.editingAcademy
             });
@@ -85,7 +91,7 @@ export default class AcademyEditScreen extends React.Component {
             this.state.isValid = true;
 
             if(!this.state.editingAcademy.name) {
-                this.state.errors.nameError = 'You must provide a valid name';
+                this.state.errors.nameError = translate('nameError');
                 this.state.isValid = false;
             } else {
                 this.state.errors.nameError = '';
@@ -183,6 +189,7 @@ export default class AcademyEditScreen extends React.Component {
   render() {
       const { martialArtList, editingAcademy } = this.state;
       let selectedMAs = editingAcademy.martialArts && editingAcademy.martialArts.map(ma => ma.name);
+      let selectedInstructors = editingAcademy.instructors && editingAcademy.instructors.map(instructor => instructor._id) || [];
       let selectedLocations = editingAcademy.locations;
       autocompleteMinHeight = 50;
       return (
@@ -199,7 +206,7 @@ export default class AcademyEditScreen extends React.Component {
                   >
 
                     <TextInput
-                      placeholder="Name"
+                      placeholder={ translate('name') }
                       style={styles.textInput}
                       value={this.state.editingAcademy.name}
                       onChangeText={val => this.onChangeText('name', val)}
@@ -217,8 +224,8 @@ export default class AcademyEditScreen extends React.Component {
                       ref={(component) => { this.multiSelect = component }}
                       onSelectedItemsChange={this.onSelectedMAs}
                       selectedItems={selectedMAs}
-                      selectText="Select Martial Arts"
-                      searchInputPlaceholderText="Search Martial Arts"
+                      selectText={ translate('selectMartialArts') }
+                      searchInputPlaceholderText={ translate('searchMartialArts') }
                       tagRemoveIconColor="#CCC"
                       tagBorderColor="#CCC"
                       tagTextColor="#CCC"
@@ -228,14 +235,35 @@ export default class AcademyEditScreen extends React.Component {
                       displayKey="name"
                       searchInputStyle={{ color: '#CCC' }}
                       submitButtonColor="#CCC"
-                      submitButtonText="Submit"
+                      submitButtonText={ translate('submit') }
+                      styleMainWrapper={ styles.textInput }
+                    />
+
+                    <MultiSelect
+                      items={editingAcademy.students}
+                      uniqueKey="_id"
+                      ref={(component) => { this.multiSelect = component }}
+                      onSelectedItemsChange={ this.onSelectedInstructors }
+                      selectedItems={ selectedInstructors }
+                      selectText={ translate('selectInstructors') }
+                      searchInputPlaceholderText={ translate('searchMembers') }
+                      tagRemoveIconColor="#CCC"
+                      tagBorderColor="#CCC"
+                      tagTextColor="#CCC"
+                      selectedItemTextColor="#CCC"
+                      selectedItemIconColor="#CCC"
+                      itemTextColor="#000"
+                      displayKey="alias"
+                      searchInputStyle={{ color: '#CCC' }}
+                      submitButtonColor="#CCC"
+                      submitButtonText={ translate('submit') }
                       styleMainWrapper={ styles.textInput }
                     />
 
                     <View style={ styles.mapElement }>
                         <View style={{position: 'absolute', width: '100%'}}>
                             <GooglePlacesAutocomplete
-                              placeholder='Enter Address'
+                              placeholder={ translate('enterAddress') }
                               minLength={2}
                               autoFocus={false}
                               returnKeyType={'default'}
@@ -246,7 +274,7 @@ export default class AcademyEditScreen extends React.Component {
                               }}
                               query={{
                                 key: 'AIzaSyCLkz2qsPEvcoajtNSTyEBQcAl-X3f5Fr0',
-                                language: 'en',
+                                language: i18n.locale,
                               }}
                               styles={{
                                 container: {
@@ -317,7 +345,7 @@ export default class AcademyEditScreen extends React.Component {
                              bottom: 10,
                              right: 10,
                              }}
-                            caption={ 'Save' }
+                            caption={ translate('save') }
                             onPress={this.submit}
                           />
                   </Animated.View>

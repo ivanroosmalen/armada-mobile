@@ -21,6 +21,15 @@ class AcademyService extends BaseService {
 
                 return this.makeRequest(httpConfig, options)
             }
+
+    async cancelMembership(id, options) {
+                const httpConfig = {
+                    method: 'PATCH',
+                    url: this.buildURL(['cancel', id])
+                };
+
+                return this.makeRequest(httpConfig, options)
+            }
 }
 
 export default AcademyService;

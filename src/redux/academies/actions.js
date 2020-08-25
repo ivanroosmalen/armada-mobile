@@ -52,3 +52,11 @@ export function getUserAcademies(id, params, options) {
     dispatch({type: USER_ACADEMIES, data: response.data.entity});
   }
 }
+
+export function cancelMembership(id, options) {
+  return async function(dispatch) {
+    let response = await service.cancelMembership(id, options);
+    dispatch(get(id));
+    dispatch(list());
+  }
+}

@@ -13,7 +13,7 @@ import {
 
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
-
+import { translate, i18n } from '../../translations/index.js';
 import isEmail from 'validator/lib/isEmail';
 
 const FORM_STATES = {
@@ -30,7 +30,8 @@ export default class AuthScreen extends React.Component {
     formState: FORM_STATES.LOGIN,
     isKeyboardVisible: false,
     entity: {
-                email: ''
+                email: '',
+                locale: i18n.locale
             },
             errors: {
                 emailError: ''
@@ -53,7 +54,7 @@ export default class AuthScreen extends React.Component {
         this.state.isValid = true;
 
         if(!isEmail(this.state.entity.email)) {
-            this.state.errors.emailError = 'You must provide a valid email';
+            this.state.errors.emailError = translate('emailError');
             this.state.isValid = false;
         } else {
             this.state.errors.emailError = '';
@@ -80,7 +81,7 @@ export default class AuthScreen extends React.Component {
                     });
 
                 } else {
-                    this.state.errors.pageError = 'Unable to register. An account with this email may already exist';
+                    this.state.errors.pageError = translate('registerError');
                 }
             } else {
                 let response = await this.props.login(this.state.entity);
@@ -88,7 +89,7 @@ export default class AuthScreen extends React.Component {
                 if(response.status === 200) {
                     this.props.navigation.navigate('Home');
                 } else {
-                    this.state.errors.pageError = 'Unable to login. Make sure your credentials are correct';
+                    this.state.errors.pageError = translate('loginError');
                 }
             }
         }
@@ -148,10 +149,8 @@ export default class AuthScreen extends React.Component {
     const isRegister = this.state.formState === FORM_STATES.REGISTER;
 
     return (
-      <ImageBackground
-        source={require('../../../assets/images/background.png')}
-        style={styles.backgroundImage}
-        resizeMode="cover"
+      <View
+        style={styles.background}
       >
         <View style={styles.container}>
           <View style={[styles.section, { paddingTop: 30 }]}>
@@ -162,7 +161,7 @@ export default class AuthScreen extends React.Component {
                 this.state.isKeyboardVisible && { height: 90 },
                 this.fadeIn(0),
               ]}
-              source={require('../../../assets/images/white-logo.png')}
+              source={require('../../../assets/images/armada-logo-notext.png')}
             />
           </View>
 
@@ -186,7 +185,7 @@ export default class AuthScreen extends React.Component {
             {this.state.formState === FORM_STATES.LOGIN && (
                 <View style={{alignSelf: 'stretch'}}>
                     <TextInput
-                      placeholder="Password"
+                      placeholder={ translate('password') }
                       secureTextEntry
                       style={styles.textInput}
                       onChangeText={val => this.onChangeText('password', val)}
@@ -200,7 +199,7 @@ export default class AuthScreen extends React.Component {
 
             {(this.state.formState === FORM_STATES.LOGIN && this.state.submitSuccess) && (
                         <Text style={{ fontSize: 16, color: 'white'}}>
-                            {'Please check your email and log in with the password provided'}
+                            { translate('checkEmail') }
                         </Text>
                 )}
 
@@ -213,15 +212,15 @@ export default class AuthScreen extends React.Component {
                   </Text>
 
               <Button
-                bgColor="white"
-                textColor={colors.primary}
+                bgColor={ colors.secondaryBackground }
+                textColor={ colors.secondaryText }
                 secondary
                 rounded
                 style={{ alignSelf: 'stretch', marginBottom: 10 }}
                 caption={
                   this.state.formState === FORM_STATES.LOGIN
-                    ? 'Login'
-                    : 'Register'
+                    ? translate('login')
+                    : translate('register')
                 }
                 onPress={this.submit}
               />
@@ -242,22 +241,22 @@ export default class AuthScreen extends React.Component {
                 >
                   <Text
                     style={{
-                      color: colors.white,
+                      color: colors.primaryText,
                       fontFamily: fonts.primaryRegular,
                     }}
                   >
                     {isRegister
-                      ? 'Already have an account?'
-                      : "Don't have an account?"}
+                      ? translate('alreadyAccount')
+                      : translate('noAccount')}
                   </Text>
                   <Text
                     style={{
-                      color: colors.white,
+                      color: colors.primaryText,
                       fontFamily: fonts.primaryBold,
                       marginLeft: 5,
                     }}
                   >
-                    {isRegister ? 'Login' : 'Register'}
+                    {isRegister ? translate('login') : translate('register')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -274,14 +273,14 @@ export default class AuthScreen extends React.Component {
                       marginLeft: 5,
                     }}
                   >
-                    {'Forgot password'}
+                    {translate('forgotPassword')}
                   </Text>
                 </TouchableOpacity>
               )}
             </Animated.View>
           </Animated.View>
         </View>
-      </ImageBackground>
+      </View>
     );
   }
 }
@@ -293,8 +292,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 30,
   },
-  backgroundImage: {
+  background: {
     flex: 1,
+    backgroundColor: colors.primaryBackground
   },
   section: {
     flex: 1,
@@ -317,6 +317,7 @@ const styles = StyleSheet.create({
   textInput: {
     alignSelf: 'stretch',
     marginTop: 20,
+    color: colors.primaryText
   },
   logo: {
     height: 150,

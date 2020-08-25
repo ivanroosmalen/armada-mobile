@@ -2,10 +2,12 @@ import React from 'react';
 import { TouchableOpacity, Image } from 'react-native';
 
 import TabNavigator from './MainTabNavigator';
+import HomeScreen from '../home/HomeViewContainer';
 import AcademyScreen from '../academies/AcademyViewContainer';
 import AcademyEditScreen from '../academies/AcademyEditViewContainer';
 import AcademyCreateScreen from '../academies/AcademyCreateViewContainer';
 import AcademyListScreen from '../academies/AcademyListViewContainer';
+import AcademyRequestListScreen from '../academies/AcademyRequestListViewContainer';
 import UserAcademiesScreen from '../academies/UserAcademiesViewContainer';
 import ProfileScreen from '../profile/ProfileViewContainer';
 import ProfileEditScreen from '../profile/ProfileEditViewContainer';
@@ -15,35 +17,31 @@ import ClassEditScreen from '../classes/ClassEditViewContainer';
 import ClassScreen from '../classes/ClassViewContainer';
 import UpdatePasswordScreen from '../auth/UpdatePasswordContainer';
 import ForgotPasswordScreen from '../auth/ForgotPasswordContainer';
-import GalleryScreen from '../gallery/GalleryViewContainer';
-import ArticleScreen from '../article/ArticleViewContainer';
-import ChatScreen from '../chat/ChatViewContainer';
-import MessagesScreen from '../chat/MessagesViewContainer';
-import ChartsScreen from '../charts/ChartsViewContainer';
 import AuthScreen from '../auth/AuthViewContainer';
-import BlogScreen from '../blog/BlogContainer';
-import PostScreen from '../blog/PostView';
+import { translate } from '../../translations/index.js';
 
 import { colors, fonts } from '../../styles';
 
-const headerLeftComponent = (props) => {
-  return (
-    <TouchableOpacity
-      onPress={props.onPress}
-      style={{
-        paddingLeft: 10,
-      }}
-    >
-      <Image
-        source={require('../../../assets/images/icons/arrow-back.png')}
-        resizeMode="contain"
-        style={{
-          height: 20,
-        }}
-      />
-    </TouchableOpacity>    
-  )
-}
+    const headerLeftComponent = (props) => {
+        return (
+            <TouchableOpacity
+              onPress={props.onPress}
+              style={{
+                paddingLeft: 20,
+                width: 40
+              }}
+            >
+              <Image
+                source={require('../../../assets/images/icons/arrow-back.png')}
+                resizeMode="contain"
+                style={{
+                  height: 20,
+                  color: 'white'
+                }}
+              />
+            </TouchableOpacity>
+          )
+    }
 
 const headerBackground = require('../../../assets/images/topBarBg.png');
 
@@ -56,262 +54,218 @@ const StackNavigationData = [
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     },
   },
   {
-    name: 'Charts',
-    displayName: 'Charts',
-    component: ChartsScreen,
-    headerLeft: headerLeftComponent,
-    headerBackground: { source: headerBackground },
-    headerTitleStyle: {
-      fontFamily: fonts.primaryRegular,
-      color: colors.white,
-      fontSize: 18,
+      name: 'Home',
+      displayName: 'Armada',
+      component: TabNavigator,
+      headerLeft: null,
+      headerBackground: { source: headerBackground },
+      headerTitleStyle: {
+        fontFamily: fonts.primaryRegular,
+        color: colors.primaryText,
+        fontSize: 18,
+        height: 70
+      },
     },
-  },
-  {
-    name: 'Gallery',
-    displayName: 'Gallery',
-    component: GalleryScreen,
-    headerLeft: headerLeftComponent,
-    headerBackground: { source: headerBackground },
-    headerTitleStyle: {
-      fontFamily: fonts.primaryRegular,
-      color: colors.white,
-      fontSize: 18,
-    },
-  },
   {
     name: 'Profile',
-    displayName: 'Profile',
+    displayName: translate('profile'),
     component: ProfileScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70,
     },
   },
   {
     name: 'ProfileEdit',
-    displayName: 'Edit Profile',
+    displayName: translate('editProfile'),
     component: ProfileEditScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     },
   },
   {
     name: 'Schedule',
-    displayName: 'Schedule',
+    displayName: translate('schedule'),
     component: ScheduleScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     }
   },
   {
         name: 'UserSchedule',
-        displayName: 'My Schedule',
+        displayName: translate('mySchedule'),
         component: UserScheduleScreen,
         headerLeft: headerLeftComponent,
         headerBackground: { source: headerBackground },
         headerTitleStyle: {
           fontFamily: fonts.primaryRegular,
-          color: colors.white,
+          color: colors.primaryText,
           fontSize: 18,
+          height: 70
         },
       },
   {
     name: 'Class',
-    displayName: 'Class',
+    displayName: translate('class'),
     component: ClassScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     }
   },
   {
     name: 'ClassEdit',
-    displayName: 'Edit Class',
+    displayName: translate('editClass'),
     component: ClassEditScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     }
   },
   {
     name: 'Academy',
-    displayName: 'Academy',
+    displayName: translate('academy'),
     component: AcademyScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     },
   },
   {
         name: 'UserAcademies',
-        displayName: 'My Academies',
+        displayName: translate('myAcademies'),
         component: UserAcademiesScreen,
         headerLeft: headerLeftComponent,
         headerBackground: { source: headerBackground },
         headerTitleStyle: {
           fontFamily: fonts.primaryRegular,
-          color: colors.white,
+          color: colors.primaryText,
           fontSize: 18,
+          height: 70
         },
       },
   {
       name: 'AcademyList',
-      displayName: 'Academies',
+      displayName: translate('academies'),
       component: AcademyListScreen,
       headerLeft: headerLeftComponent,
       headerBackground: { source: headerBackground },
       headerTitleStyle: {
         fontFamily: fonts.primaryRegular,
-        color: colors.white,
+        color: colors.primaryText,
         fontSize: 18,
+        height: 70
       },
     },
     {
       name: 'AcademyEdit',
-      displayName: 'Edit Academy',
+      displayName: translate('editAcademy'),
       component: AcademyEditScreen,
       headerLeft: headerLeftComponent,
       headerBackground: { source: headerBackground },
       headerTitleStyle: {
         fontFamily: fonts.primaryRegular,
-        color: colors.white,
+        color: colors.primaryText,
         fontSize: 18,
+        height: 70
       },
     },
     {
-      name: 'AcademyCreate',
-      displayName: 'Create Academy',
-      component: AcademyCreateScreen,
+          name: 'AcademyCreate',
+          displayName: translate('editAcademy'),
+          component: AcademyCreateScreen,
+          headerLeft: headerLeftComponent,
+          headerBackground: { source: headerBackground },
+          headerTitleStyle: {
+            fontFamily: fonts.primaryRegular,
+            color: colors.primaryText,
+            fontSize: 18,
+            height: 70
+          },
+        },
+    {
+      name: 'AcademyRequestList',
+      displayName: translate('membershipRequests'),
+      component: AcademyRequestListScreen,
       headerLeft: headerLeftComponent,
       headerBackground: { source: headerBackground },
       headerTitleStyle: {
         fontFamily: fonts.primaryRegular,
-        color: colors.white,
+        color: colors.primaryText,
         fontSize: 18,
+        height: 70
       },
     },
   {
     name: 'Account',
-    displayName: 'Account',
+    displayName: translate('account'),
     component: UpdatePasswordScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     },
   },
   {
       name: 'ForgotPassword',
-      displayName: 'Forgot Password',
+      displayName: translate('forgotPassword'),
       component: ForgotPasswordScreen,
       headerLeft: headerLeftComponent,
       headerBackground: { source: headerBackground },
       headerTitleStyle: {
         fontFamily: fonts.primaryRegular,
-        color: colors.white,
+        color: colors.primaryText,
         fontSize: 18,
+        height: 70
       },
     },
   {
-    name: 'Article',
-    displayName: 'Article',
-    component: ArticleScreen,
-    headerLeft: headerLeftComponent,
-    headerBackground: { source: headerBackground },
-    headerTitleStyle: {
-      fontFamily: fonts.primaryRegular,
-      color: colors.white,
-      fontSize: 18,
-    },
-  },
-  {
-    name: 'Chat',
-    displayName: 'Chat',
-    component: ChatScreen,
-    headerLeft: headerLeftComponent,
-    headerBackground: { source: headerBackground },
-    headerTitleStyle: {
-      fontFamily: fonts.primaryRegular,
-      color: colors.white,
-      fontSize: 18,
-    },
-  },
-  {
-    name: 'Messages',
-    displayName: 'Messages',
-    component: MessagesScreen,
-    headerLeft: headerLeftComponent,
-    headerBackground: { source: headerBackground },
-    headerTitleStyle: {
-      fontFamily: fonts.primaryRegular,
-      color: colors.white,
-      fontSize: 18,
-    },
-  },
-  {
     name: 'Auth',
-    displayName: 'Login / Register',
+    displayName: translate('loginRegister'),
     component: AuthScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
-      color: colors.white,
+      color: colors.primaryText,
       fontSize: 18,
+      height: 70
     },
-  },
-  {
-    name: 'Blog',
-    displayName: 'Blog',
-    component: BlogScreen,
-    headerLeft: headerLeftComponent,
-    headerBackground: { source: headerBackground },
-    headerTitleStyle: {
-      fontFamily: fonts.primaryRegular,
-      color: colors.white,
-      fontSize: 18,
-    },
-  },
-  {
-    name: 'Post',
-    displayName: 'Post',
-    component: PostScreen,
-    headerLeft: headerLeftComponent,
-    headerBackground: { source: headerBackground },
-    headerTitleStyle: {
-      fontFamily: fonts.primaryRegular,
-      color: colors.white,
-      fontSize: 18,
-    },
-    
   },
 ]
 

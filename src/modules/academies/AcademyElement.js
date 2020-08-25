@@ -12,6 +12,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
 import { useNavigation } from '@react-navigation/native';
+import { translate } from '../../translations/index.js';
 
 export default function AcademyElement(props) {
    const item = props.academy;
@@ -31,20 +32,21 @@ export default function AcademyElement(props) {
                                   <View style={styles.itemOneContainer}>
                                     <View style={styles.itemOneImageContainer}>
                                       <Image style={styles.itemOneImage} source={{ uri: item.profileImg || placeholderImage }} />
+
+                                      <Text style={styles.itemOneTitle} numberOfLines={1}>
+                                           {item.name}
+                                      </Text>
                                     </View>
                                     <View style={styles.itemOneContent}>
-                                      <Text style={styles.itemOneTitle} numberOfLines={1}>
-                                        {item.name}
-                                      </Text>
                                       <Text
-                                        style={styles.itemOneSubTitle}
+                                        style={styles.styles}
                                         styleName="collapsible"
                                         numberOfLines={3}
                                       >
                                         {item.martialArts.map(ma => ma.name).join(',')}
                                       </Text>
-                                      <Text style={styles.itemOnePrice} numberOfLines={1}>
-                                        {item.students.length} {'students'}
+                                      <Text style={styles.members} numberOfLines={1}>
+                                        {item.students.length} {translate('students')}
                                       </Text>
                                     </View>
                                   </View>
@@ -66,39 +68,58 @@ const styles = StyleSheet.create({
   },
   itemOneContainer: {
     flex: 1,
-    width: Dimensions.get('window').width - 40,
+//    width: Dimensions.get('window').width - 40,
   },
   itemOneImageContainer: {
-    borderRadius: 3,
+    borderTopRightRadius: 3,
+    borderTopLeftRadius: 3,
     overflow: 'hidden',
   },
   itemOneImage: {
     height: 200,
-    width: Dimensions.get('window').width - 40,
+    width: Dimensions.get('window').width - 32
   },
   itemOneTitle: {
     fontFamily: fonts.primaryRegular,
-    fontSize: 15,
+    fontSize: 18,
+    textAlign: 'center',
+    color: colors.primaryText,
+    backgroundColor: colors.primaryBackgroundTransparent,
+    alignSelf: 'flex-start',
+    position: 'absolute',
+    bottom: 5,
+    left: 5,
+    letterSpacing: 0.04,
+    paddingLeft: 8,
+    paddingRight: 8,
+    borderRadius: 13,
+    height: 27
   },
-  itemOneSubTitle: {
+  styles: {
     fontFamily: fonts.primaryRegular,
     fontSize: 13,
-    color: '#B2B2B2',
+    color: colors.quaternaryText,
     marginVertical: 3,
   },
-  itemOnePrice: {
+  members: {
     fontFamily: fonts.primaryRegular,
     fontSize: 15,
+    color: colors.terciaryText,
   },
   itemOneRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 10,
-    borderWidth:1
+    backgroundColor: 'white',
+    borderColor: colors.borderColor,
+    borderWidth: 1,
+    borderRadius: 3
   },
   itemOneContent: {
     marginTop: 5,
     marginBottom: 10,
+    paddingLeft: 5,
+    color: colors.terciaryBackground
   },
   badge: {
     backgroundColor: colors.labelTwo,

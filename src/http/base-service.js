@@ -40,6 +40,7 @@ class BaseService {
             url: this.buildURL(),
             params: params
         };
+
         return this.makeRequest(httpConfig, options);
     }
 

@@ -6,6 +6,7 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  TouchableHighlight,
   Image,
   Dimensions,
   NavigationEvents
@@ -140,19 +141,21 @@ export default class AcademyListScreen extends React.Component {
 
     return (
         <View style={styles.container}>
-                <Icon
-                    name="map"
-                    style={styles.mapIcon}
-                    onPress={() => this.showMap()}
-                  />
+                <TouchableOpacity onPress={() => this.showMap()} style={ styles.mapButton }>
+                    <Icon
+                        name="map"
+                        style={styles.mapIcon}
+                      />
+                </TouchableOpacity>
             {this.state.showMap && (
                 <View>
                 {this.state.refreshable && (
-                <Icon
-                    name="autorenew"
-                    style={styles.searchButton}
-                    onPress={() => this.searchAcademies()}
-                  />
+                <TouchableOpacity onPress={() => this.searchAcademies()} style={styles.searchButton}>
+                    <Icon
+                        name="autorenew"
+                        style={styles.searchIcon}
+                      />
+                  </TouchableOpacity>
                   )}
 
               <MapView
@@ -191,11 +194,12 @@ export default class AcademyListScreen extends React.Component {
                 />
 
                 {!!this.props.loggedInUser && (
-                <Icon
-                    name="plus-circle"
-                    style={styles.addIcon}
-                    onPress={() => this.props.navigation.navigate('AcademyCreate')}
-                  />
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('AcademyCreate')} style={ styles.addButton }>
+                    <Icon
+                        name="plus-circle"
+                        style={styles.addIcon}
+                      />
+                </TouchableOpacity>
                 )}
           </View>
     );
@@ -205,7 +209,7 @@ export default class AcademyListScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.primaryBackground,
   },
   tabsContainer: {
     alignSelf: 'stretch',
@@ -247,37 +251,45 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 10,
   },
-  badge: {
-    backgroundColor: colors.labelTwo,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
   addIcon: {
     fontSize: 35,
+    backgroundColor: colors.iconBackground,
+    color: colors.secondaryIcon,
+  },
+  addButton: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: 'white',
+    bottom: 12,
+    right: 12,
     borderRadius: 20
   },
   mapIcon: {
-        fontSize: 35,
-        position: 'absolute',
-        top: 0,
-        right: 0,
+        fontSize: 40,
         zIndex: 1,
-        backgroundColor: 'white',
-        borderRadius: 20
+        backgroundColor: colors.iconBackground,
+        color: colors.secondaryIcon,
+        borderRadius: 30,
+        elevation:5
+  },
+  mapButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    borderRadius: 30,
+    zIndex: 1,
+  },
+  searchIcon: {
+        fontSize: 35,
+        zIndex: 100,
+        backgroundColor: colors.iconBackground,
+        color: colors.secondaryIcon,
+        borderRadius: 30,
   },
   searchButton: {
-        fontSize: 35,
-        position: 'absolute',
-        top: 0,
-        zIndex: 100,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        alignSelf: 'center'
+    top: 12,
+    zIndex: 1,
+    borderRadius: 30,
+    alignSelf: 'center',
+    position: 'absolute',
   },
   map: {
     height: 300,

@@ -40,7 +40,6 @@ export function attend(data) {
   return async function(dispatch, getState) {
     let response = await service.attend(data);
     dispatch(get(response.data.entity._id));
-    console.log(getState().classes.queryParams)
     dispatch(list(getState().classes.queryParams));
     return response.data.entity;
   }
@@ -50,7 +49,6 @@ export function unattend(data) {
   return async function(dispatch, getState) {
     let response = await service.unattend(data);
     dispatch(get(response.data.entity._id));
-    console.log(getState().classes.queryParams)
     dispatch(list(getState().classes.queryParams));
     return response.data.entity;
   }

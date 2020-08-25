@@ -2,7 +2,7 @@ import { combineReducers } from 'redux';
 
 let academiesState = { academies: [], academy: {} };
 
-const martialArtsReducer = (state = academiesState, action) => {
+const academiesReducer = (state = academiesState, action) => {
      switch (action.type) {
         case 'ACADEMIES':
            state = { ...state, academies: action.data };
@@ -20,4 +20,4 @@ const martialArtsReducer = (state = academiesState, action) => {
     return state;
 };
 
-export default martialArtsReducer;
+export default academiesReducer;

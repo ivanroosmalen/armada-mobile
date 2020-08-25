@@ -1,48 +1,71 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 import { createStackNavigator, Header } from '@react-navigation/stack';
-import { Image, StyleSheet, TouchableOpacity } from 'react-native';
-
+import { Image, StyleSheet, TouchableOpacity, TouchableHighlight, View, Text } from 'react-native';
 import StackNavigationData from './stackNavigationData';
-
+const headerBackground = require('../../../assets/images/topBarBg.png');
 const Stack = createStackNavigator();
 
 export default function NavigatorView(props) {
-
-  const headerLeftComponentMenu = () => {
+  const headerRightComponentMenu = () => {
     return (
       <TouchableOpacity
         onPress={() => props.navigation.toggleDrawer()}
         style={{
-          paddingLeft: 10,
+          paddingRight: 10,
+          width: 40
         }}
       >
         <Image
           source={require('../../../assets/images/drawer/menu.png')}
           resizeMode="contain"
           style={{
-            height: 20,
+            height: 40
           }}
         />
       </TouchableOpacity>    
     )
   }
 
+  const headerTitleComponent = (displayName) => {
+    return (
+         <Image
+            source={require('../../../assets/images/armada-logo.png')}
+            resizeMode="contain"
+            style={{
+               height: 40
+            }}
+         />
+    )
+  }
+
+  const headerLeft = () => {
+    return (
+    <View style={{width: 40}}>
+    </View>
+    )
+  }
+
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+        screenOptions={{
+            headerTitle: headerTitleComponent(),
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+                height: 70
+            },
+            headerRight: headerRightComponentMenu,
+            headerStyle: { backgroundColor: 'rgb(10,42,84)' }
+        }}
+    >
       {StackNavigationData.map((item, idx) => (
         <Stack.Screen
           key={`stack_item-${idx+1}`}
           name={item.name}
           component={item.component} 
           options={{
-            title: item.displayName,
-            headerLeft: item.headerLeft || headerLeftComponentMenu,
-            headerBackground: () => (
-              <Image style={styles.headerImage} source={item.headerBackground.source} />
-            ),
-            headerTitleStyle: item.headerTitleStyle,
-          }} 
+            headerLeft: item.headerLeft || headerLeft,
+          }}
         />
       ))}
     </Stack.Navigator>
