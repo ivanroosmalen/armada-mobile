@@ -253,16 +253,16 @@ export default class ProfileEditScreen extends React.Component {
                               selectedItems={selectedMAs}
                               selectText={ translate('selectMartialArts') }
                               searchInputPlaceholderText={ translate('searchMartialArts') }
+                              displayKey="name"
                               selectedItemTextColor={colors.quaternaryText}
                               selectedItemIconColor={colors.quaternaryText}
                               itemTextColor={colors.terciaryText}
-                              displayKey="name"
                               searchInputStyle={{ color: colors.terciaryText }}
                               submitButtonColor={colors.terciaryText}
                               textColor={colors.primaryText}
-                              submitButtonText={ translate('submit') }
                               styleMainWrapper={ styles.multiSelect }
                               styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
+                              submitButtonText={ translate('submit') }
                             />
 
                         </View>
@@ -330,7 +330,8 @@ export default class ProfileEditScreen extends React.Component {
                             style={{
                              position: 'absolute',
                              bottom: 10,
-                             right: 10
+                             right: 10,
+                             zIndex: 100
                              }}
                             caption={ 'Save' }
                             onPress={this.submit}

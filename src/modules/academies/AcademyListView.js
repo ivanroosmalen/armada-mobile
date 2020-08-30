@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
+import { translate } from '../../translations/index.js';
 
 import settings from '../../settings.js';
 
@@ -23,6 +24,10 @@ import GetLocation from 'react-native-get-location'
 import AcademyElement from './AcademyElement';
 
 export default class AcademyListScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this.flatList = React.createRef();
+  }
 
   state = {
     displayedAcademies: [],
@@ -38,6 +43,8 @@ export default class AcademyListScreen extends React.Component {
         this.setState({
             displayedAcademies: [ selectedAcademy ]
         })
+        console.log(this.flatList)
+        this._flatList  && this._flatList .scrollToOffset({ offset: 0, animated: false })
 
   }
 
@@ -45,6 +52,8 @@ export default class AcademyListScreen extends React.Component {
         this.setState({
             displayedAcademies: this.props.academies,
         })
+
+        this._flatList  && this._flatList .scrollToOffset({ offset: 0, animated: false })
   }
 
   showMap() {
@@ -81,12 +90,11 @@ export default class AcademyListScreen extends React.Component {
     await this.props.getAcademies({latMin, latMax, lngMin, lngMax});
 
     this.setState({
-        displayedAcademies: this.props.academies
+        displayedAcademies: this.props.academies,
+        refreshable: false
     })
 
-    this.setState({
-      refreshable: false
-    })
+    this._flatList  && this._flatList .scrollToOffset({ offset: 0, animated: false })
   }
 
   async componentDidMount() {
@@ -115,6 +123,14 @@ export default class AcademyListScreen extends React.Component {
     })
   }
 
+    async componentDidUpdate(prevProps, prevState) {
+      if (prevProps.academies !== this.props.academies) {
+        this.setState({
+            displayedAcademies: this.props.academies
+        })
+      }
+    }
+
   _getRenderItemFunction = ({ item }) => {
 
     return (
@@ -129,6 +145,7 @@ export default class AcademyListScreen extends React.Component {
   render() {
     let location = this.state.location;
     let locations = [];
+
     this.props.academies && this.props.academies.forEach(academy => {
         academy.locations && academy.locations.forEach(location => {
             if(location.geo && location.geo.coordinates && location.geo.coordinates.length) {
@@ -186,12 +203,34 @@ export default class AcademyListScreen extends React.Component {
               </View>
             )}
 
-                <FlatList
-                  keyExtractor={item => item._id }
-                  style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
-                  data={this.state.displayedAcademies}
-                  renderItem={this._getRenderItemFunction}
-                />
+            {!(this.state.displayedAcademies && this.state.displayedAcademies.length) && (
+                <View style={styles.noDataContainer}>
+                    <Text style={styles.noData}>
+                        {translate('noAcademies')}
+                    </Text>
+                </View>
+            )}
+
+            {!!(this.state.displayedAcademies && this.state.displayedAcademies.length) && !this.state.showMap && (
+                    <FlatList
+                      ref={this.flatList}
+                      keyExtractor={item => item._id }
+                      style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
+                      data={this.state.displayedAcademies}
+                      renderItem={this._getRenderItemFunction}
+                    />
+            )}
+
+            {!!(this.state.displayedAcademies && this.state.displayedAcademies.length) && this.state.showMap && (
+                    <FlatList
+                      ref={(fl) => this._flatList = fl}
+                      horizontal
+                      keyExtractor={item => item._id }
+                      style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
+                      data={this.state.displayedAcademies}
+                      renderItem={this._getRenderItemFunction}
+                    />
+            )}
 
                 {!!this.props.loggedInUser && (
                 <TouchableOpacity onPress={() => this.props.navigation.navigate('AcademyCreate')} style={ styles.addButton }>
@@ -255,6 +294,7 @@ const styles = StyleSheet.create({
     fontSize: 35,
     backgroundColor: colors.iconBackground,
     color: colors.secondaryIcon,
+    borderRadius: 20
   },
   addButton: {
     position: 'absolute',
@@ -292,9 +332,19 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   map: {
-    height: 300,
-    width: 400,
+    height: 330,
     justifyContent: 'flex-end',
     alignItems: 'center',
+  },
+  noData: {
+    fontSize: 20,
+    backgroundColor: colors.secondaryBackground,
+    color: colors.terciaryText,
+    paddingHorizontal: 20,
+    paddingTop: 20
+  },
+  noDataContainer: {
+      backgroundColor: colors.secondaryBackground,
+      flex: 1
   }
 });

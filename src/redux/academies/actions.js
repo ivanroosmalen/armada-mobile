@@ -1,14 +1,19 @@
 import AcademyService from '../../http/academy-service.js';
+import { store } from '../store.js';
 
 const service = new AcademyService('academies');
 const ACADEMIES = 'ACADEMIES';
 const ACADEMY = 'ACADEMY';
 const USER_ACADEMIES = 'USER_ACADEMIES';
+const QUERY_PARAMS = 'QUERY_PARAMS';
 
 export function list(params, options) {
   return async function(dispatch) {
+    const state = store.getState();
+    if(!params) params = state.academies.queryParams;
     let response = await service.list(params, options);
     dispatch({type: ACADEMIES, data: response.data.entity});
+    dispatch({type: QUERY_PARAMS, data: params});
   }
 }
 
@@ -22,7 +27,7 @@ export function get(id, params, options) {
 export function create(entity, options) {
   return async function(dispatch) {
     let response = await service.create(entity, options);
-    dispatch(list())
+    dispatch(list());
     return response.data.entity;
   }
 }
@@ -31,6 +36,7 @@ export function update(id, entity, options) {
   return async function(dispatch) {
     let response = await service.update(id, entity, options);
     dispatch({type: ACADEMY, data: response.data.entity});
+    dispatch(list());
   }
 }
 

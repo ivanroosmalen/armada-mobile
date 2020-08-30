@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { View, Text } from 'react-native';
 
-import { colors } from '../styles';
+import { colors, fonts } from '../styles';
 
 class RNSDropDown extends React.Component {
   static defaultProps = {
@@ -49,6 +49,7 @@ class RNSDropDown extends React.Component {
           },
           shadowRadius: 5,
           shadowOpacity: 1.0,
+          backgroundColor: colors.secondaryBackground
         }}
         adjustFrame={params => {
           // eslint-disable-next-line no-param-reassign
@@ -59,13 +60,13 @@ class RNSDropDown extends React.Component {
         }}
         renderRow={text => (
           <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
-            <Text style={{ color }}>{text}</Text>
+            <Text style={{ color: colors.terciaryText }}>{text}</Text>
           </View>
         )}
         onSelect={onSelect}
       >
-        <View style={[styles.container, style && style, { borderColor }]}>
-          <Text style={{ color }}>
+        <View style={[styles.container, style && style, { borderBottomColor: colors.primaryText }]}>
+          <Text style={{ color, fontFamily: fonts.primaryRegular }}>
             {selectedIndex > -1 && items[selectedIndex]
               ? items[selectedIndex]
               : placeholder}
@@ -85,13 +86,14 @@ class RNSDropDown extends React.Component {
 const styles = {
   container: {
     height: 40,
-    borderWidth: 1,
-    borderColor: colors.primary,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primaryText,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     flexDirection: 'row',
     borderRadius: 5,
+    fontFamily: fonts.primaryRegular
   },
   icon: {
     marginLeft: 10,

@@ -92,5 +92,16 @@
   "noRequests":"You have no requests",
   "wantsToJoin":"wants to join",
   "approve":"Approve",
-  "decline":"Decline"
+  "decline":"Decline",
+  "academiesNearYou": "Academies near you",
+  "welcome": "Welcome to Armada",
+  "howToUse": "Use this app to connect your academy to its members. Expand your armada!",
+  "yourAcademies": "Your academies",
+  "academyRequests": "You have academy requests",
+  "noAcademies": "There are no academies in selected area",
+  "noAcademiesNear": "Be the first to create an academy in your area!",
+  "browse": "Browse academies",
+  "imageUpload": "Image is being updated",
+  "contact": "Contact",
+  "featureRequests": "For issues, questions, or feature requests, please send an email to:"
 }

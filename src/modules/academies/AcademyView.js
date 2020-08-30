@@ -24,6 +24,7 @@ import UserElement from '../profile/UserElement';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import { translate } from '../../translations/index.js';
+import Toast from 'react-native-simple-toast';
 
 export default class AcademyScreen extends React.Component {
 
@@ -44,6 +45,7 @@ export default class AcademyScreen extends React.Component {
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
+                Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
                 await s3Service.uploadImage(file, uploadUrl);
             }
 
@@ -55,7 +57,7 @@ export default class AcademyScreen extends React.Component {
   menuOptionSelected(menuEntity) {
         switch(menuEntity) {
             case 'edit':
-                this.props.navigation.navigate('AcademyEdit', { id: this.props.academy._id });
+                this.props.navigation.navigate('AcademyEdit', { id: this.props.academy && this.props.academy._id });
             break;
             case 'updateImage':
                 this.selectImage();
@@ -121,11 +123,11 @@ export default class AcademyScreen extends React.Component {
       let academyRequest = this.props.academyRequest;
 
       let isLoggedIn = this.props.loggedInUser;
-      let isStudent = this.props.loggedInUser && academy.students && !!academy.students.find(student => (student._id === this.props.loggedInUser._id));
-      let userIsOwner = !!(academy && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
+      let isStudent = isLoggedIn && academy && academy.students && !!academy.students.find(student => (student._id === this.props.loggedInUser._id));
+      let userIsOwner = !!(isLoggedIn && academy && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
 
-      menuOptions = [];
-      menuEntities = [];
+      let menuOptions = [];
+      let menuEntities = [];
 
       if(userIsOwner) {
         menuOptions.push(translate('edit'));

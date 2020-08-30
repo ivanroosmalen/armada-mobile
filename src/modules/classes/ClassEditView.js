@@ -318,10 +318,8 @@ export default class ClassEditScreen extends React.Component {
 
       return (
 
-        <ImageBackground
-                source={require('../../../assets/images/background.png')}
-                style={styles.backgroundImage}
-                resizeMode="cover"
+        <View
+                style={styles.background}
               >
                 <View style={styles.container}>
 
@@ -355,7 +353,8 @@ export default class ClassEditScreen extends React.Component {
 
                     <View style={{alignSelf: 'stretch'}}>
                         <Dropdown
-                            style={{ backgroundColor: colors.white }}
+                            color={colors.primaryText}
+                            style={ styles.dropdown }
                             items={martialArts}
                             selectedIndex={martialArtIndex}
                             placeholder={ translate('selectMartialArt') }
@@ -363,7 +362,8 @@ export default class ClassEditScreen extends React.Component {
                         />
 
                         <Dropdown
-                            style={{ backgroundColor: colors.white }}
+                            color={colors.primaryText}
+                            style={styles.dropdown}
                             items={locations}
                             selectedIndex={locationIndex}
                             placeholder={ translate('selectLocation') }
@@ -371,7 +371,8 @@ export default class ClassEditScreen extends React.Component {
                         />
 
                         <Dropdown
-                            style={{ backgroundColor: colors.white }}
+                            color={colors.primaryText}
+                            style={ styles.dropdown }
                             items={instructors}
                             selectedIndex={instructorIndex}
                             placeholder={ translate('selectInstructor') }
@@ -392,7 +393,7 @@ export default class ClassEditScreen extends React.Component {
                     <View style={ styles.datepickerField }>
 
                         <Text style={styles.dateText}>
-                            { moment(this.state.editingClass.schedule.startDate || new Date()).format('DD MMM, YYYY HH:mm') }
+                           { moment(this.state.editingClass.schedule.startDate || new Date()).format('DD MMM, YYYY HH:mm') }
                         </Text>
                         <Icon
                           name="calendar"
@@ -421,19 +422,21 @@ export default class ClassEditScreen extends React.Component {
                         />
                     </View>
 
-                    <View style={{ flexDirection: 'row', alignSelf: 'flex-start' }}>
+                    <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 10}}>
                         <CheckBox
                             onClick={this.onCheckboxUpdate}
                             isChecked={!!this.state.editingClass.schedule.recurring}
+                            checkBoxColor={colors.primaryText}
                         />
 
-                        <Text style={{color: 'black'}}> { translate('recurring') } </Text>
+                        <Text style={{color: colors.primaryText }}> { translate('recurring') } </Text>
                     </View>
 
                     {!!this.state.editingClass.schedule.recurring && (
                         <View  style={{alignSelf: 'stretch'}}>
                             <Dropdown
-                                style={{ backgroundColor: colors.white }}
+                                color={colors.primaryText}
+                                style={ styles.dropdown }
                                 items={this.state.intervals.map(interval => interval.display)}
                                 selectedIndex={intervalIndex}
                                 placeholder={ translate('selectInterval') }
@@ -451,22 +454,24 @@ export default class ClassEditScreen extends React.Component {
 
                         </Animated.View>
 
-                      <Button
-                            bgColor="white"
-                            textColor={colors.primary}
+                  </Animated.View>
+                </View>
+
+                        <Button
+                            bgColor={colors.secondaryBackground}
+                            textColor={colors.secondaryText}
                             secondary
                             rounded
                             style={{
                              position: 'absolute',
-                             bottom: 10,
-                             right: 10,
+                             bottom: 30,
+                             right: 30,
+                             zIndex: 100
                              }}
                             caption={ translate('save') }
                             onPress={this.submit}
                           />
-                  </Animated.View>
-                </View>
-              </ImageBackground>
+              </View>
       );
     }
   }
@@ -478,8 +483,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 30,
   },
-  backgroundImage: {
+  background: {
     flex: 1,
+    backgroundColor: colors.primaryBackground
   },
   section: {
     flex: 1,
@@ -501,39 +507,37 @@ const styles = StyleSheet.create({
   },
   textAreaInput: {
     alignSelf: 'stretch',
-    height:150
+    height:100
   },
   textInput: {
     alignSelf: 'stretch',
-    marginTop: 30
+    marginTop: 30,
+    color: colors.primaryText,
+    borderColor: colors.primaryText
   },
   headerTitle: {
       fontWeight: "bold",
       fontSize: 25,
       color: "white"
   },
-  mapElement: {
-        alignSelf: 'stretch',
-        width: '100%'
-  },
-  mapTextInput: {
-  },
-  locations: {
-      width: '100%',
-      marginTop: 50,
-      zIndex: 1,
-      elevation: 1,
-  },
   datepickerField: {
     justifyContent: 'space-between',
     alignSelf: 'stretch',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginTop: 15,
   },
   dateText: {
     width: 200,
-    fontSize: 17
+    fontSize: 15,
+    color: colors.primaryText,
+    fontFamily: fonts.primaryRegular
   },
   calendarIcon: {
-    fontSize: 35
+    fontSize: 30,
+    color: colors.primaryText
+  },
+  dropdown: {
+      backgroundColor: colors.primaryBackground,
+      marginTop: 10
   }
 });

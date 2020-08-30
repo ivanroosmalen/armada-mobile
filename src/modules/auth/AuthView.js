@@ -96,8 +96,6 @@ export default class AuthScreen extends React.Component {
   }
 
   componentDidMount() {
-    this.props.logout();
-
     this.keyboardDidShowListener = Keyboard.addListener(
       Platform.select({ android: 'keyboardDidShow', ios: 'keyboardWillShow' }),
       this._keyboardDidShow.bind(this),

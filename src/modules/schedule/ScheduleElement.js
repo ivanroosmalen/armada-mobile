@@ -44,7 +44,7 @@ import { translate, setLocateConfig } from '../../translations/index.js';
           </View>
           <Text style={styles.itemTitleText}>{item.description}</Text>
           <View style={styles.itemButtonContainer}>
-            <Button color={item.isAttending ? 'blue' : (item.isFull ? 'red' : 'grey')} title={`${item.numberOfAttendees} ${translate('attending')}`} onPress={() => buttonPressed(item)}/>
+            <Button color={item.isAttending ? colors.primaryBackground : (item.isFull ? 'red' : colors.quaternaryBackground)} title={`${item.numberOfAttendees} ${translate('attending')}`} onPress={() => buttonPressed(item)}/>
           </View>
         </TouchableOpacity>
       );
@@ -126,11 +126,33 @@ export default function ScheduleElement(props) {
           <WeekCalendar
             firstDay={1}
             markedDates={markedDates}
+            theme={{
+                calendarBackground: colors.terciaryBackground,
+                backgroundColor: colors.terciaryBackground,
+                textSectionTitleColor: colors.terciaryText,
+                textSectionTitleDisabledColor: colors.quaternaryText,
+                selectedDayBackgroundColor: colors.primaryBackground,
+                selectedDayTextColor: colors.primaryText,
+                todayTextColor: colors.secondaryText,
+                dayTextColor: colors.quaternaryText,
+                dotColor: colors.secondaryText,
+                selectedDotColor: colors.primaryText,
+                textDayFontWeight: '300',
+                textDayHeaderFontWeight: '300',
+                textDayFontSize: 16,
+                textMonthFontSize: 16,
+                textDayHeaderFontSize: 16
+          }}
           />
 
         <AgendaList
           sections={displayItems}
           renderItem={renderItem}
+          theme={{
+            calendarBackground: colors.secondaryBackground,
+            textSectionTitleColor: 'blue',
+            textSectionTitleDisabledColor: 'blue',
+          }}
         />
       </CalendarProvider>
 
@@ -150,22 +172,22 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: colors.terciaryBackground,
     borderBottomWidth: 1,
     borderBottomColor: 'lightgrey',
     flexDirection: 'row'
   },
   itemHourText: {
-    color: 'black'
+    color: colors.terciaryText
   },
   itemDurationText: {
-    color: 'grey',
+    color: colors.quaternaryText,
     fontSize: 12,
     marginTop: 4,
     marginLeft: 4
   },
   itemTitleText: {
-    color: 'black',
+    color: colors.terciaryText,
     marginLeft: 16,
     fontWeight: 'bold',
     fontSize: 16

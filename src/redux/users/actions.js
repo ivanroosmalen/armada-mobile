@@ -7,6 +7,7 @@ const USER = 'USER';
 const JWT = 'JWT';
 const LOGGED_IN_USER = 'LOGGED_IN_USER';
 const TRANSLATIONS = 'TRANSLATIONS';
+const LOGOUT = 'LOGOUT';
 
 export function list(params, options) {
   return async function(dispatch) {
@@ -19,6 +20,7 @@ export function get(id, params, options) {
   return async function(dispatch) {
     let response = await userService.get(id, params, options);
     dispatch({type: USER, data: response.data.entity});
+    return response.data.entity;
   }
 }
 
@@ -33,6 +35,7 @@ export function update(id, entity, options) {
   return async function(dispatch) {
     let response = await userService.update(id, entity, options);
     dispatch({type: USER, data: response.data.entity});
+    dispatch(setLoggedInUser(response.data.entity));
   }
 }
 
@@ -58,18 +61,22 @@ export function login(entity) {
 export function logout(entity) {
   return async function(dispatch) {
     const state = store.getState();
-
     if(state.users.jwt) {
         userService.logout();
     }
 
     await dispatch(setLoggedInUser(null));
     await dispatch(setJwt(null));
+    await dispatch({type: LOGOUT});
   }
 }
 
   export function setLoggedInUser(user) {
    return async function(dispatch) {
+     if(user && !user.thumbnailImg) {
+        user.thumbnailImg = 'https://armada-user-images.s3.amazonaws.com/default/thumbnail.jpg';
+     }
+
      dispatch({type: LOGGED_IN_USER, data: user});
      try {
        await AsyncStorage.setItem('loggedInUser', user ? JSON.stringify(user) : '');

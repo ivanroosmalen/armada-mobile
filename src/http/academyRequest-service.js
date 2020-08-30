@@ -1,6 +1,11 @@
 import BaseService from './base-service.js';
 
 class AcademyRequestService extends BaseService {
+
+    constructor(entity) {
+        super(entity, 'https://academy.armadama.com/v1/');
+    }
+
     async getByAcademyId(id, params = {}, options = {}) {
         const httpConfig = {
             method: 'GET',

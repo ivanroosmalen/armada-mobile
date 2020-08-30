@@ -23,11 +23,14 @@ class ScheduleScreen extends React.Component {
       <View style={{flex: 1}}>
         <ScheduleElement classes={this.props.classes} loggedInUser={this.props.loggedInUser} attend={this.props.attend} unattend={this.props.unattend}/>
 
-        <Icon
+        <TouchableOpacity
+            onPress={() => this.props.navigation.navigate('ClassEdit', { academyId: this.props.route.params.id })}
+            style={ styles.addButton } >
+          <Icon
               name="plus-circle"
               style={styles.addIcon}
-              onPress={() => this.props.navigation.navigate('ClassEdit', { academyId: this.props.route.params.id })}
             />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -39,10 +42,14 @@ export default ScheduleScreen;
 const styles = StyleSheet.create({
   addIcon: {
         fontSize: 35,
+        backgroundColor: colors.iconBackground,
+        color: colors.secondaryIcon,
+        borderRadius: 20
+      },
+  addButton: {
         position: 'absolute',
         bottom: 15,
         right: 15,
-        backgroundColor: 'white',
         borderRadius: 20
-      }
+  }
 });

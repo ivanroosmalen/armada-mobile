@@ -92,5 +92,16 @@
   "noRequests":"Não tem pedidos",
   "wantsToJoin":"quer se juntar a",
   "approve":"Aprove",
-  "decline":"Recise"
+  "decline":"Recise",
+  "academiesNearYou": "Academias perto de você",
+  "welcome": "Bem vindo a Armada",
+  "howToUse": "Use este aplicativo para conectar sua academia aos seus membros. Expanda sua armada!",
+  "yourAcademies": "Suas academias",
+  "academyRequests": "Você tem solicitações de academia",
+  "noAcademies": "Não há academias na área selecionada",
+  "noAcademiesNear": "Seja o primeiro a criar uma academia em sua área!",
+  "browse": "Procura academias",
+  "imageUpload": "A imagem está sendo atualizada",
+  "contact": "Contato",
+  "featureRequests": "Se tem problemas, perguntas ou solicitações de recursos, envie um e-mail para:"
 }

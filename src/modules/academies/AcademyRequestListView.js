@@ -43,7 +43,7 @@ export default class AcademyRequestListScreen extends React.Component {
   render() {
     let academyRequests = (this.props && this.props.academyRequests) || [];
     return (
-        <View>
+        <View style={ styles.container }>
                 { !academyRequests.length && (
                     <Text style={styles.noRequests}>{ translate('noRequests') }</Text>
                 )}
@@ -51,7 +51,7 @@ export default class AcademyRequestListScreen extends React.Component {
                 { !!academyRequests.length && (
                     <FlatList
                       keyExtractor={item => item._id }
-                      style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
+                      style={{ backgroundColor: colors.terciaryBackground, paddingHorizontal: 15 }}
                       data={this.props.academyRequests || []}
                       renderItem={this._getRenderItemFunction}
                     />
@@ -62,8 +62,12 @@ export default class AcademyRequestListScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        backgroundColor: colors.secondaryBackground
+    },
     noRequests: {
         fontSize: 20,
-        textAlign: 'center'
+        textAlign: 'center',
+        color: colors.terciaryText
     }
 });

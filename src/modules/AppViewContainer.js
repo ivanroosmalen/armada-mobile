@@ -1,7 +1,7 @@
 import { compose, lifecycle } from 'recompose';
 import { connect } from 'react-redux';
 import { Platform, UIManager, StatusBar } from 'react-native';
-import { setLoggedInUser, setJwt } from '../redux/users/actions';
+import { setLoggedInUser, setJwt, get } from '../redux/users/actions';
 import { getUserAcademies } from '../redux/academies/actions.js';
 import { list } from '../redux/academyRequests/actions.js';
 import AppView from './AppView';
@@ -26,6 +26,7 @@ export default compose(
       let jwt= promises[1];
       if(loggedInUserString && jwt) {
           let user = JSON.parse(loggedInUserString);
+          user = await store.dispatch(get(user._id));
           store.dispatch(setLoggedInUser(user));
           store.dispatch(setJwt(jwt));
           store.dispatch(getUserAcademies(user._id));

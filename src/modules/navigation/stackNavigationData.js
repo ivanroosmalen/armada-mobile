@@ -18,6 +18,7 @@ import ClassScreen from '../classes/ClassViewContainer';
 import UpdatePasswordScreen from '../auth/UpdatePasswordContainer';
 import ForgotPasswordScreen from '../auth/ForgotPasswordContainer';
 import AuthScreen from '../auth/AuthViewContainer';
+import ContactScreen from '../contact/ContactViewContainer';
 import { translate } from '../../translations/index.js';
 
 import { colors, fonts } from '../../styles';
@@ -258,6 +259,19 @@ const StackNavigationData = [
     name: 'Auth',
     displayName: translate('loginRegister'),
     component: AuthScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.primaryText,
+      fontSize: 18,
+      height: 70
+    },
+  },
+  {
+    name: 'Contact',
+    displayName: translate('contact'),
+    component: ContactScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {

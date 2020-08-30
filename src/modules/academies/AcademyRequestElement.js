@@ -47,6 +47,8 @@ export default function AcademyRequestElement(props) {
                         secondary
                         rounded
                         small
+                        bgColor={ colors.primaryBackground }
+                        textColor={ colors.primaryText }
                         caption={ translate('approve') }
                         onPress={ () => this.approveRequest(true) }
                       />
@@ -55,6 +57,8 @@ export default function AcademyRequestElement(props) {
                         secondary
                         rounded
                         small
+                        bgColor={ colors.primaryBackground }
+                        textColor={ colors.primaryText }
                         caption={ translate('decline') }
                         onPress={ () => this.approveRequest(false) }
                       />

@@ -2,6 +2,10 @@ import BaseService from './base-service.js';
 
 class UserService extends BaseService {
 
+    constructor(entity) {
+        super(entity);
+    }
+
     async login(entity) {
             const httpConfig = {
                 method: 'POST',
@@ -64,6 +68,7 @@ async forgotPassword(data, options) {
                     url: this.buildURL(['forgotPassword']),
                     data
                 };
+                console.log(httpConfig)
 
                 return this.makeRequest(httpConfig, options)
             }

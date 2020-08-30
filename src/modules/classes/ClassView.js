@@ -17,6 +17,8 @@ import { colors, fonts } from '../../styles';
 import moment from 'moment';
 import { Button } from '../../components';
 import { translate } from '../../translations/index.js';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import ModalDropdown from 'react-native-modal-dropdown';
 
 import UserElement from '../profile/UserElement';
 
@@ -26,7 +28,9 @@ export default class ClassScreen extends React.Component {
     editDialogVisible: false,
     deleteDialogVisible: false,
     deleteConfirmationDialogVisible: false,
-    deleteSingleItem: true
+    deleteSingleItem: true,
+    menuOptions: [translate('edit'), translate('delete')],
+    menuEntities: ['edit', 'delete']
   }
 
   async componentDidMount() {
@@ -36,12 +40,23 @@ export default class ClassScreen extends React.Component {
     ])
   }
 
-  onEditPressed() {
-    if(this.props.class.schedule.recurring) {
-        this.setState({ editDialogVisible: true });
-    } else {
-        this.props.navigation.navigate('ClassEdit', { id: this.props.class._id, academyId: this.props.academy._id })
-    }
+  menuOptionSelected(menuEntity) {
+        switch(menuEntity) {
+            case 'edit':
+                if(this.props.class.schedule.recurring) {
+                    this.setState({ editDialogVisible: true });
+                } else {
+                    this.props.navigation.navigate('ClassEdit', { id: this.props.class._id, academyId: this.props.academy._id })
+                }
+            break;
+            case 'delete':
+                if(this.props.class.schedule.recurring) {
+                    this.setState({ deleteDialogVisible: true });
+                } else {
+                    this.setState({ deleteConfirmationDialogVisible: true });
+                }
+            break;
+        }
   }
 
   onDetailedEditPressed(singleItem) {
@@ -54,14 +69,6 @@ export default class ClassScreen extends React.Component {
              singleItem
          })
     }
-
-  onDeletePressed() {
-    if(this.props.class.schedule.recurring) {
-        this.setState({ deleteDialogVisible: true });
-    } else {
-        this.setState({ deleteConfirmationDialogVisible: true });
-    }
-  }
 
     onDetailedRemovePressed(singleItem) {
         this.setState({
@@ -192,12 +199,16 @@ export default class ClassScreen extends React.Component {
                           renderItem={this._getRenderItemFunction}
                       />
               </View>
-              <View style={styles.attendContainer}>
+            </ScrollView>
+
+                <View style={styles.attendContainer}>
                 {!userIsAttending && userIsStudent && !classIsFull && (
                       <Button
                         secondary
                         rounded
                         small
+                        bgColor={ colors.primaryBackground }
+                        textColor={ colors.primaryText }
                         style={ styles.attendButton }
                         caption={ translate('attend') }
                         onPress={ () => (this.onAttendPressed()) }
@@ -209,45 +220,53 @@ export default class ClassScreen extends React.Component {
                         secondary
                         rounded
                         small
+                        bgColor={ colors.primaryBackground }
+                        textColor={ colors.primaryText }
                         style={ styles.attendButton }
                         caption={ translate('unattend') }
                         onPress={ () => (this.onUnattendPressed()) }
                       />
                 )}
               </View>
-            </ScrollView>
 
           </View>
-                <View style={ styles.buttonContainer }>
                     {userIsOwner && (
-                          <Button
-                            secondary
-                            rounded
-                            small
-                            style={ styles.actionButton }
-                            caption={ translate('edit') }
-                            onPress={ () => (this.onEditPressed()) }
-                          />
+                      <View style={ styles.optionsMenu }>
+                          <TouchableOpacity onPress={() => this.optionsMenu.show()}>
+                              <Icon
+                                name="dots-horizontal"
+                                size={25}
+                                color={colors.secondaryIcon}
+                              />
+                          </TouchableOpacity>
+
+                          <ModalDropdown ref={(el) => {this.optionsMenu = el}}
+                                  options={ this.state.menuOptions }
+                                  renderRow={text => (
+                                    <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText }}>
+                                      <Text>{text}</Text>
+                                    </View>
+                                  )}
+                                  dropdownStyle={{ height: 80 }}
+                                  onSelect={(index) => this.menuOptionSelected(this.state.menuEntities[index])}
+                                >
+                            <View>
+                              <Text>
+                              </Text>
+                            </View>
+                           </ModalDropdown>
+
+                      </View>
                     )}
 
-                    {userIsOwner && (
-                          <Button
-                            secondary
-                            rounded
-                            small
-                            style={ styles.actionButton }
-                            caption={ translate('delete') }
-                            onPress={ () => (this.onDeletePressed()) }
-                          />
-                    )}
-
-          </View>
                         <Modal isVisible={this.state.editDialogVisible} onBackdropPress={() => (this.setState({ editDialogVisible: false }))}>
                             <View>
                               <Button
                                 secondary
                                 rounded
                                 small
+                                bgColor={ colors.primaryBackground }
+                                textColor={ colors.primaryText }
                                 style={ styles.editDetailsButton }
                                 caption={ translate('updateSeries') }
                                 onPress={() => this.onDetailedEditPressed(false)}
@@ -257,6 +276,8 @@ export default class ClassScreen extends React.Component {
                                 secondary
                                 rounded
                                 small
+                                bgColor={ colors.primaryBackground }
+                                textColor={ colors.primaryText }
                                 style={ styles.editDetailsButton }
                                 caption={ translate('updateEvent') }
                                 onPress={() => this.onDetailedEditPressed(true)}
@@ -270,6 +291,8 @@ export default class ClassScreen extends React.Component {
                                 secondary
                                 rounded
                                 small
+                                bgColor={ colors.primaryBackground }
+                                textColor={ colors.primaryText }
                                 style={ styles.editDetailsButton }
                                 caption={ translate('removeSeries') }
                                 onPress={() => this.onDetailedRemovePressed(false)}
@@ -279,6 +302,8 @@ export default class ClassScreen extends React.Component {
                                 secondary
                                 rounded
                                 small
+                                bgColor={ colors.primaryBackground }
+                                textColor={ colors.primaryText }
                                 style={ styles.editDetailsButton }
                                 caption={ translate('removeEvent') }
                                 onPress={() => this.onDetailedRemovePressed(true)}
@@ -292,6 +317,8 @@ export default class ClassScreen extends React.Component {
                                 secondary
                                 rounded
                                 small
+                                bgColor={ colors.primaryBackground }
+                                textColor={ colors.primaryText }
                                 style={ styles.editDetailsButton }
                                 caption={ translate('confirmDelete') }
                                 onPress={() => this.onDeleteConfirmationPressed(true)}
@@ -301,6 +328,8 @@ export default class ClassScreen extends React.Component {
                                 secondary
                                 rounded
                                 small
+                                bgColor={ colors.primaryBackground }
+                                textColor={ colors.primaryText }
                                 style={ styles.editDetailsButton }
                                 caption={ translate('cancel') }
                                 onPress={() => this.onDeleteConfirmationPressed(false)}
@@ -315,7 +344,8 @@ export default class ClassScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.secondaryBackground,
+    color: colors.terciaryText
   },
   header: {
     flex: 2,
@@ -324,29 +354,35 @@ const styles = StyleSheet.create({
   section: {
     flex: 4,
     position: 'relative',
+    color: colors.terciaryText
   },
   dates: {
         fontSize: 15,
-        fontStyle: 'italic'
+        fontStyle: 'italic',
+        color: colors.terciaryText
    },
    name: {
         fontSize: 25,
         fontWeight: 'bold',
         paddingLeft: 20,
-        paddingTop: 20
+        paddingTop: 20,
+        color: colors.terciaryText
    },
    description: {
            fontSize: 20,
-           paddingLeft: 20
+           paddingLeft: 20,
+           color: colors.terciaryText
     },
     martialArt: {
         fontSize: 15,
-        fontStyle: 'italic'
+        fontStyle: 'italic',
+        color: colors.terciaryText
    },
    location: {
       fontSize: 15,
       paddingLeft: 20,
-      paddingTop: 20
+      paddingTop: 20,
+      color: colors.terciaryText
    },
   itemLabel: {
     width: 200,
@@ -427,7 +463,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     backgroundColor: colors.white,
-    marginTop: 15
+    marginTop: 15,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -443,7 +479,8 @@ const styles = StyleSheet.create({
     width: 180,
     position: 'absolute',
     bottom: 20,
-    left: 20
+    right: 20,
+    zIndex: 100
   },
   editDetailsButton: {
     width: 300,
@@ -451,7 +488,22 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   attendContainer: {
-    marginTop: 40
+  },
+  optionsMenu: {
+    opacity: 1,
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    color: colors.secondaryIcon,
+    backgroundColor: colors.iconBackground,
+    borderRadius: 30,
+    borderWidth: 1,
+    borderColor: colors.quaternaryText,
+    width: 28,
+    height: 28,
+    textAlign: 'center',
+    alignItems: 'center',
+    zIndex: 100
   }
 });
 

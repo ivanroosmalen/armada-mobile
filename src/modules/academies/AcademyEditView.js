@@ -54,7 +54,14 @@ export default class AcademyEditScreen extends React.Component {
           };
 
           onSelectedInstructors = selectedInstructors => {
-            this.state.editingAcademy.instructors = this.state.editingAcademy.students.filter(student => selectedInstructors.indexOf(student._id) !== -1);
+            let instructors = this.state.editingAcademy.students && this.state.editingAcademy.students.filter(student => selectedInstructors.indexOf(student._id) !== -1);
+
+            if(!instructors) {
+                if(selectedInstructors[0] === this.props.loggedInUser._id) {
+                    instructors = [ this.props.loggedInUser ];
+                }
+            }
+            this.state.editingAcademy.instructors = instructors;
             this.setState({
                 editingAcademy: this.state.editingAcademy
             });
@@ -110,12 +117,16 @@ export default class AcademyEditScreen extends React.Component {
                 if(this.props.route.params && this.props.route.params.id) {
                     await this.props.updateAcademy(this.props.academy._id, this.state.editingAcademy);
                     academyId = this.props.academy._id
+
+                    this.props.navigation.goBack();
                 } else {
                     let entity = await this.props.createAcademy(this.state.editingAcademy);
                     academyId = entity._id
+
+                    this.props.navigation.goBack();
+                    this.props.navigation.navigate('Academy', {id: academyId})
                 }
 
-                this.props.navigation.goBack();
             }
       }
 
@@ -192,13 +203,10 @@ export default class AcademyEditScreen extends React.Component {
       let selectedInstructors = editingAcademy.instructors && editingAcademy.instructors.map(instructor => instructor._id) || [];
       let selectedLocations = editingAcademy.locations;
       autocompleteMinHeight = 50;
+
       return (
 
-        <ImageBackground
-                source={require('../../../assets/images/background.png')}
-                style={styles.backgroundImage}
-                resizeMode="cover"
-              >
+        <View style={styles.background} >
                 <View style={styles.container}>
 
                   <Animated.View
@@ -226,38 +234,42 @@ export default class AcademyEditScreen extends React.Component {
                       selectedItems={selectedMAs}
                       selectText={ translate('selectMartialArts') }
                       searchInputPlaceholderText={ translate('searchMartialArts') }
-                      tagRemoveIconColor="#CCC"
-                      tagBorderColor="#CCC"
-                      tagTextColor="#CCC"
-                      selectedItemTextColor="#CCC"
-                      selectedItemIconColor="#CCC"
-                      itemTextColor="#000"
+                      selectedItemTextColor={colors.quaternaryText}
+                      selectedItemIconColor={colors.quaternaryText}
+                      itemTextColor={colors.terciaryText}
+                      searchInputStyle={{ color: colors.terciaryText }}
+                      submitButtonColor={colors.terciaryText}
+                      textColor={colors.primaryText}
+                      styleMainWrapper={ styles.multiSelect }
+                      styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
+                      tagRemoveIconColor={ colors.primaryText }
+                      tagBorderColor={ colors.primaryText }
+                      tagTextColor={ colors.primaryText }
                       displayKey="name"
-                      searchInputStyle={{ color: '#CCC' }}
-                      submitButtonColor="#CCC"
                       submitButtonText={ translate('submit') }
-                      styleMainWrapper={ styles.textInput }
                     />
 
                     <MultiSelect
-                      items={editingAcademy.students}
+                      items={(editingAcademy && editingAcademy.students) ? editingAcademy.students : [this.props.loggedInUser]}
                       uniqueKey="_id"
                       ref={(component) => { this.multiSelect = component }}
                       onSelectedItemsChange={ this.onSelectedInstructors }
                       selectedItems={ selectedInstructors }
                       selectText={ translate('selectInstructors') }
                       searchInputPlaceholderText={ translate('searchMembers') }
-                      tagRemoveIconColor="#CCC"
-                      tagBorderColor="#CCC"
-                      tagTextColor="#CCC"
-                      selectedItemTextColor="#CCC"
-                      selectedItemIconColor="#CCC"
-                      itemTextColor="#000"
+                      selectedItemTextColor={colors.quaternaryText}
+                      selectedItemIconColor={colors.quaternaryText}
+                      itemTextColor={colors.terciaryText}
+                      searchInputStyle={{ color: colors.terciaryText }}
+                      submitButtonColor={colors.terciaryText}
+                      textColor={colors.primaryText}
+                      styleMainWrapper={ styles.multiSelect }
+                      styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
+                      tagRemoveIconColor={ colors.primaryText }
+                      tagBorderColor={ colors.primaryText }
+                      tagTextColor={ colors.primaryText }
                       displayKey="alias"
-                      searchInputStyle={{ color: '#CCC' }}
-                      submitButtonColor="#CCC"
                       submitButtonText={ translate('submit') }
-                      styleMainWrapper={ styles.textInput }
                     />
 
                     <View style={ styles.mapElement }>
@@ -281,6 +293,7 @@ export default class AcademyEditScreen extends React.Component {
                                     alignSelf: 'stretch',
                                     width: '100%',
                                     backgroundColor: 'rgba(0,0,0,0)',
+                                    color: colors.terciaryText,
                                     height: 40,
                                     zIndex: 10,
                                     elevation: 10,
@@ -319,9 +332,9 @@ export default class AcademyEditScreen extends React.Component {
                                 uniqueKey="address"
                                 displayKey="address"
                                 onItemsUpdated={this.onLocationRemoved}
-                                tagRemoveIconColor="#CCC"
-                                tagBorderColor="#CCC"
-                                tagTextColor="#CCC"
+                                tagRemoveIconColor={ colors.primaryText }
+                                tagBorderColor={ colors.primaryText }
+                                tagTextColor={ colors.primaryText }
                             />
                         </View>
                       </View>
@@ -344,13 +357,14 @@ export default class AcademyEditScreen extends React.Component {
                              position: 'absolute',
                              bottom: 10,
                              right: 10,
+                             zIndex: 100
                              }}
                             caption={ translate('save') }
                             onPress={this.submit}
                           />
                   </Animated.View>
                 </View>
-              </ImageBackground>
+              </View>
       );
     }
   }
@@ -362,8 +376,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 30,
   },
-  backgroundImage: {
+  background: {
     flex: 1,
+    backgroundColor: colors.primaryBackground
   },
   section: {
     flex: 1,
@@ -384,6 +399,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   textInput: {
+    alignSelf: 'stretch',
+    marginTop: 20,
+  },
+  multiSelect: {
     alignSelf: 'stretch',
     marginTop: 20,
   },

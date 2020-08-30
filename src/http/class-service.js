@@ -2,6 +2,10 @@ import BaseService from './base-service.js';
 
 class ClassService extends BaseService {
 
+    constructor(entity) {
+        super(entity, 'https://academy.armadama.com/v1/');
+    }
+
     async attend(data) {
             const httpConfig = {
                 method: 'PATCH',

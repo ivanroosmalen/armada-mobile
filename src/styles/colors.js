@@ -6,6 +6,7 @@ const colors = {
   secondaryText: 'rgb(10,42,84)',
   terciaryBackground: '#f5f5f5',
   terciaryText: '#2e2d2d',
+  quaternaryBackground: '#a8a8a8',
   quaternaryText: '#a8a8a8',
   primaryIcon: '#efefef',
   secondaryIcon: '#2e2d2d',

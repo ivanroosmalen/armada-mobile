@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-let academiesState = { academies: [], academy: {} };
+let academiesState = { academies: [], academy: {}, userAcademies: {}, queryParams: {} };
 
 const academiesReducer = (state = academiesState, action) => {
      switch (action.type) {
@@ -12,6 +12,9 @@ const academiesReducer = (state = academiesState, action) => {
             break;
         case 'USER_ACADEMIES':
             state = { ...state, userAcademies: action.data };
+            break;
+        case 'QUERY_PARAMS':
+            state = { ...state, queryParams: action.data };
             break;
         default:
           break

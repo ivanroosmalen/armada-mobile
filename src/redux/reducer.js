@@ -9,7 +9,7 @@ import martialArts from './martialArts/martialArt-reducers';
 import scheduleItems from './scheduleItems/scheduleItem-reducers';
 import classes from './classes/class-reducers';
 
-export default combineReducers({
+const appReducer = combineReducers({
   // ## Generator Reducers
   app,
   users,
@@ -19,3 +19,13 @@ export default combineReducers({
   scheduleItems,
   classes
 });
+
+const rootReducer = (state, action) => {
+  if (action.type === 'LOGOUT') {
+    state = undefined
+  }
+
+  return appReducer(state, action)
+}
+
+export default rootReducer;

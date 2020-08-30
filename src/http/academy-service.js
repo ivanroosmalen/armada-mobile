@@ -2,6 +2,10 @@ import BaseService from './base-service.js';
 
 class AcademyService extends BaseService {
 
+    constructor(entity) {
+        super(entity, 'https://academy.armadama.com/v1/');
+    }
+
     async updateProfileImage(id, data, options) {
                 const httpConfig = {
                     method: 'POST',

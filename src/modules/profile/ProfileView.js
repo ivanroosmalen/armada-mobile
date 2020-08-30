@@ -8,6 +8,7 @@ import moment from 'moment';
 import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
 import { translate } from '../../translations/index.js';
+import Toast from 'react-native-simple-toast';
 
 import { Button } from '../../components';
 import { fonts, colors } from '../../styles';
@@ -19,24 +20,23 @@ export default class ProfileScreen extends React.Component {
       selectedIndex: 0,
       userIsOwner: false,
       placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg',
-      menuOptions: [translate('edit'), translate('updateProfileImage')]
+      menuOptions: [translate('edit'), translate('updateProfileImage')],
+      menuEntities: ['edit', 'updateProfileImage']
   }
 
   getStudentAcademies(martialArt = {}) {
     return martialArt.studentAcademies || [];
   }
 
-  menuOptionSelected(index) {
-    if(this.state) {
-        switch(this.state.menuOptions[index]) {
-            case 'Edit':
+  menuOptionSelected(menuEntity) {
+        switch(menuEntity) {
+            case 'edit':
                 this.props.navigation.navigate('ProfileEdit', { id: this.props.loggedInUser._id });
             break;
-            case 'Update profile image':
+            case 'updateProfileImage':
                 this.selectImage();
             break;
         }
-    }
   }
 
   async selectImage() {
@@ -50,10 +50,12 @@ export default class ProfileScreen extends React.Component {
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
+                Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
                 await s3Service.uploadImage(file, uploadUrl);
             }
 
             await this.props.getUser(this.props.route.params.id);
+
           }
         })
   }
@@ -95,7 +97,7 @@ export default class ProfileScreen extends React.Component {
                             </View>
                           )}
                           dropdownStyle={{ height: 80 }}
-                          onSelect={(index) => this.menuOptionSelected(index)}
+                          onSelect={(index) => this.menuOptionSelected(this.state.menuEntities[index])}
                         >
                     <View>
                       <Text>
@@ -106,6 +108,7 @@ export default class ProfileScreen extends React.Component {
               </View>
           )}
 
+            {!!(user.alias || user.firstName || user.lastName) && (
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
               <Text style={styles.alias}>{user.alias}</Text>
 
@@ -115,6 +118,7 @@ export default class ProfileScreen extends React.Component {
               </View>
               )}
             </View>
+            )}
 
           </ImageBackground>
           {!!(user.martialArts && user.martialArts.length) && (

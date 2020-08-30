@@ -1,12 +1,13 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://10.0.2.2:3000/v1/';
+//const BASE_URL = 'http://10.0.2.2:3000/v1/';
+const BASE_URL = 'https://user.armadama.com/v1/';
 import { store } from '../redux/store.js';
 
 class BaseService {
 
-    constructor(entity) {
-        this.url = BASE_URL + entity;
+    constructor(entity, baseUrl) {
+        this.url = (baseUrl || BASE_URL) + entity;
         this.httpRequest = axios;
     }
 
@@ -23,7 +24,7 @@ class BaseService {
         return await this.httpRequest(httpConfig, options).then(res => {
             return res;
         }).catch(e => {
-            console.error('Failed request', e);
+            console.log('Failed request', e);
             return e.response;
         });
     }

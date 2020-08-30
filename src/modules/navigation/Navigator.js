@@ -5,43 +5,55 @@ import {
   DrawerItem,
   DrawerContentScrollView,
 } from '@react-navigation/drawer';
+import {
+  CommonActions
+} from '@react-navigation/native';
 import NavigatorView from './RootNavigation';
 import { store } from '../../redux/store.js';
 import { colors } from '../../styles';
 import ImagePicker from 'react-native-image-picker'
 import { translate } from '../../translations/index.js';
-import { updateThumbnailImage } from '../../redux/users/actions';
+import { updateThumbnailImage, logout } from '../../redux/users/actions';
 import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
+import Toast from 'react-native-simple-toast';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Drawer = createDrawerNavigator();
 
-async function selectImage() {
+async function selectImage(props) {
+        const state = store.getState();
+        let currentUser = state.users.loggedInUser;
         const options = {
           noData: false,
           mediaType: 'photo'
         }
         ImagePicker.showImagePicker(options, async file => {
           if (file.uri) {
-            let response = await store.dispatch(updateThumbnailImage(loggedInUser._id, { contentType: file.type }))
+            let response = await store.dispatch(updateThumbnailImage(currentUser._id, { contentType: file.type }))
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
+                Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
                 await s3Service.uploadImage(file, uploadUrl);
-
-                loggedInUser.thumbnailImg = url;
-                await store.dispatch({type: 'LOGGED_IN_USER', data: loggedInUser});
+                currentUser.thumbnailImg = uploadUrl.split('?')[0];
+                await store.dispatch({type: 'LOGGED_IN_USER', data: currentUser});
             }
+
+            props.navigation.closeDrawer();
           }
         })
+  }
+
+  async function onLogout(props) {
+    await store.dispatch(logout());
+    props.navigation.navigate('Auth')
   }
 
 function CustomDrawerContent(props) {
   const state = store.getState();
   let currentUser = state.users.loggedInUser;
-  let placeholderImage = 'https://armada-user-images.s3.amazonaws.com/default/thumbnail.jpg'
 
   let userAcademies = state.academies.userAcademies;
   let isAcademyOwner = !!(userAcademies && userAcademies.owner && userAcademies.owner.length)
@@ -56,12 +68,14 @@ function CustomDrawerContent(props) {
           label={() => (
           <View>
               <View style={styles.avatarContainer}>
-                <TouchableOpacity onPress={() => selectImage()}>
-                    <Image
-                      style={styles.avatar}
-                      source={{ uri: state.users.loggedInUser.thumbnailImg || placeholderImage }}
-                    />
+              {!!(currentUser && currentUser.thumbnailImg) && (
+                <TouchableOpacity onPress={() => selectImage(props)}>
+                        <Image
+                          style={styles.avatar}
+                          source={{ uri: currentUser.thumbnailImg }}
+                        />
                 </TouchableOpacity>
+                )}
                 <TouchableOpacity onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}>
                     <View style={{ paddingLeft: 15, alignSelf: 'stretch' }}>
                       <Text style={styles.userName}>{currentUser.alias || 'Edit profile'}</Text>
@@ -77,7 +91,7 @@ function CustomDrawerContent(props) {
       )}
 
         <DrawerItem
-          key={`account`}
+          key={`home`}
           label={() => (
             <View
               style={styles.menuLabelFlex}>
@@ -97,7 +111,7 @@ function CustomDrawerContent(props) {
       {currentUser && (
         <View>
             <DrawerItem
-              key={`account`}
+              key={`academies`}
               label={() => (
                 <View
                   style={styles.menuLabelFlex}>
@@ -115,7 +129,7 @@ function CustomDrawerContent(props) {
             />
 
             <DrawerItem
-              key={`account`}
+              key={`schedule`}
               label={() => (
                 <View
                   style={styles.menuLabelFlex}>
@@ -134,7 +148,7 @@ function CustomDrawerContent(props) {
 
             { isAcademyOwner && (
             <DrawerItem
-              key={`account`}
+              key={`requests`}
               label={() => (
                 <View
                   style={styles.menuLabelFlex}>
@@ -155,6 +169,7 @@ function CustomDrawerContent(props) {
       )}
 
       <View style={styles.divider} />
+
       {currentUser && (
         <View>
         <DrawerItem
@@ -176,6 +191,7 @@ function CustomDrawerContent(props) {
         />
 
           <DrawerItem
+            key={`logout`}
             label={() => (
               <View style={styles.menuLabelFlex}>
                     <Icon
@@ -189,7 +205,7 @@ function CustomDrawerContent(props) {
               </View>
             )}
             onPress={() =>  {
-                    props.navigation.navigate('Auth')
+                    onLogout(props)
                 }
             }
           />
@@ -198,6 +214,7 @@ function CustomDrawerContent(props) {
 
       {!currentUser && (
                 <DrawerItem
+                  key={`login`}
                   label={() => (
                     <View style={styles.menuLabelFlex}>
                         <Icon
@@ -213,6 +230,24 @@ function CustomDrawerContent(props) {
                   onPress={() => props.navigation.navigate('Auth')}
                 />
             )}
+
+    <DrawerItem
+          key={`contact`}
+          label={() => (
+            <View
+              style={styles.menuLabelFlex}>
+                <Icon
+                          name="email"
+                          style={{
+                            fontSize: 20,
+                            color: colors.primaryIcon
+                          }}
+                        />
+              <Text style={styles.menuTitle}>{ translate('contact') || 'Contact'}</Text>
+            </View>
+          )}
+          onPress={() => props.navigation.navigate('Contact')}
+        />
     </DrawerContentScrollView>
   );
 }
