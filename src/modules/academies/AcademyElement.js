@@ -59,7 +59,6 @@ export default function AcademyElement(props) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: colors.white,
   },
   tabsContainer: {
@@ -67,8 +66,8 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   itemOneContainer: {
-    flex: 1,
-//    width: Dimensions.get('window').width - 40,
+    width: Dimensions.get('window').width - 32,
+    height: Dimensions.get('window').width
   },
   itemOneImageContainer: {
     borderTopRightRadius: 3,
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   itemOneImage: {
-    height: 200,
+    height: Dimensions.get('window').width / 2,
     width: Dimensions.get('window').width - 32
   },
   itemOneTitle: {
@@ -113,18 +112,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderColor: colors.borderColor,
     borderWidth: 1,
-    borderRadius: 3
+    borderRadius: 3,
+    height: Dimensions.get('window').width / 1.5
   },
   itemOneContent: {
     marginTop: 5,
     marginBottom: 10,
     paddingLeft: 5,
     color: colors.terciaryBackground
-  },
-  badge: {
-    backgroundColor: colors.labelTwo,
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
+  }
 });

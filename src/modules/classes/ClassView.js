@@ -131,9 +131,9 @@ export default class ClassScreen extends React.Component {
       let startDate = this.props.route.params.startDate;
       let endDate = this.props.route.params.endDate;
 
-      let userIsOwner = !!(this.props.academy && this.props.academy.owners && this.props.academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
-      let userIsStudent = !!(this.props.academy && this.props.academy.students && this.props.academy.students.find(student => student._id === this.props.loggedInUser._id));
-      let userIsAttending = !!(classObj.attendees && classObj.attendees.find(attendee => attendee._id === this.props.loggedInUser._id));
+      let userIsOwner = !!(this.props.loggedInUser && this.props.academy && this.props.academy.owners && this.props.academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
+      let userIsStudent = !!(this.props.loggedInUser && this.props.academy && this.props.academy.students && this.props.academy.students.find(student => student._id === this.props.loggedInUser._id));
+      let userIsAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => attendee._id === this.props.loggedInUser._id));
       let classIsFull = classObj.attendees && classObj.attendees.length === classObj.classSize;
 
       if(moment(classObj.schedule.startDate).valueOf() !== moment(startDate).valueOf()) {

@@ -23,6 +23,7 @@ class ScheduleScreen extends React.Component {
       <View style={{flex: 1}}>
         <ScheduleElement classes={this.props.classes} loggedInUser={this.props.loggedInUser} attend={this.props.attend} unattend={this.props.unattend}/>
 
+        {!!this.props.loggedInUser && (
         <TouchableOpacity
             onPress={() => this.props.navigation.navigate('ClassEdit', { academyId: this.props.route.params.id })}
             style={ styles.addButton } >
@@ -31,6 +32,7 @@ class ScheduleScreen extends React.Component {
               style={styles.addIcon}
             />
         </TouchableOpacity>
+        )}
       </View>
     );
   }
@@ -50,6 +52,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 15,
         right: 15,
-        borderRadius: 20
+        borderRadius: 20,
+        overflow: 'hidden'
   }
 });

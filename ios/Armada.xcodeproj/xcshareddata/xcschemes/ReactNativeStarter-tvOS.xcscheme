@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0940"
+   LastUpgradeVersion = "1160"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "NO"
@@ -29,9 +29,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "ReactNativeStarter-tvOS.app"
-               BlueprintName = "ReactNativeStarter-tvOS"
-               ReferencedContainer = "container:ReactNativeStarter.xcodeproj">
+               BuildableName = "Armada-tvOS.app"
+               BlueprintName = "Armada-tvOS"
+               ReferencedContainer = "container:Armada.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -43,9 +43,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "ReactNativeStarter-tvOSTests.xctest"
-               BlueprintName = "ReactNativeStarter-tvOSTests"
-               ReferencedContainer = "container:ReactNativeStarter.xcodeproj">
+               BuildableName = "Armada-tvOSTests.xctest"
+               BlueprintName = "Armada-tvOSTests"
+               ReferencedContainer = "container:Armada.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -55,29 +55,27 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
+            BuildableName = "Armada-tvOS.app"
+            BlueprintName = "Armada-tvOS"
+            ReferencedContainer = "container:Armada.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "ReactNativeStarter-tvOSTests.xctest"
-               BlueprintName = "ReactNativeStarter-tvOSTests"
-               ReferencedContainer = "container:ReactNativeStarter.xcodeproj">
+               BuildableName = "Armada-tvOSTests.xctest"
+               BlueprintName = "Armada-tvOSTests"
+               ReferencedContainer = "container:Armada.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "ReactNativeStarter-tvOS.app"
-            BlueprintName = "ReactNativeStarter-tvOS"
-            ReferencedContainer = "container:ReactNativeStarter.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </TestAction>
    <LaunchAction
       buildConfiguration = "Debug"
@@ -94,13 +92,11 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "ReactNativeStarter-tvOS.app"
-            BlueprintName = "ReactNativeStarter-tvOS"
-            ReferencedContainer = "container:ReactNativeStarter.xcodeproj">
+            BuildableName = "Armada-tvOS.app"
+            BlueprintName = "Armada-tvOS"
+            ReferencedContainer = "container:Armada.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <AdditionalOptions>
-      </AdditionalOptions>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -113,9 +109,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "ReactNativeStarter-tvOS.app"
-            BlueprintName = "ReactNativeStarter-tvOS"
-            ReferencedContainer = "container:ReactNativeStarter.xcodeproj">
+            BuildableName = "Armada-tvOS.app"
+            BlueprintName = "Armada-tvOS"
+            ReferencedContainer = "container:Armada.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

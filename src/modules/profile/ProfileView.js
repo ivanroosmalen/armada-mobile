@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, ImageBackground, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, ImageBackground, Image, TouchableOpacity, Dimensions } from 'react-native';
 import ImagePicker from 'react-native-image-picker'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RadioGroup } from '../../components';
@@ -29,12 +29,16 @@ export default class ProfileScreen extends React.Component {
   }
 
   menuOptionSelected(menuEntity) {
+        this.optionsMenu.hide();
+
         switch(menuEntity) {
             case 'edit':
                 this.props.navigation.navigate('ProfileEdit', { id: this.props.loggedInUser._id });
             break;
             case 'updateProfileImage':
-                this.selectImage();
+                setTimeout(() => {
+                    this.selectImage();
+                }, 500)
             break;
         }
   }
@@ -46,11 +50,11 @@ export default class ProfileScreen extends React.Component {
         }
         ImagePicker.showImagePicker(options, async file => {
           if (file.uri) {
+            Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
             let response = await this.props.updateProfileImage(this.props.loggedInUser._id, { contentType: file.type });
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
-                Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
                 await s3Service.uploadImage(file, uploadUrl);
             }
 
@@ -76,7 +80,7 @@ export default class ProfileScreen extends React.Component {
           <ImageBackground
             resizeMode="cover"
             source={{uri: imageUri} }
-            style={[styles.section, styles.header]}
+            style={styles.backgroundImage}
           >
 
           {userIsOwner && (
@@ -109,7 +113,7 @@ export default class ProfileScreen extends React.Component {
           )}
 
             {!!(user.alias || user.firstName || user.lastName) && (
-            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 20, paddingLeft: 20 }}>
               <Text style={styles.alias}>{user.alias}</Text>
 
               {(user.firstName || user.lastName) && (
@@ -163,12 +167,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   header: {
-    flex: 2,
     padding: 20,
+    height: 300
   },
   section: {
     flex: 3,
     position: 'relative',
+  },
+  backgroundImage: {
+    height: Dimensions.get('window').width / 1.5
   },
   itemLabel: {
     width: 200,
@@ -190,9 +197,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryBackgroundTransparent,
     alignSelf: 'flex-start',
     borderRadius: 15,
+    overflow: 'hidden',
     paddingLeft: 10,
     paddingRight: 10,
-    height: 40
+    height: 35
   },
   name: {
     color: colors.primaryText,
@@ -202,10 +210,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryBackgroundTransparent,
     alignSelf: 'flex-start',
     borderRadius: 15,
-    borderColor: 'rgb(65, 131, 215)',
+    overflow: 'hidden',
     paddingLeft: 10,
     paddingRight: 10,
-    height: 25
+    height: 23
   },
   lightText: {
     color: colors.white,
@@ -237,13 +245,6 @@ const styles = StyleSheet.create({
   bottomRow: {
     height: 80,
     flexDirection: 'row',
-  },
-  backgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 250,
   },
   company: {
     color: colors.white,

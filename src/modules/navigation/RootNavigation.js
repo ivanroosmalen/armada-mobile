@@ -27,13 +27,13 @@ export default function NavigatorView(props) {
     )
   }
 
-  const headerTitleComponent = (displayName) => {
+  const headerTitleComponent = () => {
     return (
          <Image
             source={require('../../../assets/images/armada-logo.png')}
             resizeMode="contain"
             style={{
-               height: 40
+               marginTop:20
             }}
          />
     )

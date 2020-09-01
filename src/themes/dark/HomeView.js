@@ -10,7 +10,7 @@ import { fonts, colors } from '../../styles';
 import { Text } from '../../components/StyledText';
 
 export default function HomeScreen({ isExtended, setIsExtended }) {
-  // const rnsUrl = 'https://reactnativestarter.com';
+  // const rnsUrl = 'https://armadama.com';
   // const handleClick = () => {
   //   Linking.canOpenURL(rnsUrl).then(supported => {
   //     if (supported) {

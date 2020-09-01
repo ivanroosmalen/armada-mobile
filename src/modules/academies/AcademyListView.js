@@ -38,17 +38,19 @@ export default class AcademyListScreen extends React.Component {
   }
 
   onMarkerSelect(location) {
-
+  console.log("MARKER")
         let selectedAcademy = this.props.academies.find(academy => (academy._id === location.academyId));
+
         this.setState({
-            displayedAcademies: [ selectedAcademy ]
+            displayedAcademies: [selectedAcademy]
         })
-        console.log(this.flatList)
+
         this._flatList  && this._flatList .scrollToOffset({ offset: 0, animated: false })
 
   }
 
   onMapSelect() {
+  console.log("MAP")
         this.setState({
             displayedAcademies: this.props.academies,
         })
@@ -143,6 +145,7 @@ export default class AcademyListScreen extends React.Component {
   };
 
   render() {
+    let displayedAcademies = this.state.displayedAcademies;
     let location = this.state.location;
     let locations = [];
 
@@ -165,7 +168,7 @@ export default class AcademyListScreen extends React.Component {
                       />
                 </TouchableOpacity>
             {this.state.showMap && (
-                <View>
+                <View style={styles.mapParent}>
                 {this.state.refreshable && (
                 <TouchableOpacity onPress={() => this.searchAcademies()} style={styles.searchButton}>
                     <Icon
@@ -193,7 +196,7 @@ export default class AcademyListScreen extends React.Component {
                     <Marker
                         coordinate={{ latitude: location.geo.coordinates[1], longitude: location.geo.coordinates[0] }}
                         title={location.academyName}
-                        onPress={() => {this.onMarkerSelect(location)}}
+                        onPress={(e) => {e.stopPropagation(); this.onMarkerSelect(location)}}
                         onDeselect={() => {this.onMapSelect()}}
                     />
 
@@ -203,7 +206,7 @@ export default class AcademyListScreen extends React.Component {
               </View>
             )}
 
-            {!(this.state.displayedAcademies && this.state.displayedAcademies.length) && (
+            {!(displayedAcademies && displayedAcademies.length) && (
                 <View style={styles.noDataContainer}>
                     <Text style={styles.noData}>
                         {translate('noAcademies')}
@@ -211,26 +214,30 @@ export default class AcademyListScreen extends React.Component {
                 </View>
             )}
 
-            {!!(this.state.displayedAcademies && this.state.displayedAcademies.length) && !this.state.showMap && (
+            <View style={styles.content}>
+            {!!(displayedAcademies && displayedAcademies.length) && !this.state.showMap && (
                     <FlatList
                       ref={this.flatList}
                       keyExtractor={item => item._id }
-                      style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
-                      data={this.state.displayedAcademies}
+                      style={styles.list}
+                      data={displayedAcademies}
                       renderItem={this._getRenderItemFunction}
+                      contentContainerStyle={{ height: '100%'}}
                     />
             )}
 
-            {!!(this.state.displayedAcademies && this.state.displayedAcademies.length) && this.state.showMap && (
+            {!!(displayedAcademies && displayedAcademies.length) && this.state.showMap && (
                     <FlatList
                       ref={(fl) => this._flatList = fl}
                       horizontal
                       keyExtractor={item => item._id }
-                      style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
-                      data={this.state.displayedAcademies}
+                      style={styles.list}
+                      data={displayedAcademies}
                       renderItem={this._getRenderItemFunction}
+                      contentContainerStyle={{ paddingRight: 30 }}
                     />
             )}
+            </View>
 
                 {!!this.props.loggedInUser && (
                 <TouchableOpacity onPress={() => this.props.navigation.navigate('AcademyCreate')} style={ styles.addButton }>
@@ -248,6 +255,7 @@ export default class AcademyListScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'space-between',
     backgroundColor: colors.primaryBackground,
   },
   tabsContainer: {
@@ -282,7 +290,7 @@ const styles = StyleSheet.create({
   },
   itemOneRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     marginTop: 10,
     borderWidth:1
   },
@@ -300,7 +308,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 12,
     right: 12,
-    borderRadius: 20
+    borderRadius: 20,
+    overflow: 'hidden'
   },
   mapIcon: {
         fontSize: 40,
@@ -316,6 +325,7 @@ const styles = StyleSheet.create({
     right: 12,
     borderRadius: 30,
     zIndex: 1,
+    overflow: 'hidden'
   },
   searchIcon: {
         fontSize: 35,
@@ -330,11 +340,15 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     alignSelf: 'center',
     position: 'absolute',
+    overflow: 'hidden'
   },
   map: {
-    height: 330,
     justifyContent: 'flex-end',
     alignItems: 'center',
+    flex: 1
+  },
+  mapParent: {
+    flex: 1
   },
   noData: {
     fontSize: 20,
@@ -346,5 +360,14 @@ const styles = StyleSheet.create({
   noDataContainer: {
       backgroundColor: colors.secondaryBackground,
       flex: 1
+  },
+  list: {
+      backgroundColor: colors.white,
+      paddingHorizontal: 15,
+  },
+  content: {
+    height: 'auto',
+    justifyContent: 'flex-end',
+    backgroundColor: colors.secondaryBackground,
   }
 });

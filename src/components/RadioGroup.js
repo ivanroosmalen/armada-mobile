@@ -78,7 +78,7 @@ export default function RNSRadioGroup({
 
 const styles = {
   container: {
-    flex: 1,
+    height: 75,
     flexDirection: 'row',
     borderColor: colors.secondaryText,
     borderWidth: 1,

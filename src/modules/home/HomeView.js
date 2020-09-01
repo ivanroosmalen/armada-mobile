@@ -4,7 +4,8 @@ import {
   View,
   TouchableOpacity,
   ImageBackground,
-  FlatList
+  FlatList,
+  Dimensions
 } from 'react-native';
 
 import { fonts, colors } from '../../styles';
@@ -12,6 +13,7 @@ import { Text } from '../../components/StyledText';
 import { translate } from '../../translations/index.js';
 import GetLocation from 'react-native-get-location'
 import { Button } from '../../components';
+import settings from '../../settings.js'
 
 import AcademyElement from '../academies/AcademyElement';
 import AcademyRequestElement from '../academies/AcademyRequestElement';
@@ -159,7 +161,7 @@ export default class HomeScreen extends React.Component {
               </View>
 
               {!!(displayedAcademies && displayedAcademies.length) && (
-                  <View style={styles.section}>
+                  <View style={styles.academySection}>
                      <Text style={styles.header}>
                          {hasAcademies ? translate('yourAcademies') : translate('academiesNearYou')}
                      </Text>
@@ -175,7 +177,7 @@ export default class HomeScreen extends React.Component {
               )}
 
               {!(displayedAcademies && displayedAcademies.length) && (
-                <View style={styles.section}>
+                <View style={styles.academySection}>
                   <View>
                      <Text style={styles.content}>
                          {translate('noAcademiesNear')}
@@ -236,12 +238,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.secondaryBackground,
+    justifyContent: 'space-between'
   },
   section: {
-    flex: 0.5
+  },
+  academySection: {
+    justifyContent: 'flex-end'
   },
   quarterSection: {
-    flex: 0.25
+    justifyContent: 'flex-end',
+    paddingBottom: 20
   },
   header: {
     marginTop: 5,
@@ -262,7 +268,7 @@ const styles = StyleSheet.create({
   },
   createAcademyButton: {
     width: 250,
-    marginTop: 30,
+    marginTop: 20,
     alignSelf: 'center'
   }
 });

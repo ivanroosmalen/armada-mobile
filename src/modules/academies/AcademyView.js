@@ -41,11 +41,11 @@ export default class AcademyScreen extends React.Component {
         }
         ImagePicker.showImagePicker(options, async file => {
           if (file.uri) {
+            Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
             let response = await this.props.updateProfileImage(this.props.academy._id, { contentType: file.type });
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
-                Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
                 await s3Service.uploadImage(file, uploadUrl);
             }
 
@@ -60,7 +60,9 @@ export default class AcademyScreen extends React.Component {
                 this.props.navigation.navigate('AcademyEdit', { id: this.props.academy && this.props.academy._id });
             break;
             case 'updateImage':
-                this.selectImage();
+                setTimeout(() => {
+                    this.selectImage();
+                }, 500)
             break;
             case 'join':
                 this.createAcademyRequest()
@@ -157,10 +159,10 @@ export default class AcademyScreen extends React.Component {
           <ImageBackground
             resizeMode="cover"
             source={{uri: (academy && academy.profileImg) ? academy.profileImg : this.state.placeholderImage} }
-            style={[styles.section, styles.header]}
+            style={styles.backgroundImage}
           >
 
-            <View style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <View style={{ flex: 1, justifyContent: 'flex-end', paddingBottom: 20, paddingLeft: 20 }}>
               <Text style={styles.title}>{academy && academy.name}</Text>
             </View>
 
@@ -339,7 +341,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: colors.secondaryBackground
   },
-
+  backgroundImage: {
+    height: Dimensions.get('window').width / 1.5
+  },
   itemLabel: {
     width: 200,
     fontWeight: 'bold',
@@ -356,10 +360,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryBackgroundTransparent,
     alignSelf: 'flex-start',
     borderRadius: 15,
+    overflow: 'hidden',
     borderColor: 'rgb(65, 131, 215)',
     paddingLeft: 10,
     paddingRight: 10,
-    height: 40
+    height: 35
   },
   infoRow: {
     alignItems: 'center',
@@ -395,13 +400,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#e3e3e3',
     borderBottomWidth: 1,
     marginLeft: 20,
-  },
-  backgroundImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 250
   },
   position: {
     color: colors.white,

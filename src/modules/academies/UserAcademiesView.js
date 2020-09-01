@@ -161,17 +161,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 12,
     right: 12,
-    borderRadius: 20
+    borderRadius: 20,
+    overflow: 'hidden'
   },
   addIconEmpty: {
     fontSize: 35,
     backgroundColor: colors.iconBackground,
     color: colors.secondaryIcon,
     borderRadius: 20,
-    alignSelf: 'center'
+    alignSelf: 'center',
+    overflow: 'hidden'
   },
   addButtonEmpty: {
-    borderRadius: 20
+    borderRadius: 20,
+    overflow: 'hidden'
   },
   noData: {
     fontSize: 20,

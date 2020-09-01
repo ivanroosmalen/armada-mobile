@@ -9,7 +9,8 @@ import { StyleSheet,
            TouchableOpacity,
            ImageBackground,
            Image,
-           TouchableHighlight
+           TouchableHighlight,
+           ScrollView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
@@ -236,11 +237,13 @@ export default class AcademyEditScreen extends React.Component {
                       searchInputPlaceholderText={ translate('searchMartialArts') }
                       selectedItemTextColor={colors.quaternaryText}
                       selectedItemIconColor={colors.quaternaryText}
+                      styleMainWrapper={{zIndex: 100}}
                       itemTextColor={colors.terciaryText}
                       searchInputStyle={{ color: colors.terciaryText }}
                       submitButtonColor={colors.terciaryText}
                       textColor={colors.primaryText}
-                      styleMainWrapper={ styles.multiSelect }
+                      styleMainWrapper={ styles.maMultiSelect }
+                      styleListContainer={{height: 200}}
                       styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
                       tagRemoveIconColor={ colors.primaryText }
                       tagBorderColor={ colors.primaryText }
@@ -263,7 +266,8 @@ export default class AcademyEditScreen extends React.Component {
                       searchInputStyle={{ color: colors.terciaryText }}
                       submitButtonColor={colors.terciaryText}
                       textColor={colors.primaryText}
-                      styleMainWrapper={ styles.multiSelect }
+                      styleMainWrapper={ styles.instructorMultiSelect }
+                      styleListContainer={{height: 200}}
                       styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
                       tagRemoveIconColor={ colors.primaryText }
                       tagBorderColor={ colors.primaryText }
@@ -273,15 +277,15 @@ export default class AcademyEditScreen extends React.Component {
                     />
 
                     <View style={ styles.mapElement }>
-                        <View style={{position: 'absolute', width: '100%'}}>
+                        <View style={{minHeight: 200}}>
                             <GooglePlacesAutocomplete
                               placeholder={ translate('enterAddress') }
                               minLength={2}
                               autoFocus={false}
                               returnKeyType={'default'}
                               fetchDetails={true}
+                              listViewDisplayed={true}
                               onPress={(data, details = null) => {
-                                // 'details' is provided when fetchDetails = true
                                 this.onAddressSelect(details);
                               }}
                               query={{
@@ -294,13 +298,13 @@ export default class AcademyEditScreen extends React.Component {
                                     width: '100%',
                                     backgroundColor: 'rgba(0,0,0,0)',
                                     color: colors.terciaryText,
-                                    height: 40,
-                                    zIndex: 10,
                                     elevation: 10,
-                                    height:200
+                                    minHeight:0,
+                                    zIndex: 999
                                 },
                                 listView: {
-                                    backgroundColor: 'rgba(255,255,255,1)'
+                                    backgroundColor: 'rgba(255,255,255,1)',
+                                    height:300
                                 },
                                 row: {
                                     backgroundColor: 'rgba(255,255,255,1)'
@@ -402,10 +406,16 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     marginTop: 20,
   },
-  multiSelect: {
+  instructorMultiSelect: {
     alignSelf: 'stretch',
     marginTop: 20,
+    zIndex:100
   },
+  maMultiSelect: {
+      alignSelf: 'stretch',
+      marginTop: 20,
+      zIndex:1000
+    },
   headerTitle: {
       fontWeight: "bold",
       fontSize: 25,
@@ -418,9 +428,6 @@ const styles = StyleSheet.create({
   mapTextInput: {
   },
   locations: {
-      width: '100%',
-      marginTop: 50,
-      zIndex: 1,
-      elevation: 1,
+      width: '100%'
   }
 });

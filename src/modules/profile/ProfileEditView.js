@@ -261,6 +261,7 @@ export default class ProfileEditScreen extends React.Component {
                               submitButtonColor={colors.terciaryText}
                               textColor={colors.primaryText}
                               styleMainWrapper={ styles.multiSelect }
+                              styleListContainer={{height: 200}}
                               styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
                               submitButtonText={ translate('submit') }
                             />
@@ -379,7 +380,8 @@ const styles = StyleSheet.create({
   },
   multiSelect: {
     alignSelf: 'stretch',
-    width: '100%'
+    width: '100%',
+    zIndex: 99999
   },
   martialArtRadio: {
       backgroundColor: 'white'

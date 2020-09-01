@@ -1,4 +1,4 @@
-package com.reactnativestarter;
+package com.armadama;
 
 import android.app.Application;
 import android.content.Context;

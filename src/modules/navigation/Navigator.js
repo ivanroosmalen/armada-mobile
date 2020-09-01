@@ -64,27 +64,30 @@ function CustomDrawerContent(props) {
     <DrawerContentScrollView {...props} style={{padding: 0}}>
       {currentUser && currentUser._id && (
       <View>
+      <View style={{flexDirection: 'row'}}>
+      {!!(currentUser && currentUser.thumbnailImg) && (
       <DrawerItem
+            style={{width: 75}}
           label={() => (
-          <View>
               <View style={styles.avatarContainer}>
-              {!!(currentUser && currentUser.thumbnailImg) && (
-                <TouchableOpacity onPress={() => selectImage(props)}>
                         <Image
                           style={styles.avatar}
                           source={{ uri: currentUser.thumbnailImg }}
                         />
-                </TouchableOpacity>
-                )}
-                <TouchableOpacity onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}>
-                    <View style={{ paddingLeft: 15, alignSelf: 'stretch' }}>
-                      <Text style={styles.userName}>{currentUser.alias || 'Edit profile'}</Text>
-                    </View>
-                </TouchableOpacity>
-              </View>
-          </View>)}
+              </View>)}
+          onPress={() => selectImage(props)}
+          />
+      )}
+      <DrawerItem
+            style={{width: '100%'}}
+          label={() => (
+            <View style={{justifyContent: 'center', alignItems: 'center', height: 75, width: '100%'}}>
+                <Text style={styles.userName}>{currentUser.alias || 'Edit profile'}</Text>
+            </View>
+          )}
           onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}
           />
+          </View>
 
           <View style={styles.divider} />
           </View>
@@ -277,7 +280,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     color: '#fff',
-    fontSize: 18
+    fontSize: 18,
   },
   divider: {
     borderBottomColor: 'white',
