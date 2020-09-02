@@ -103,5 +103,6 @@
   "browse": "Browse academies",
   "imageUpload": "Image is being updated",
   "contact": "Contact",
-  "featureRequests": "For issues, questions, or feature requests, please send an email to:"
+  "featureRequests": "For issues, questions, or feature requests, please send an email to:",
+  "loading": "Loading..."
 }

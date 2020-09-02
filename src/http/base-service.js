@@ -93,7 +93,6 @@ class BaseService {
             method: 'DELETE',
             url: this.buildURL([id])
         };
-        console.log("DELETING")
         return this.makeRequest(httpConfig, options);
     }
 

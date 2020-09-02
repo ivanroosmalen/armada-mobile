@@ -8,7 +8,10 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  NavigationEvents
+  NavigationEvents,
+  Animated,
+  RefreshControl,
+  ScrollView
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
@@ -23,11 +26,41 @@ import { translate } from '../../translations/index.js';
 export default class AcademyRequestListScreen extends React.Component {
 
   state = {
+    anim: new Animated.Value(0),
+    refreshing: false
+  }
+
+  async onRefresh() {
+    this.setState({ refreshing: true })
+    await this.props.getAcademyRequests({ complete: false });
+    this.setState({ refreshing: false })
   }
 
   async componentDidMount() {
-    this.props.getAcademyRequests({ complete: false });
+    await this.props.getAcademyRequests({ complete: false });
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
 
   _getRenderItemFunction = ({ item }) => {
     return (
@@ -43,7 +76,8 @@ export default class AcademyRequestListScreen extends React.Component {
   render() {
     let academyRequests = (this.props && this.props.academyRequests) || [];
     return (
-        <View style={ styles.container }>
+        <Animated.ScrollView style={[styles.container, this.fadeIn(0, -20)]}
+            refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}>
                 { !academyRequests.length && (
                     <Text style={styles.noRequests}>{ translate('noRequests') }</Text>
                 )}
@@ -54,9 +88,10 @@ export default class AcademyRequestListScreen extends React.Component {
                       style={{ backgroundColor: colors.terciaryBackground, paddingHorizontal: 15 }}
                       data={this.props.academyRequests || []}
                       renderItem={this._getRenderItemFunction}
+                      refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                     />
                 )}
-          </View>
+          </Animated.ScrollView>
     );
   }
 }

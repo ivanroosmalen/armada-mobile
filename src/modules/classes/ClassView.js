@@ -9,7 +9,9 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  ImageBackground
+  ImageBackground,
+  Animated,
+  RefreshControl
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Modal from 'react-native-modal';
@@ -19,6 +21,7 @@ import { Button } from '../../components';
 import { translate } from '../../translations/index.js';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 import UserElement from '../profile/UserElement';
 
@@ -30,15 +33,49 @@ export default class ClassScreen extends React.Component {
     deleteConfirmationDialogVisible: false,
     deleteSingleItem: true,
     menuOptions: [translate('edit'), translate('delete')],
-    menuEntities: ['edit', 'delete']
+    menuEntities: ['edit', 'delete'],
+    anim: new Animated.Value(0),
+    refreshing: false,
+    spinner: false
   }
+
+    async onRefresh() {
+      this.setState({ refreshing: true })
+        await Promise.all([
+            this.props.getAcademy(this.props.route.params.academyId),
+            this.props.getClass(this.props.route.params.id)
+        ]);
+      this.setState({ refreshing: false })
+    }
 
   async componentDidMount() {
     await Promise.all([
         this.props.getAcademy(this.props.route.params.academyId),
         this.props.getClass(this.props.route.params.id)
-    ])
+    ]);
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
 
   menuOptionSelected(menuEntity) {
         switch(menuEntity) {
@@ -81,9 +118,11 @@ export default class ClassScreen extends React.Component {
     async onDeleteConfirmationPressed(confirm) {
         let state = {
             deleteConfirmationDialogVisible: false,
+            spinner: false
         };
 
         if(confirm) {
+            this.setState({ spinner: true });
             if(!this.props.class.schedule.recurring || !this.state.deleteSingleItem) {
                 await this.props.removeClass(this.props.class._id);
             } else {
@@ -102,20 +141,26 @@ export default class ClassScreen extends React.Component {
         this.setState(state);
     }
 
-  onAttendPressed() {
+  async onAttendPressed() {
+    this.setState({ spinner: true });
     let data = {
         classId: this.props.class._id,
         startDate: this.props.route.params.startDate,
         endDate: this.props.route.params.endDate
     }
-    this.props.attend(data);
+    await this.props.attend(data);
+
+    this.setState({ spinner: false });
   }
 
-  onUnattendPressed() {
+  async onUnattendPressed() {
+      this.setState({ spinner: true });
       let data = {
           classId: this.props.class._id
       }
-      this.props.unattend(data);
+      await this.props.unattend(data);
+
+      this.setState({ spinner: false });
     }
 
   _getRenderItemFunction = ({ item }) => {
@@ -141,9 +186,14 @@ export default class ClassScreen extends React.Component {
       }
 
       return (
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
+             <Spinner
+               visible={this.state.spinner}
+               textContent={translate('loading')}
+               textStyle={{color: colors.quaternaryText}}
+             />
           <View style={styles.section}>
-            <ScrollView>
+            <ScrollView refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}>
 
               <View style={styles.expandingRow}>
                     <Text style={styles.name}>
@@ -249,6 +299,7 @@ export default class ClassScreen extends React.Component {
                                   )}
                                   dropdownStyle={{ height: 80 }}
                                   onSelect={(index) => this.menuOptionSelected(this.state.menuEntities[index])}
+                                  renderSeparator={() => (<View></View>)}
                                 >
                             <View>
                               <Text>
@@ -336,7 +387,7 @@ export default class ClassScreen extends React.Component {
                               />
                           </View>
                         </Modal>
-        </View>
+        </Animated.View>
       );
     }
   }

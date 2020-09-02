@@ -19,7 +19,6 @@ import { RadioGroup, Dropdown } from '../../components';
 import MultiSelect from 'react-native-multiple-select';
 import MatComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { translate } from '../../translations/index.js';
-
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
 
@@ -162,7 +161,7 @@ export default class ProfileEditScreen extends React.Component {
           this._keyboardDidHide.bind(this),
         );
 
-        Animated.timing(this.state.anim, { toValue: 3000, duration: 3000 }).start();
+        Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
       }
 
       componentWillUnmount() {
@@ -184,14 +183,14 @@ export default class ProfileEditScreen extends React.Component {
         const { anim } = this.state;
         return {
           opacity: anim.interpolate({
-            inputRange: [delay, Math.min(delay + 500, 3000)],
+            inputRange: [delay, Math.min(delay + 500, 1000)],
             outputRange: [0, 1],
             extrapolate: 'clamp',
           }),
           transform: [
             {
               translateY: anim.interpolate({
-                inputRange: [delay, Math.min(delay + 500, 3000)],
+                inputRange: [delay, Math.min(delay + 500, 1000)],
                 outputRange: [from, 0],
                 extrapolate: 'clamp',
               }),

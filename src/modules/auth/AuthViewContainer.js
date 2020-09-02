@@ -2,17 +2,18 @@
 import { compose } from 'recompose';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as userActions from '../../redux/users/actions';
+import { register, login } from '../../redux/users/actions';
 
 import AuthView from './AuthView';
 
-function mapStateToProps(state, props) {
-    return {
-    }
-}
+export default compose(
+  connect(
+    state => {
+    return ({
+    })},
+    dispatch => ({
+      register: (entity) => dispatch(register(entity)),
+      login: (entity) => dispatch(login(entity))
+    }),
+  ))(AuthView);
 
-function mapDispatchToProps(dispatch) {
-    return bindActionCreators(userActions, dispatch);
-}
-
-export default compose(connect(mapStateToProps, mapDispatchToProps))(AuthView);

@@ -8,7 +8,8 @@ import { forgotPassword } from '../../redux/users/actions.js'
 export default compose(
   connect(
     state => {
-    return ({})},
+    return ({
+    })},
     dispatch => ({
       forgotPassword: (id, entity) => dispatch(forgotPassword(id, entity))
     }),

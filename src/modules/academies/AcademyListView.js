@@ -9,12 +9,13 @@ import {
   TouchableHighlight,
   Image,
   Dimensions,
-  NavigationEvents
+  NavigationEvents,
+  Animated,
+  RefreshControl
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
 import { translate } from '../../translations/index.js';
-
 import settings from '../../settings.js';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,36 +27,41 @@ import AcademyElement from './AcademyElement';
 export default class AcademyListScreen extends React.Component {
   constructor(props) {
     super(props);
-    this.flatList = React.createRef();
   }
 
   state = {
+    anim: new Animated.Value(0),
     displayedAcademies: [],
     showMap: true,
     refreshable: false,
     mapLoaded: false,
-    region: {}
+    region: {},
+    refreshing: false
+  }
+
+  async onRefresh() {
+    this.setState({ refreshing: true })
+    await this.props.getAcademies();
+    this.setState({ refreshing: false })
   }
 
   onMarkerSelect(location) {
-  console.log("MARKER")
         let selectedAcademy = this.props.academies.find(academy => (academy._id === location.academyId));
 
         this.setState({
             displayedAcademies: [selectedAcademy]
         })
 
-        this._flatList  && this._flatList .scrollToOffset({ offset: 0, animated: false })
+        this._flatList  && this._flatList.scrollToOffset({ offset: 0, animated: false })
 
   }
 
   onMapSelect() {
-  console.log("MAP")
         this.setState({
             displayedAcademies: this.props.academies,
         })
 
-        this._flatList  && this._flatList .scrollToOffset({ offset: 0, animated: false })
+        this._flatList  && this._flatList.scrollToOffset({ offset: 0, animated: false })
   }
 
   showMap() {
@@ -96,7 +102,7 @@ export default class AcademyListScreen extends React.Component {
         refreshable: false
     })
 
-    this._flatList  && this._flatList .scrollToOffset({ offset: 0, animated: false })
+    this._flatList  && this._flatList.scrollToOffset({ offset: 0, animated: false })
   }
 
   async componentDidMount() {
@@ -123,7 +129,29 @@ export default class AcademyListScreen extends React.Component {
         location,
         displayedAcademies: this.props.academies
     })
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+      fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.academies !== this.props.academies) {
@@ -160,7 +188,9 @@ export default class AcademyListScreen extends React.Component {
     })
 
     return (
-        <View style={styles.container}>
+            <Animated.View
+                    style={[styles.container, this.fadeIn(0, -20)]}
+                  >
                 <TouchableOpacity onPress={() => this.showMap()} style={ styles.mapButton }>
                     <Icon
                         name="map"
@@ -217,12 +247,12 @@ export default class AcademyListScreen extends React.Component {
             <View style={styles.content}>
             {!!(displayedAcademies && displayedAcademies.length) && !this.state.showMap && (
                     <FlatList
-                      ref={this.flatList}
                       keyExtractor={item => item._id }
                       style={styles.list}
                       data={displayedAcademies}
                       renderItem={this._getRenderItemFunction}
-                      contentContainerStyle={{ height: '100%'}}
+                      contentContainerStyle={{}}
+                      refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                     />
             )}
 
@@ -235,6 +265,7 @@ export default class AcademyListScreen extends React.Component {
                       data={displayedAcademies}
                       renderItem={this._getRenderItemFunction}
                       contentContainerStyle={{ paddingRight: 30 }}
+                      refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                     />
             )}
             </View>
@@ -247,7 +278,7 @@ export default class AcademyListScreen extends React.Component {
                       />
                 </TouchableOpacity>
                 )}
-          </View>
+             </Animated.View>
     );
   }
 }

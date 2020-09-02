@@ -9,7 +9,7 @@ import S3Service from '../../http/s3-service.js';
 const s3Service = new S3Service();
 import { translate } from '../../translations/index.js';
 import Toast from 'react-native-simple-toast';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 import { Button } from '../../components';
 import { fonts, colors } from '../../styles';
 
@@ -21,7 +21,9 @@ export default class ProfileScreen extends React.Component {
       userIsOwner: false,
       placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg',
       menuOptions: [translate('edit'), translate('updateProfileImage')],
-      menuEntities: ['edit', 'updateProfileImage']
+      menuEntities: ['edit', 'updateProfileImage'],
+      spinner: false,
+      user: {}
   }
 
   getStudentAcademies(martialArt = {}) {
@@ -50,7 +52,7 @@ export default class ProfileScreen extends React.Component {
         }
         ImagePicker.showImagePicker(options, async file => {
           if (file.uri) {
-            Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
+            this.setState({ spinner: true })
             let response = await this.props.updateProfileImage(this.props.loggedInUser._id, { contentType: file.type });
             let uploadUrl = response.data.entity;
 
@@ -59,24 +61,43 @@ export default class ProfileScreen extends React.Component {
             }
 
             await this.props.getUser(this.props.route.params.id);
-
+            this.setState({ spinner: false })
           }
         })
   }
 
   async componentDidMount() {
+    this.setState({
+        spinner: true,
+        user: {}
+    })
     await this.props.getUser(this.props.route.params.id);
     this.setState({
-        userIsOwner: this.props.route.params.id === this.props.loggedInUser._id
+        userIsOwner: this.props.route.params.id === this.props.loggedInUser._id,
+        user: this.props.user,
+        spinner: false
     })
   }
 
+    async componentDidUpdate(prevProps, prevState) {
+      if (prevProps.user !== this.props.user) {
+        this.setState({
+            user: this.props.user
+        })
+      }
+    }
+
   render() {
-      let imageUri = (this.props.user && this.props.user.profileImg) ? this.props.user.profileImg : this.state.placeholderImage;
+      let imageUri = (this.state.user && this.state.user.profileImg) ? this.state.user.profileImg : this.state.placeholderImage;
       let userIsOwner = this.state.userIsOwner || false;
-      let user = this.props.user || {};
+      let user = this.state.user || {};
       return (
         <View style={styles.container}>
+            <Spinner
+              visible={this.state.spinner}
+              textContent={translate('loading')}
+              textStyle={{color: colors.quaternaryText}}
+            />
           <ImageBackground
             resizeMode="cover"
             source={{uri: imageUri} }
@@ -102,6 +123,7 @@ export default class ProfileScreen extends React.Component {
                           )}
                           dropdownStyle={{ height: 80 }}
                           onSelect={(index) => this.menuOptionSelected(this.state.menuEntities[index])}
+                          renderSeparator={() => (<View></View>)}
                         >
                     <View>
                       <Text>

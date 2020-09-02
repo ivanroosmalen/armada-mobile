@@ -10,7 +10,9 @@ import {
   TouchableHighlight,
   Image,
   Dimensions,
-  ImageBackground
+  ImageBackground,
+  Animated,
+  RefreshControl
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
@@ -25,14 +27,32 @@ import moment from 'moment';
 import Modal from 'react-native-modal';
 import { translate } from '../../translations/index.js';
 import Toast from 'react-native-simple-toast';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class AcademyScreen extends React.Component {
 
   state = {
       placeholderImage: 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg',
       cancelMembershipDialog: false,
-      menuEntities:[]
+      menuEntities:[],
+      spinner: false,
+      anim: new Animated.Value(0),
+      refreshing: false
   }
+
+    async onRefresh() {
+      this.setState({ refreshing: true })
+        await Promise.all([
+            this.props.getAcademy(this.props.route.params.id),
+            this.props.list({
+                academyId: this.props.route.params.id,
+                startDate: moment().format('YYYY-MM-DD'),
+                endDate: moment().add(31, 'days').format('YYYY-MM-DD')
+            }),
+            this.props.getByAcademyId(this.props.route.params.id, { complete: false, approved: false })
+        ])
+      this.setState({ refreshing: false })
+    }
 
   async selectImage() {
         const options = {
@@ -41,7 +61,7 @@ export default class AcademyScreen extends React.Component {
         }
         ImagePicker.showImagePicker(options, async file => {
           if (file.uri) {
-            Toast.showWithGravity(translate('imageUpload'), Toast.LONG, Toast.TOP);
+            this.setState({ spinner: true })
             let response = await this.props.updateProfileImage(this.props.academy._id, { contentType: file.type });
             let uploadUrl = response.data.entity;
 
@@ -50,6 +70,8 @@ export default class AcademyScreen extends React.Component {
             }
 
             await this.props.getAcademy(this.props.route.params.id);
+
+            this.setState({ spinner: false })
           }
         })
   }
@@ -77,16 +99,21 @@ export default class AcademyScreen extends React.Component {
   }
 
   async createAcademyRequest() {
-    this.props.createAcademyRequest({ academy: { _id: this.props.academy._id, name: this.props.academy.name } });
+    this.setState({ spinner: true });
+    await this.props.createAcademyRequest({ academy: { _id: this.props.academy._id, name: this.props.academy.name } });
+    this.setState({ spinner: false });
   }
 
   async removeAcademyRequest() {
-    this.props.removeAcademyRequest(this.props.academyRequest._id);
+    this.setState({ spinner: true });
+    await this.props.removeAcademyRequest(this.props.academyRequest._id);
+    this.setState({ spinner: false });
   }
 
   async cancelMembership() {
-    this.props.cancelMembership(this.props.academy._id);
-    this.setState({ cancelMembershipDialog: false })
+    this.setState({ spinner: true });
+    await this.props.cancelMembership(this.props.academy._id);
+    this.setState({ cancelMembershipDialog: false, spinner: false })
   }
 
   async componentDidMount() {
@@ -99,7 +126,29 @@ export default class AcademyScreen extends React.Component {
         }),
         this.props.getByAcademyId(this.props.route.params.id, { complete: false, approved: false })
     ])
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
 
   _getRenderItemFunction = ({ item }) => {
 
@@ -144,7 +193,7 @@ export default class AcademyScreen extends React.Component {
         menuEntities.push('join');
       }
 
-      if(!userIsOwner && academyRequest) {
+      if(!userIsOwner && academyRequest && !isStudent) {
         menuOptions.push(translate('cancelRequest'));
         menuEntities.push('cancelRequest');
       }
@@ -155,7 +204,17 @@ export default class AcademyScreen extends React.Component {
       }
 
       return (
-        <View style={styles.container}>
+        <Animated.ScrollView
+                style={[this.fadeIn(0, 0)]}
+                contentContainerStyle={styles.container}
+                refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
+                >
+            <Spinner
+              visible={this.state.spinner}
+              textContent={translate('loading')}
+              textStyle={{color: colors.quaternaryText}}
+            />
+
           <ImageBackground
             resizeMode="cover"
             source={{uri: (academy && academy.profileImg) ? academy.profileImg : this.state.placeholderImage} }
@@ -185,6 +244,7 @@ export default class AcademyScreen extends React.Component {
                           )}
                           dropdownStyle={{ height: menuEntities.length * 40 }}
                           onSelect={(index) => this.menuOptionSelected(menuEntities[index])}
+                          renderSeparator={() => (<View></View>)}
                         >
                     <View>
                       <Text>
@@ -322,7 +382,7 @@ export default class AcademyScreen extends React.Component {
                           </View>
                         </Modal>
 
-        </View>
+        </Animated.ScrollView>
       );
     }
   }

@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
     paddingRight: 8,
     borderRadius: 13,
-    height: 27
+    overflow: 'hidden',
+    height: 25
   },
   styles: {
     fontFamily: fonts.primaryRegular,

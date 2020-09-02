@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  NavigationEvents
+  NavigationEvents,
+  Animated,
+  RefreshControl
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
@@ -40,7 +42,28 @@ export default class UserAcademiesScreen extends React.Component {
           displayName: translate('ownerAt')
         }
     ],
-    selectedIndex: 0
+    selectedIndex: 0,
+    anim: new Animated.Value(0),
+    refreshing: false
+  }
+
+  async onRefresh() {
+    this.setState({ refreshing: true })
+    await this.props.getUserAcademies(this.props.route.params.id);
+
+    let setDisplayedAcademies = false;
+        this.state.academyTypeObjs.forEach(academyTypeObj => {
+            if(this.props.userAcademies && this.props.userAcademies[academyTypeObj.key] && this.props.userAcademies[academyTypeObj.key].length) {
+                if(!setDisplayedAcademies) {
+                    this.setState({
+                        displayedAcademies: this.props.userAcademies[academyTypeObj.key]
+                    })
+
+                    setDisplayedAcademies = true;
+                }
+            }
+        })
+    this.setState({ refreshing: false })
   }
 
   onSwitchType(index) {
@@ -65,7 +88,29 @@ export default class UserAcademiesScreen extends React.Component {
                 }
             }
         })
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
 
   _getRenderItemFunction = ({ item }) => {
     return (
@@ -85,7 +130,7 @@ export default class UserAcademiesScreen extends React.Component {
     })
 
     return (
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
             {!academyTypes.length && (
                 <View>
                 <Text style={styles.noData}>
@@ -120,6 +165,7 @@ export default class UserAcademiesScreen extends React.Component {
                   style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
                   data={this.state.displayedAcademies}
                   renderItem={this._getRenderItemFunction}
+                  refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                 />
 
                 {!!this.props.loggedInUser && (
@@ -132,7 +178,7 @@ export default class UserAcademiesScreen extends React.Component {
                 )}
                 </View>
             )}
-          </View>
+          </Animated.View>
     );
   }
 }

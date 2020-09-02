@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Button, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Button, Alert, Animated, RefreshControl } from 'react-native';
 
 import { colors, fonts } from '../../styles';
 import moment from 'moment';
@@ -9,6 +9,22 @@ import ScheduleElement from './ScheduleElement';
 
 class ScheduleScreen extends React.Component {
 
+  state = {
+    anim: new Animated.Value(0),
+    refreshing: false
+  }
+
+    async onRefresh() {
+      this.setState({ refreshing: true })
+        let data = {
+            academyId: this.props.route.params.id,
+            startDate: moment().format('YYYY-MM-DD'),
+            endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
+        }
+        await this.props.list(data);
+      this.setState({ refreshing: false })
+    }
+
   async componentDidMount() {
     let data = {
         academyId: this.props.route.params.id,
@@ -16,12 +32,40 @@ class ScheduleScreen extends React.Component {
         endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
     }
     await this.props.list(data);
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
 
   render() {
     return (
-      <View style={{flex: 1}}>
-        <ScheduleElement classes={this.props.classes} loggedInUser={this.props.loggedInUser} attend={this.props.attend} unattend={this.props.unattend}/>
+      <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
+        <ScheduleElement
+            classes={this.props.classes}
+            loggedInUser={this.props.loggedInUser}
+            attend={this.props.attend}
+            unattend={this.props.unattend}
+            onRefresh={() => this.onRefresh()}
+            refreshing={this.state.refreshing}/>
 
         {!!this.props.loggedInUser && (
         <TouchableOpacity
@@ -33,7 +77,7 @@ class ScheduleScreen extends React.Component {
             />
         </TouchableOpacity>
         )}
-      </View>
+      </Animated.View>
     );
   }
 }
@@ -42,6 +86,9 @@ class ScheduleScreen extends React.Component {
 export default ScheduleScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
   addIcon: {
         fontSize: 35,
         backgroundColor: colors.iconBackground,

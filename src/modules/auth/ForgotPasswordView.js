@@ -15,12 +15,13 @@ import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
 import { translate, i18n } from '../../translations/index.js';
 import isEmail from 'validator/lib/isEmail';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class ForgotPasswordScreen extends React.Component {
 
   state = {
     anim: new Animated.Value(0),
-
+    spinner: false,
     // Current visible form
     isKeyboardVisible: false,
     entity: {
@@ -63,6 +64,7 @@ export default class ForgotPasswordScreen extends React.Component {
 
   submit = async () => {
         if(this.validate()) {
+            this.setState({ spinner: true });
             let response = await this.props.forgotPassword(this.state.entity);
                 if(response.status === 200) {
                     this.state.submitSuccess = true;
@@ -70,6 +72,7 @@ export default class ForgotPasswordScreen extends React.Component {
                 } else {
                     this.state.errors.pageError = translate('resetPasswordError');
                 }
+            this.setState({ spinner: false });
         }
   }
 
@@ -84,6 +87,8 @@ export default class ForgotPasswordScreen extends React.Component {
     );
 
     Animated.timing(this.state.anim, { toValue: 3000, duration: 3000 }).start();
+
+    this.setState({ spinner: false });
   }
 
   componentWillUnmount() {
@@ -126,6 +131,11 @@ export default class ForgotPasswordScreen extends React.Component {
       <View
         style={styles.background}
       >
+        <Spinner
+          visible={this.state.spinner}
+          textContent={translate('loading')}
+          textStyle={{color: colors.quaternaryText}}
+        />
         <View style={styles.container}>
           <View style={[styles.section, { paddingTop: 30 }]}>
             <Animated.Image

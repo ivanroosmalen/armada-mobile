@@ -5,7 +5,9 @@ import {
   TouchableOpacity,
   ImageBackground,
   FlatList,
-  Dimensions
+  Dimensions,
+  Animated,
+  RefreshControl
 } from 'react-native';
 
 import { fonts, colors } from '../../styles';
@@ -22,7 +24,38 @@ export default class HomeScreen extends React.Component {
 
     state = {
         displayedAcademies: [],
+        anim: new Animated.Value(0),
+        refreshing: false
       }
+
+    async onRefresh() {
+      this.setState({ refreshing: true })
+        let dataRequests = [
+            this.props.getAcademies()
+        ];
+        if(this.props.loggedInUser) {
+             dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
+             dataRequests.push(this.props.getAcademyRequests({ complete: false }))
+        }
+             await Promise.all(dataRequests);
+
+             let academyTypeObjs = ['student', 'instructor', 'owner']
+             let userAcademiesById = {};
+                 academyTypeObjs.forEach(academyTypeObj => {
+                     if(this.props.userAcademies && this.props.userAcademies[academyTypeObj] && this.props.userAcademies[academyTypeObj].length) {
+                         this.props.userAcademies[academyTypeObj].forEach(academy => {
+                             userAcademiesById[academy._id] = academy;
+                         })
+                     }
+                 })
+
+              let userAcademies = Object.values(userAcademiesById);
+
+             this.setState({
+                 allUserAcademies: userAcademies
+             });
+      this.setState({ refreshing: false })
+    }
 
   async componentDidMount() {
     let location = {};
@@ -67,7 +100,9 @@ export default class HomeScreen extends React.Component {
     this.setState({
         location,
         allUserAcademies: userAcademies
-    })
+    });
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
 
     async componentDidUpdate(prevProps, prevState) {
@@ -90,6 +125,26 @@ export default class HomeScreen extends React.Component {
             })
       }
     }
+
+    fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
 
     _getRenderItemFunction = ({ item }) => {
 
@@ -119,7 +174,11 @@ export default class HomeScreen extends React.Component {
            let academyRequests = (this.props && this.props.academyRequests) || [];
 
            return (
-             <View style={styles.container}>
+             <Animated.ScrollView
+                style={[this.fadeIn(0, 0)]}
+                contentContainerStyle={styles.container}
+                refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
+                >
                 <View style={styles.section}>
                 {!academyRequests || !academyRequests.length && (
                     <View>
@@ -229,7 +288,7 @@ export default class HomeScreen extends React.Component {
                 </View>
               )}
 
-             </View>
+             </Animated.ScrollView>
            );
          }
 }

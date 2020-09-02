@@ -6,10 +6,9 @@ import { colors } from './src/styles';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { store, persistor } from './src/redux/store';
-
 import AppView from './src/modules/AppViewContainer';
 import * as RNLocalize from 'react-native-localize';
-import { setI18nConfig } from './src/translations/index.js';
+import { setI18nConfig, translate } from './src/translations/index.js';
 import { setTranslations } from './src/redux/users/actions';
 
 class App extends React.Component {
@@ -32,20 +31,20 @@ class App extends React.Component {
 
   render() {
       return (
-        <Provider store={store}>
-          <NavigationContainer>
-            <PersistGate
-              loading={
-                <View style={styles.container}>
-                  <ActivityIndicator color={colors.red} />
-                </View>
-              }
-              persistor={persistor}
-            >
-              <AppView />
-            </PersistGate>
-          </NavigationContainer>
-        </Provider>
+            <Provider store={store}>
+              <NavigationContainer>
+                <PersistGate
+                  loading={
+                    <View style={styles.container}>
+                      <ActivityIndicator color={colors.red} />
+                    </View>
+                  }
+                  persistor={persistor}
+                >
+                  <AppView />
+                </PersistGate>
+              </NavigationContainer>
+            </Provider>
       );
   }
 }

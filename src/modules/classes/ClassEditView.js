@@ -20,6 +20,7 @@ import { TextInput, Button, Dropdown } from '../../components';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import CheckBox from 'react-native-check-box'
 import { translate } from '../../translations/index.js';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class ClassEditScreen extends React.Component {
 
@@ -50,6 +51,7 @@ export default class ClassEditScreen extends React.Component {
                 value: 'yearly',
                 display: translate('yearly')
             }],
+            spinner: false
       };
 
         onChangeText = async (key, val) => {
@@ -140,6 +142,7 @@ export default class ClassEditScreen extends React.Component {
 
       submit = async () => {
             if(this.validate()) {
+                this.setState({spinner: true});
                 let entity;
                 let isCreating = !(this.props.class && this.props.class._id);
 
@@ -156,6 +159,8 @@ export default class ClassEditScreen extends React.Component {
                 }
 
                 this.props.navigation.navigate('Class', { id: entity._id, academyId: entity.academyId, startDate: entity.schedule.startDate, endDate: entity.schedule.endDate })
+
+                this.setState({spinner: true});
             }
       }
 
@@ -321,6 +326,11 @@ export default class ClassEditScreen extends React.Component {
         <View
                 style={styles.background}
               >
+            <Spinner
+              visible={this.state.spinner}
+              textContent={translate('loading')}
+              textStyle={{color: colors.quaternaryText}}
+            />
                 <View style={styles.container}>
 
                   <Animated.View

@@ -68,7 +68,6 @@ async forgotPassword(data, options) {
                     url: this.buildURL(['forgotPassword']),
                     data
                 };
-                console.log(httpConfig)
 
                 return this.makeRequest(httpConfig, options)
             }

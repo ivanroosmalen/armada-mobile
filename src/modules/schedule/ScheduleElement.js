@@ -56,6 +56,9 @@ export default function ScheduleElement(props) {
     const navigation = useNavigation();
 
     buttonPressed = (item) => {
+        if(!props.loggedInUser) {
+            return;
+        }
         if(item.isAttending) {
             let data = {
               classId: item.entityId
@@ -153,6 +156,8 @@ export default function ScheduleElement(props) {
             textSectionTitleColor: 'blue',
             textSectionTitleDisabledColor: 'blue',
           }}
+          onRefresh={() => props.onRefresh()}
+          refreshing={props.refreshing}
         />
       </CalendarProvider>
 

@@ -14,12 +14,13 @@ import {
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
 import { translate } from '../../translations/index.js';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class UpdatePasswordScreen extends React.Component {
 
   state = {
     anim: new Animated.Value(0),
-
+    spinner: false,
     // Current visible form
     isKeyboardVisible: false,
     entity: {
@@ -69,12 +70,14 @@ export default class UpdatePasswordScreen extends React.Component {
 
   submit = async () => {
         if(this.validate()) {
+            this.setState({ spinner: true });
             let response = await this.props.updatePassword(this.props.loggedInUser._id, this.state.entity);
                 if(response.status === 200) {
                     this.props.navigation.navigate('Home');
                 } else {
                     this.state.errors.pageError = translate('unableUpdatePassword');
                 }
+            this.setState({ spinner: false });
         }
   }
 
@@ -89,6 +92,7 @@ export default class UpdatePasswordScreen extends React.Component {
     );
 
     Animated.timing(this.state.anim, { toValue: 3000, duration: 3000 }).start();
+    this.setState({ spinner: false });
   }
 
   componentWillUnmount() {
@@ -131,6 +135,11 @@ export default class UpdatePasswordScreen extends React.Component {
       <View
         style={styles.background}
       >
+        <Spinner
+          visible={this.state.spinner}
+          textContent={translate('loading')}
+          textStyle={{color: colors.quaternaryText}}
+        />
         <View style={styles.container}>
           <View style={[styles.section, { paddingTop: 30 }]}>
             <Animated.Image

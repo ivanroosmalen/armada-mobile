@@ -17,7 +17,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MonthPicker from 'react-native-month-year-picker';
 import moment from 'moment';
 import { RadioGroup, Dropdown, Cards } from '../../components';
-
+import Spinner from 'react-native-loading-spinner-overlay';
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
 import MultiSelect from 'react-native-multiple-select';
@@ -28,7 +28,7 @@ export default class AcademyEditScreen extends React.Component {
 
     state = {
         anim: new Animated.Value(0),
-
+        spinner: false,
         // Current visible form
         isKeyboardVisible: false,
         errors: {
@@ -114,6 +114,8 @@ export default class AcademyEditScreen extends React.Component {
 
       submit = async () => {
             if(this.validate()) {
+                this.setState({ spinner: true });
+
                 let academyId = '';
                 if(this.props.route.params && this.props.route.params.id) {
                     await this.props.updateAcademy(this.props.academy._id, this.state.editingAcademy);
@@ -128,6 +130,7 @@ export default class AcademyEditScreen extends React.Component {
                     this.props.navigation.navigate('Academy', {id: academyId})
                 }
 
+                this.setState({ spinner: false });
             }
       }
 
@@ -148,7 +151,8 @@ export default class AcademyEditScreen extends React.Component {
 
         this.setState({
             editingAcademy: this.props.academy || { martialArts: [] },
-            martialArtList: this.props.martialArts && this.props.martialArts.map(ma => ({ name: ma.name })).sort()
+            martialArtList: this.props.martialArts && this.props.martialArts.map(ma => ({ name: ma.name })).sort(),
+            spinner: false
         });
 
         this.keyboardDidShowListener = Keyboard.addListener(
@@ -160,7 +164,7 @@ export default class AcademyEditScreen extends React.Component {
           this._keyboardDidHide.bind(this),
         );
 
-        Animated.timing(this.state.anim, { toValue: 3000, duration: 3000 }).start();
+        Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
       }
 
       componentWillUnmount() {
@@ -182,14 +186,14 @@ export default class AcademyEditScreen extends React.Component {
         const { anim } = this.state;
         return {
           opacity: anim.interpolate({
-            inputRange: [delay, Math.min(delay + 500, 3000)],
+            inputRange: [delay, Math.min(delay + 500, 1000)],
             outputRange: [0, 1],
             extrapolate: 'clamp',
           }),
           transform: [
             {
               translateY: anim.interpolate({
-                inputRange: [delay, Math.min(delay + 500, 3000)],
+                inputRange: [delay, Math.min(delay + 500, 1000)],
                 outputRange: [from, 0],
                 extrapolate: 'clamp',
               }),
@@ -208,6 +212,11 @@ export default class AcademyEditScreen extends React.Component {
       return (
 
         <View style={styles.background} >
+            <Spinner
+              visible={this.state.spinner}
+              textContent={translate('loading')}
+              textStyle={{color: colors.quaternaryText}}
+            />
                 <View style={styles.container}>
 
                   <Animated.View
