@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, ImageBackground, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, ImageBackground, Image, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import ImagePicker from 'react-native-image-picker'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RadioGroup } from '../../components';
@@ -23,7 +23,8 @@ export default class ProfileScreen extends React.Component {
       menuOptions: [translate('edit'), translate('updateProfileImage')],
       menuEntities: ['edit', 'updateProfileImage'],
       spinner: false,
-      user: {}
+      user: {},
+      anim: new Animated.Value(0),
   }
 
   getStudentAcademies(martialArt = {}) {
@@ -68,15 +69,15 @@ export default class ProfileScreen extends React.Component {
 
   async componentDidMount() {
     this.setState({
-        spinner: true,
         user: {}
     })
     await this.props.getUser(this.props.route.params.id);
     this.setState({
-        userIsOwner: this.props.route.params.id === this.props.loggedInUser._id,
-        user: this.props.user,
-        spinner: false
+        userIsOwner: this.props.loggedInUser && (this.props.route.params.id === this.props.loggedInUser._id),
+        user: this.props.user
     })
+
+    Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
 
     async componentDidUpdate(prevProps, prevState) {
@@ -87,12 +88,32 @@ export default class ProfileScreen extends React.Component {
       }
     }
 
+    fadeIn(delay, from = 0) {
+        const { anim } = this.state;
+        return {
+          opacity: anim.interpolate({
+            inputRange: [delay, Math.min(delay + 500, 1000)],
+            outputRange: [0, 1],
+            extrapolate: 'clamp',
+          }),
+          transform: [
+            {
+              translateY: anim.interpolate({
+                inputRange: [delay, Math.min(delay + 500, 1000)],
+                outputRange: [from, 0],
+                extrapolate: 'clamp',
+              }),
+            },
+          ],
+        };
+      }
+
   render() {
       let imageUri = (this.state.user && this.state.user.profileImg) ? this.state.user.profileImg : this.state.placeholderImage;
       let userIsOwner = this.state.userIsOwner || false;
       let user = this.state.user || {};
       return (
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
             <Spinner
               visible={this.state.spinner}
               textContent={translate('loading')}
@@ -178,7 +199,7 @@ export default class ProfileScreen extends React.Component {
           {!(user.martialArts && user.martialArts.length) && (
             <Text style={styles.itemLabel, styles.noData}>No profile data </Text>
           )}
-        </View>
+        </Animated.View>
       );
     }
   }

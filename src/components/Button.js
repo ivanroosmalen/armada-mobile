@@ -139,6 +139,7 @@ export default function RNSButton(props) {
       accessibilityTraits="button"
       onPress={props.onPress}
       activeOpacity={0.8}
+      disabled={props.disabled}
       style={[
         styles.container,
         props.small && styles.containerSmall,

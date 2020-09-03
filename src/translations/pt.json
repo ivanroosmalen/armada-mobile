@@ -104,5 +104,8 @@
   "imageUpload": "A imagem está sendo atualizada",
   "contact": "Contato",
   "featureRequests": "Se tem problemas, perguntas ou solicitações de recursos, envie um e-mail para:",
-  "loading": "Carregando..."
+  "loading": "Carregando...",
+  "agree": "Eu concordo com os termos e condições e política de privacidade",
+  "privacyPolicy": "Política de privacidade",
+  "tac": "Termos e condições"
 }

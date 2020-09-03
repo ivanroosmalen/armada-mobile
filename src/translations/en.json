@@ -104,5 +104,8 @@
   "imageUpload": "Image is being updated",
   "contact": "Contact",
   "featureRequests": "For issues, questions, or feature requests, please send an email to:",
-  "loading": "Loading..."
+  "loading": "Loading...",
+  "agree": "I agree to the terms and conditions and privacy policy",
+  "privacyPolicy": "Privacy policy",
+  "tac": "Terms & conditions"
 }

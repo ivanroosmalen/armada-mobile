@@ -33,7 +33,9 @@ export default function NavigatorView(props) {
             source={require('../../../assets/images/armada-logo.png')}
             resizeMode="contain"
             style={{
-               marginTop:20
+                marginTop: 15,
+               height: 45,
+               width: 175
             }}
          />
     )

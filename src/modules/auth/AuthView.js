@@ -9,6 +9,7 @@ import {
   LayoutAnimation,
   TouchableOpacity,
   ImageBackground,
+  Linking
 } from 'react-native';
 
 import { fonts, colors } from '../../styles';
@@ -16,6 +17,7 @@ import { TextInput, Button } from '../../components';
 import { translate, i18n } from '../../translations/index.js';
 import isEmail from 'validator/lib/isEmail';
 import Spinner from 'react-native-loading-spinner-overlay';
+import CheckBox from 'react-native-check-box'
 
 const FORM_STATES = {
   LOGIN: 0,
@@ -27,6 +29,7 @@ export default class AuthScreen extends React.Component {
   state = {
     anim: new Animated.Value(0),
     spinner: false,
+    agree: false,
     // Current visible form
     formState: FORM_STATES.LOGIN,
     isKeyboardVisible: false,
@@ -40,6 +43,11 @@ export default class AuthScreen extends React.Component {
             isValid: false,
             submitSuccess: false
   };
+
+    onCheckboxUpdate = () => {
+        let agree = !this.state.agree;
+        this.setState({ agree });
+    }
 
     onChangeText = async (key, val) => {
       this.state.entity[key] = val;
@@ -213,10 +221,34 @@ export default class AuthScreen extends React.Component {
                         </Text>
                 )}
 
+            {this.state.formState === FORM_STATES.REGISTER && (
+                <View style={{zIndex: 100}}>
+                    <View style={{ flexDirection: 'row', alignSelf: 'stretch'}}>
+                            <CheckBox
+                                onClick={this.onCheckboxUpdate}
+                                isChecked={!!this.state.agree}
+                                checkBoxColor={colors.primaryText}
+                            />
+
+                            <Text style={{color: colors.primaryText }}> { translate('agree') } </Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch'}}>
+                        <Text style={{fontSize: 20, color: 'white', textDecorationLine: 'underline',}}
+                            onPress={() => Linking.openURL('http://armada-app.com/privacy-policy')}>
+                            {translate('privacyPolicy')}
+                        </Text>
+                        <Text style={{fontSize: 20, color: 'white', textDecorationLine: 'underline',}}
+                            onPress={() => Linking.openURL('http://armada-app.com/terms-and-conditions')}>
+                            {translate('tac')}
+                        </Text>
+                    </View>
+                </View>
+            )}
+
             <Animated.View
               style={[styles.section, styles.bottom, this.fadeIn(700, -20)]}
             >
-
                   <Text style={{ fontSize: 12, color: 'red'}}>
                         {this.state.errors.pageError}
                   </Text>
@@ -227,6 +259,7 @@ export default class AuthScreen extends React.Component {
                 secondary
                 rounded
                 style={{ alignSelf: 'stretch', marginBottom: 10 }}
+                disabled={this.state.formState === FORM_STATES.REGISTER && !this.state.agree}
                 caption={
                   this.state.formState === FORM_STATES.LOGIN
                     ? translate('login')

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Linking } from 'react-native';
 import { 
   createDrawerNavigator,
   DrawerItem,
@@ -251,6 +251,43 @@ function CustomDrawerContent(props) {
           )}
           onPress={() => props.navigation.navigate('Contact')}
         />
+
+    <DrawerItem
+          key={`privacyPolicy`}
+          label={() => (
+            <View
+              style={styles.menuLabelFlex}>
+                <Icon
+                          name="pencil"
+                          style={{
+                            fontSize: 20,
+                            color: colors.primaryIcon
+                          }}
+                        />
+              <Text style={styles.menuTitle}>{ translate('privacyPolicy')}</Text>
+            </View>
+          )}
+          onPress={() => Linking.openURL('http://armada-app.com/privacy-policy')}
+        />
+
+    <DrawerItem
+          key={`tac`}
+          label={() => (
+            <View
+              style={styles.menuLabelFlex}>
+                <Icon
+                          name="pencil"
+                          style={{
+                            fontSize: 20,
+                            color: colors.primaryIcon
+                          }}
+                        />
+              <Text style={styles.menuTitle}>{ translate('tac')}</Text>
+            </View>
+          )}
+          onPress={() => Linking.openURL('http://armada-app.com/terms-and-conditions')}
+        />
+
     </DrawerContentScrollView>
   );
 }
