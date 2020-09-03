@@ -4,7 +4,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { PersistGate } from 'redux-persist/integration/react';
 import { colors } from './src/styles';
 import { NavigationContainer } from '@react-navigation/native';
-
+import SplashScreen from 'react-native-splash-screen';
 import { store, persistor } from './src/redux/store';
 import AppView from './src/modules/AppViewContainer';
 import * as RNLocalize from 'react-native-localize';
@@ -18,7 +18,8 @@ class App extends React.Component {
     }
 
  componentDidMount() {
-    RNLocalize.addEventListener('change', this.handleLocalizationChange)
+    RNLocalize.addEventListener('change', this.handleLocalizationChange);
+    SplashScreen.hide();
  }
 
  componentWillUnmount() {
