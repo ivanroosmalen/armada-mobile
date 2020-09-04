@@ -76,7 +76,7 @@ export default class AcademyRequestListScreen extends React.Component {
   render() {
     let academyRequests = (this.props && this.props.academyRequests) || [];
     return (
-        <Animated.ScrollView style={[styles.container, this.fadeIn(0, -20)]}
+        <Animated.ScrollView style={[styles.container, this.fadeIn(0, 0)]}
             refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}>
                 { !academyRequests.length && (
                     <Text style={styles.noRequests}>{ translate('noRequests') }</Text>
