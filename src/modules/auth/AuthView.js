@@ -222,17 +222,16 @@ export default class AuthScreen extends React.Component {
                 )}
 
             {this.state.formState === FORM_STATES.REGISTER && (
-                <View style={{zIndex: 100}}>
-                    <View style={{ flexDirection: 'row', alignSelf: 'stretch'}}>
-                            <CheckBox
-                                onClick={this.onCheckboxUpdate}
-                                isChecked={!!this.state.agree}
-                                checkBoxColor={colors.primaryText}
-                            />
+                <View>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+                                <CheckBox
+                                    onClick={this.onCheckboxUpdate}
+                                    isChecked={!!this.state.agree}
+                                    checkBoxColor={colors.primaryText}
+                                />
 
-                            <Text style={{color: colors.primaryText }}> { translate('agree') } </Text>
+                            <Text style={{color: colors.primaryText, marginLeft: 30 }}> { translate('agree') } </Text>
                     </View>
-
                     <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch'}}>
                         <Text style={{fontSize: 20, color: 'white', textDecorationLine: 'underline',}}
                             onPress={() => Linking.openURL('http://armada-app.com/privacy-policy')}>
