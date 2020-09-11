@@ -31,7 +31,10 @@ class ScheduleScreen extends React.Component {
         startDate: moment().format('YYYY-MM-DD'),
         endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
     }
-    await this.props.list(data);
+    await Promise.all([
+        this.props.list(data),
+        this.props.getAcademy(this.props.route.params.id)
+    ]);
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
@@ -57,6 +60,10 @@ class ScheduleScreen extends React.Component {
       }
 
   render() {
+    let academy = this.props.academy;
+    let isLoggedIn = this.props.loggedInUser;
+    let userIsOwner = !!(isLoggedIn && academy && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
+
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
         <ScheduleElement
@@ -67,7 +74,7 @@ class ScheduleScreen extends React.Component {
             onRefresh={() => this.onRefresh()}
             refreshing={this.state.refreshing}/>
 
-        {!!this.props.loggedInUser && (
+        {userIsOwner && (
         <TouchableOpacity
             onPress={() => this.props.navigation.navigate('ClassEdit', { academyId: this.props.route.params.id })}
             style={ styles.addButton } >
