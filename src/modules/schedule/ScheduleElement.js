@@ -42,9 +42,11 @@ import { translate, setLocateConfig } from '../../translations/index.js';
             <Text style={styles.itemHourText}>{item.time}</Text>
             <Text style={styles.itemDurationText}>{item.durationHour ? item.durationHour+'h' : ''} {item.durationMinute ? item.durationMinute+'m' : ''}</Text>
           </View>
-          <Text style={styles.itemTitleText}>{item.description}</Text>
+          <Text style={styles.itemTitleText}>{item.name}</Text>
           <View style={styles.itemButtonContainer}>
+
             <Button color={item.isAttending ? colors.primaryBackground : (item.isFull ? 'red' : colors.quaternaryBackground)} title={`${item.numberOfAttendees} ${translate('attending')}`} onPress={() => buttonPressed(item)}/>
+
           </View>
         </TouchableOpacity>
       );
@@ -176,11 +178,12 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize'
   },
   item: {
-    padding: 20,
+    padding: 10,
     backgroundColor: colors.terciaryBackground,
     borderBottomWidth: 1,
     borderBottomColor: 'lightgrey',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    minHeight: 50
   },
   itemHourText: {
     color: colors.terciaryText
@@ -193,13 +196,19 @@ const styles = StyleSheet.create({
   },
   itemTitleText: {
     color: colors.terciaryText,
-    marginLeft: 16,
+    paddingLeft: 16,
+    marginRight: 150,
     fontWeight: 'bold',
-    fontSize: 16
+    fontSize: 16,
+    overflow: 'hidden'
   },
   itemButtonContainer: {
-    flex: 1,
-    alignItems: 'flex-end'
+    position: 'absolute',
+    right: 10,
+    width: 120,
+    height: '100%',
+    margin: 'auto',
+    top: 10
   },
   emptyItem: {
     paddingLeft: 20,

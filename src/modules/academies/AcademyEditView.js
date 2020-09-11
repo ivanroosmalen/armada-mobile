@@ -208,6 +208,10 @@ export default class AcademyEditScreen extends React.Component {
       let selectedInstructors = editingAcademy.instructors && editingAcademy.instructors.map(instructor => instructor._id) || [];
       let selectedLocations = editingAcademy.locations;
       autocompleteMinHeight = 50;
+      let loggedInUser = this.props.loggedInUser;
+      if(loggedInUser) {
+        loggedInUser.alias = loggedInUser.alias || 'You'
+      }
 
       return (
 
@@ -262,7 +266,7 @@ export default class AcademyEditScreen extends React.Component {
                     />
 
                     <MultiSelect
-                      items={(editingAcademy && editingAcademy.students) ? editingAcademy.students : [this.props.loggedInUser]}
+                      items={(editingAcademy && editingAcademy.students) ? editingAcademy.students : [loggedInUser]}
                       uniqueKey="_id"
                       ref={(component) => { this.multiSelect = component }}
                       onSelectedItemsChange={ this.onSelectedInstructors }
