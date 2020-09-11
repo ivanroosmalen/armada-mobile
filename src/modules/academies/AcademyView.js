@@ -171,6 +171,10 @@ export default class AcademyScreen extends React.Component {
           })
       }
 
+      let nextClass = classes.find(classObj => {
+        return moment() < moment(classObj.schedule.startDate)
+      }) || { schedule: {} }
+
       let academyRequest = this.props.academyRequest;
 
       let isLoggedIn = this.props.loggedInUser;
@@ -277,7 +281,7 @@ export default class AcademyScreen extends React.Component {
                         {!!classes && !!classes.length && (
                             <View style={styles.scheduleContent}>
                                 <Text style={styles.textContent}>
-                                    {moment(classes[0].schedule.startDate).format('dddd DD MMM') }
+                                    {moment(nextClass.schedule.startDate).format('dddd DD MMM') }
                                 </Text>
 
                                 <TouchableOpacity
