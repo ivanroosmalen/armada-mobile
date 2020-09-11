@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Button, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Button, Alert, Dimensions } from 'react-native';
 import { ExpandableCalendar, AgendaList, CalendarProvider, WeekCalendar, Agenda, LocaleConfig } from 'react-native-calendars';
 
 import { colors, fonts } from '../../styles';
@@ -38,15 +38,15 @@ import { translate, setLocateConfig } from '../../translations/index.js';
           onPress={() => itemPressed(item)}
           style={styles.item}
         >
-          <View>
+          <View style={styles.dateTimeSection}>
             <Text style={styles.itemHourText}>{item.time}</Text>
             <Text style={styles.itemDurationText}>{item.durationHour ? item.durationHour+'h' : ''} {item.durationMinute ? item.durationMinute+'m' : ''}</Text>
           </View>
-          <Text style={styles.itemTitleText}>{item.name}</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.itemTitleText}>{item.name}</Text>
+          </View>
           <View style={styles.itemButtonContainer}>
-
             <Button color={item.isAttending ? colors.primaryBackground : (item.isFull ? 'red' : colors.quaternaryBackground)} title={`${item.numberOfAttendees} ${translate('attending')}`} onPress={() => buttonPressed(item)}/>
-
           </View>
         </TouchableOpacity>
       );
@@ -183,7 +183,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'lightgrey',
     flexDirection: 'row',
-    minHeight: 50
+    flex: 1,
+    minHeight: 50,
   },
   itemHourText: {
     color: colors.terciaryText
@@ -194,21 +195,24 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginLeft: 4
   },
+  dateTimeSection: {
+    width: 40
+  },
+  titleContainer: {
+    overflow: 'hidden',
+    width: Dimensions.get('window').width - 170,
+  },
   itemTitleText: {
     color: colors.terciaryText,
-    paddingLeft: 16,
+    paddingLeft: 15,
     marginRight: 150,
     fontWeight: 'bold',
     fontSize: 16,
-    overflow: 'hidden'
+    width: Dimensions.get('window').width - 185
   },
   itemButtonContainer: {
-    position: 'absolute',
-    right: 10,
     width: 120,
-    height: '100%',
-    margin: 'auto',
-    top: 10
+    paddingRight: 10
   },
   emptyItem: {
     paddingLeft: 20,
