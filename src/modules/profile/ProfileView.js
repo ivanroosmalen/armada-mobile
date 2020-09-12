@@ -108,10 +108,26 @@ export default class ProfileScreen extends React.Component {
         };
       }
 
+      getDuration(startDate) {
+        if(!startDate) {
+            return '';
+        }
+
+        let diff = moment.duration(moment().diff(moment(startDate)))
+        let years = parseInt(diff.asYears())
+        if(years > 0) {
+            return `${years} years`
+        } else {
+            let months = parseInt(diff.asMonths())
+            return `${months} months`
+        }
+      }
+
   render() {
       let imageUri = (this.state.user && this.state.user.profileImg) ? this.state.user.profileImg : this.state.placeholderImage;
       let userIsOwner = this.state.userIsOwner || false;
       let user = this.state.user || {};
+
       return (
         <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
             <Spinner
@@ -188,8 +204,8 @@ export default class ProfileScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.infoRow}>
-                <Text style={styles.itemLabel}>{ translate('started') } </Text>
-                <Text style={ styles.itemValue }>{user.martialArts[this.state.selectedIndex].startDate ? moment(user.martialArts[this.state.selectedIndex].startDate).format("MMMM YYYY") : ''}</Text>
+                <Text style={styles.itemLabel}>{ translate('trainingSince') } </Text>
+                <Text style={ styles.itemValue }>{ this.getDuration(user.martialArts[this.state.selectedIndex].startDate) }</Text>
               </View>
               <View style={styles.hr} />
             </View>

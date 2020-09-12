@@ -238,17 +238,19 @@ export default class ClassScreen extends React.Component {
               </View>
               <View style={styles.hr} />
 
-              <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>{ translate('attending') } ({classObj && classObj.attendees && classObj.attendees.length}{classIsFull && ' - full'})</Text>
+              {userIsStudent && (
+                  <View style={styles.userRow}>
+                        <Text style={styles.itemLabel}>{ translate('attending') } ({classObj && classObj.attendees && classObj.attendees.length}{classIsFull && ' - full'})</Text>
 
-                    <FlatList
-                          horizontal
-                          keyExtractor={item => item._id }
-                          style={ styles.imageContainer }
-                          data={classObj && classObj.attendees}
-                          renderItem={this._getRenderItemFunction}
-                      />
-              </View>
+                        <FlatList
+                              horizontal
+                              keyExtractor={item => item._id }
+                              style={ styles.imageContainer }
+                              data={classObj && classObj.attendees}
+                              renderItem={this._getRenderItemFunction}
+                          />
+                  </View>
+              )}
             </ScrollView>
 
                 <View style={styles.attendContainer}>

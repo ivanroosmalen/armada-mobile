@@ -356,17 +356,19 @@ export default class AcademyScreen extends React.Component {
               </View>
               <View style={styles.hr} />
 
-              <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>{ translate('members') } ({academy && academy.students && academy.students.length})</Text>
+                  <View style={styles.userRow}>
+                        <Text style={styles.itemLabel}>{ translate('members') } ({academy && academy.students && academy.students.length})</Text>
 
-                    <FlatList
-                          horizontal
-                          keyExtractor={item => item._id }
-                          style={ styles.imageContainer }
-                          data={academy && academy.students}
-                          renderItem={this._getRenderItemFunction}
-                      />
-              </View>
+                        {isStudent && (
+                        <FlatList
+                              horizontal
+                              keyExtractor={item => item._id }
+                              style={ styles.imageContainer }
+                              data={academy && academy.students}
+                              renderItem={this._getRenderItemFunction}
+                          />
+                        )}
+                  </View>
 
             </ScrollView>
           </View>

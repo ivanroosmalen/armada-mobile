@@ -108,5 +108,6 @@
   "loading": "Carregando...",
   "agree": "Eu concordo com os termos e condições e política de privacidade",
   "privacyPolicy": "Política de privacidade",
-  "tac": "Termos e condições"
+  "tac": "Termos e condições",
+  "trainingSince": "Treinando desde"
 }
