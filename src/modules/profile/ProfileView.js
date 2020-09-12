@@ -138,8 +138,8 @@ export default class ProfileScreen extends React.Component {
                   <ModalDropdown ref={(el) => {this.optionsMenu = el}}
                           options={ this.state.menuOptions }
                           renderRow={text => (
-                            <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText }}>
-                              <Text>{text}</Text>
+                            <View style={{ paddingHorizontal: 20, paddingVertical: 10, backgroundColor: colors.primaryBackground }}>
+                              <Text style={{color: colors.primaryText}}>{text}</Text>
                             </View>
                           )}
                           dropdownStyle={{ height: 80 }}
@@ -323,6 +323,8 @@ const styles = StyleSheet.create({
     color: colors.secondaryIcon,
     backgroundColor: colors.iconBackground,
     borderRadius: 30,
+    borderColor: colors.secondaryIcon,
+    borderWidth: 1,
     width: 28,
     height: 28,
     textAlign: 'center',

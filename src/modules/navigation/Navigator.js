@@ -67,6 +67,7 @@ function CustomDrawerContent(props) {
       <View style={{flexDirection: 'row'}}>
       {!!(currentUser && currentUser.thumbnailImg) && (
       <DrawerItem
+            key={`profileImage`}
             style={{width: 75}}
           label={() => (
               <View style={styles.avatarContainer}>
@@ -79,6 +80,7 @@ function CustomDrawerContent(props) {
           />
       )}
       <DrawerItem
+            key={`editProfile`}
             style={{width: '100%'}}
           label={() => (
             <View style={{justifyContent: 'center', alignItems: 'center', height: 75, width: '100%'}}>
@@ -113,6 +115,24 @@ function CustomDrawerContent(props) {
 
       {currentUser && (
         <View>
+            <DrawerItem
+              key={`profile`}
+              label={() => (
+                <View
+                  style={styles.menuLabelFlex}>
+                    <Icon
+                              name="account"
+                              style={{
+                                fontSize: 20,
+                                color: colors.primaryIcon
+                              }}
+                            />
+                  <Text style={styles.menuTitle}>{ translate('myProfile') }</Text>
+                </View>
+              )}
+              onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}
+            />
+
             <DrawerItem
               key={`academies`}
               label={() => (
@@ -250,42 +270,6 @@ function CustomDrawerContent(props) {
             </View>
           )}
           onPress={() => props.navigation.navigate('Contact')}
-        />
-
-    <DrawerItem
-          key={`privacyPolicy`}
-          label={() => (
-            <View
-              style={styles.menuLabelFlex}>
-                <Icon
-                          name="pencil"
-                          style={{
-                            fontSize: 20,
-                            color: colors.primaryIcon
-                          }}
-                        />
-              <Text style={styles.menuTitle}>{ translate('privacyPolicy')}</Text>
-            </View>
-          )}
-          onPress={() => Linking.openURL('http://armada-app.com/privacy-policy')}
-        />
-
-    <DrawerItem
-          key={`tac`}
-          label={() => (
-            <View
-              style={styles.menuLabelFlex}>
-                <Icon
-                          name="pencil"
-                          style={{
-                            fontSize: 20,
-                            color: colors.primaryIcon
-                          }}
-                        />
-              <Text style={styles.menuTitle}>{ translate('tac')}</Text>
-            </View>
-          )}
-          onPress={() => Linking.openURL('http://armada-app.com/terms-and-conditions')}
         />
 
     </DrawerContentScrollView>

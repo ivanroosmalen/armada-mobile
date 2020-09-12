@@ -124,8 +124,8 @@ export default class AuthScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    this.keyboardDidShowListener.remove();
-    this.keyboardDidHideListener.remove();
+    this.keyboardDidShowListener && this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener && this.keyboardDidHideListener.remove();
   }
 
   _keyboardDidShow() {

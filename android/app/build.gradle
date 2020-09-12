@@ -144,8 +144,8 @@ android {
         applicationId "com.armadama"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.0.1-test5"
+        versionCode 9
+        versionName "1.0.1-test6"
     }
     splits {
         abi {

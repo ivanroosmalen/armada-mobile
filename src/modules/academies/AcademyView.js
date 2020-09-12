@@ -28,6 +28,7 @@ import Modal from 'react-native-modal';
 import { translate } from '../../translations/index.js';
 import Toast from 'react-native-simple-toast';
 import Spinner from 'react-native-loading-spinner-overlay';
+import openMap from 'react-native-open-maps';
 
 export default class AcademyScreen extends React.Component {
 
@@ -74,6 +75,10 @@ export default class AcademyScreen extends React.Component {
             this.setState({ spinner: false })
           }
         })
+  }
+
+  locationSelected(location) {
+    openMap({ query: location.address } )
   }
 
   menuOptionSelected(menuEntity) {
@@ -162,6 +167,7 @@ export default class AcademyScreen extends React.Component {
   render() {
       let academy = this.props.academy;
       let classes = this.props.classes;
+      let nextClass = { schedule: {} };
       if(classes) {
           classes.sort((a, b) => {
             if(!a.schedule) return -1;
@@ -169,11 +175,11 @@ export default class AcademyScreen extends React.Component {
 
            return moment(a.schedule.startDate) > moment(b.schedule.startDate) ? 1 : -1
           })
-      }
 
-      let nextClass = classes.find(classObj => {
-        return moment() < moment(classObj.schedule.startDate)
-      }) || { schedule: {} }
+          let nextClass = classes.find(classObj => {
+            return moment() < moment(classObj.schedule.startDate)
+          }) || { schedule: {} }
+      }
 
       let academyRequest = this.props.academyRequest;
 
@@ -242,8 +248,8 @@ export default class AcademyScreen extends React.Component {
                   <ModalDropdown ref={(el) => {this.optionsMenu = el}}
                           options={ menuOptions }
                           renderRow={text => (
-                            <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText }}>
-                              <Text>{text}</Text>
+                            <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText, backgroundColor: colors.primaryBackground }}>
+                              <Text style={{color: colors.primaryText}}>{text}</Text>
                             </View>
                           )}
                           dropdownStyle={{ height: menuEntities.length * 40 }}
@@ -279,22 +285,18 @@ export default class AcademyScreen extends React.Component {
                     <Text style={styles.itemLabel}>{ translate('nextClass') }</Text>
                     <View>
                         {!!classes && !!classes.length && (
-                            <View style={styles.scheduleContent}>
+                            <TouchableOpacity style={styles.scheduleContent} onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}>
                                 <Text style={styles.textContent}>
                                     {moment(nextClass.schedule.startDate).format('dddd DD MMM') }
                                 </Text>
 
-                                <TouchableOpacity
-                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
-                                >
                                   <Icon
                                     name="calendar"
                                     size={30}
                                     color={colors.secondaryIcon}
                                   />
-                                </TouchableOpacity>
 
-                            </View>
+                            </TouchableOpacity>
                         )}
 
                         {!classes || !classes.length && (
@@ -327,9 +329,14 @@ export default class AcademyScreen extends React.Component {
                     <Text style={styles.itemLabel}>{ translate('locations') }</Text>
                     <View style={styles.multilineText}>
                     {academy && academy.locations && academy.locations.map(location => (
-                        <Text style={styles.textContent}>
-                            {location.address}
-                        </Text>
+                        <TouchableOpacity
+                            onPress={() => this.locationSelected(location)}
+                            style={styles.textContent}
+                        >
+                            <Text>
+                                {location.address}
+                            </Text>
+                        </TouchableOpacity>
                     ))}
                     </View>
               </View>
@@ -488,11 +495,13 @@ const styles = StyleSheet.create({
     color: colors.secondaryIcon,
     backgroundColor: colors.iconBackground,
     borderRadius: 30,
+    borderColor: colors.secondaryIcon,
+    borderWidth: 1,
     width: 28,
     height: 28,
     textAlign: 'center',
     alignItems: 'center',
-    zIndex: 100
+    zIndex: 100,
   }
 });
 
