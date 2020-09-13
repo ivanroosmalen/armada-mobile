@@ -176,7 +176,9 @@ export default class AcademyScreen extends React.Component {
            return moment(a.schedule.startDate) > moment(b.schedule.startDate) ? 1 : -1
           })
 
-          let nextClass = classes.find(classObj => {
+          nextClass = classes.find(classObj => {
+            console.log(moment())
+            console.log(moment(classObj.schedule.startDate))
             return moment() < moment(classObj.schedule.startDate)
           }) || { schedule: {} }
       }
