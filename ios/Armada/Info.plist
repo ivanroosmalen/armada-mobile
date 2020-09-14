@@ -44,7 +44,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>For taking a photo.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>For displaying academies on a map</string>
 	<key>NSMainNibFile</key>
 	<string>LaunchScreen</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

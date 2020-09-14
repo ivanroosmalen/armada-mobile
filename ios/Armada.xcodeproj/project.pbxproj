@@ -27,6 +27,7 @@
 		B0A7D913BBC54C44AF1698B1 /* Lato-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 28E289B344EA470BB95EE8B2 /* Lato-BoldItalic.ttf */; };
 		C27FBFDB12034472897F8CB9 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CF871DC00C4A468BB043F632 /* Lato-Regular.ttf */; };
 		CA5A7C8036FE47B0BDE01EA7 /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC477E0AC8F54F1BBC658478 /* Lato-Bold.ttf */; };
+		D14F0260250EEADC00210F85 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = D14F025F250EEADC00210F85 /* AppCenter-Config.plist */; };
 		D17F4EF924FEA0D4008B4C8A /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = D17F4EF824FEA0D4008B4C8A /* main.jsbundle */; };
 		D17F4EFB24FEA0DB008B4C8A /* assets in Resources */ = {isa = PBXBuildFile; fileRef = D17F4EFA24FEA0DB008B4C8A /* assets */; };
 		E35BD30ADBBE43FB97FE667C /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5B3ACF96CD341A8B1ED4CCB /* Lato-Italic.ttf */; };
@@ -87,6 +88,7 @@
 		BA8ED76AAF71FF414AEE0F76 /* Pods-Armada-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Armada-tvOS.release.xcconfig"; path = "Target Support Files/Pods-Armada-tvOS/Pods-Armada-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		C68BBBE32340884C5363FE3A /* Pods-Armada-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Armada-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Armada-tvOSTests/Pods-Armada-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		CF871DC00C4A468BB043F632 /* Lato-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-Regular.ttf"; path = "../assets/fonts/Lato-Regular.ttf"; sourceTree = "<group>"; };
+		D14F025F250EEADC00210F85 /* AppCenter-Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "AppCenter-Config.plist"; path = "Armada/AppCenter-Config.plist"; sourceTree = "<group>"; };
 		D17F4EF824FEA0D4008B4C8A /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		D17F4EFA24FEA0DB008B4C8A /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		DB47AE6058534E84A8C10F16 /* Lato-Semibold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-Semibold.ttf"; path = "../assets/fonts/Lato-Semibold.ttf"; sourceTree = "<group>"; };
@@ -154,6 +156,7 @@
 		13B07FAE1A68108700A75B9A /* Armada */ = {
 			isa = PBXGroup;
 			children = (
+				D14F025F250EEADC00210F85 /* AppCenter-Config.plist */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -394,6 +397,7 @@
 				D17F4EFB24FEA0DB008B4C8A /* assets in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				D14F0260250EEADC00210F85 /* AppCenter-Config.plist in Resources */,
 				CA5A7C8036FE47B0BDE01EA7 /* Lato-Bold.ttf in Resources */,
 				D17F4EF924FEA0D4008B4C8A /* main.jsbundle in Resources */,
 				B0A7D913BBC54C44AF1698B1 /* Lato-BoldItalic.ttf in Resources */,
@@ -697,7 +701,7 @@
 			baseConfigurationReference = A0D17C8E9D2EB5776AE458C7 /* Pods-Armada.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEAD_CODE_STRIPPING = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -713,7 +717,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -730,7 +734,7 @@
 			baseConfigurationReference = AA07717A762A94187A4CEA08 /* Pods-Armada.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 692KR5NCLD;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -746,7 +750,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.4;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
