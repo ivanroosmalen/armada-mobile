@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   buttonSmall: {
-    paddingHorizontal: 0,
+    paddingHorizontal: 10,
   },
   border: {
     borderWidth: 1,
