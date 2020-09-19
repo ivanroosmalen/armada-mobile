@@ -42,15 +42,15 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>For taking a photo.</string>
+	<string>For taking a picture for your user profile image, thumbnail image, or academy profile image. This will allow you to create a more personalized profile.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>For displaying academies on a map</string>
+	<string>For displaying academies near you on a map. This will allow you to join the academy you want</string>
 	<key>NSMainNibFile</key>
 	<string>LaunchScreen</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>For saving a photo.</string>
+	<string>For saving an academy or user profile image you took with your camera. These image will allow you to create a more personalized profile.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>For choosing a photo.</string>
+	<string>For selecting an academy or user profile image. This will allow you to create a more personalized profile.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Lato-Bold.ttf</string>

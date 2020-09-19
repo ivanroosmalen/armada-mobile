@@ -106,11 +106,15 @@ export default class AuthScreen extends React.Component {
                     this.state.errors.pageError = translate('registerError');
                 }
             } else {
-                let response = await this.props.login(this.state.entity);
-
-                if(response.status === 200) {
-                    this.props.navigation.navigate('Home');
-                } else {
+                let response;
+                try {
+                    response = await this.props.login(this.state.entity);
+                    if(response.status === 200) {
+                        this.props.navigation.navigate('Home');
+                    } else {
+                        this.state.errors.pageError = translate('loginError');
+                    }
+                } catch(e) {
                     this.state.errors.pageError = translate('loginError');
                 }
             }
