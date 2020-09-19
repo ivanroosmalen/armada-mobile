@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   buttonSmall: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
   },
   border: {
     borderWidth: 1,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.primaryBold,
   },
   captionSmall: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
   },
   captionWithIcon: {

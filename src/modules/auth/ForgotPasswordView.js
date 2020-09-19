@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 import { fonts, colors } from '../../styles';
-import { TextInput, Button } from '../../components';
+import { TextInput, Button, KeyboardInputWrapper } from '../../components';
 import { translate, i18n } from '../../translations/index.js';
 import isEmail from 'validator/lib/isEmail';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -136,6 +136,7 @@ export default class ForgotPasswordScreen extends React.Component {
           textContent={translate('loading')}
           textStyle={{color: colors.quaternaryText}}
         />
+        <KeyboardInputWrapper>
         <View style={styles.container}>
           <View style={[styles.section, { paddingTop: 30 }]}>
             <Animated.Image
@@ -185,6 +186,7 @@ export default class ForgotPasswordScreen extends React.Component {
             </Animated.View>
           </Animated.View>
         </View>
+        </KeyboardInputWrapper>
       </View>
     );
   }

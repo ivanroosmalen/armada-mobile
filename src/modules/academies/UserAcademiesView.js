@@ -27,7 +27,7 @@ export default class UserAcademiesScreen extends React.Component {
 
   state = {
     displayedAcademies: [],
-    academyTypes: ['Student', 'Instructor', 'owner'],
+    academyTypes: [],
     academyTypeObjs: [
         {
           key: 'student',
@@ -66,9 +66,9 @@ export default class UserAcademiesScreen extends React.Component {
     this.setState({ refreshing: false })
   }
 
-  onSwitchType(index) {
+  onSwitchType(index, type) {
     this.setState({
-      displayedAcademies: this.props.userAcademies[this.state.academyTypeObjs[index].key],
+      displayedAcademies: this.props.userAcademies[type],
       selectedIndex: index
     })
   }
@@ -123,9 +123,11 @@ export default class UserAcademiesScreen extends React.Component {
 
   render() {
     let academyTypes = [];
+    let academyTypeObjs = [];
     this.state.academyTypeObjs.forEach(academyTypeObj => {
         if(this.props.userAcademies && this.props.userAcademies[academyTypeObj.key] && this.props.userAcademies[academyTypeObj.key].length) {
             academyTypes.push(academyTypeObj.displayName);
+            academyTypeObjs.push(academyTypeObj.key);
         }
     })
 
@@ -156,7 +158,7 @@ export default class UserAcademiesScreen extends React.Component {
                           style={styles.radioGroup}
                           items={academyTypes}
                           selectedIndex={this.state.selectedIndex}
-                          onChange={index => this.onSwitchType(index)}
+                          onChange={index => this.onSwitchType(index, academyTypeObjs[index])}
                         />
                     </View>
 

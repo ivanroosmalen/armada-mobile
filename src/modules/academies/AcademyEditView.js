@@ -16,7 +16,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import MonthPicker from 'react-native-month-year-picker';
 import moment from 'moment';
-import { RadioGroup, Dropdown, Cards } from '../../components';
+import { RadioGroup, Dropdown, Cards, KeyboardInputWrapper } from '../../components';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { fonts, colors } from '../../styles';
 import { TextInput, Button } from '../../components';
@@ -86,6 +86,7 @@ export default class AcademyEditScreen extends React.Component {
                 editingAcademy: this.state.editingAcademy
             })
 
+            this.googlePlacesAutocomplete._handleChangeText('');
          }
 
          onLocationRemoved = locations => {
@@ -221,18 +222,25 @@ export default class AcademyEditScreen extends React.Component {
               textContent={translate('loading')}
               textStyle={{color: colors.quaternaryText}}
             />
+                <KeyboardInputWrapper>
                 <View style={styles.container}>
 
                   <Animated.View
                     style={[styles.section, styles.middle, this.fadeIn(700, -20)]}
                   >
+                    {!!(this.props.route.params && this.props.route.params.id) && (
+                        <Text style={styles.headerTitle}>{translate('updateAcademy')}</Text>
+                    )}
+                    {!(this.props.route.params && this.props.route.params.id) && (
+                        <Text style={styles.headerTitle}>{translate('createAcademy')}</Text>
+                    )}
 
-                    <TextInput
-                      placeholder={ translate('name') }
-                      style={styles.textInput}
-                      value={this.state.editingAcademy.name}
-                      onChangeText={val => this.onChangeText('name', val)}
-                    />
+                        <TextInput
+                          placeholder={ translate('name') }
+                          style={styles.textInput}
+                          value={this.state.editingAcademy.name}
+                          onChangeText={val => this.onChangeText('name', val)}
+                        />
 
                     {!!this.state.errors.nameError &&
                         <Text style={{ fontSize: 12, color: 'red'}}>
@@ -290,9 +298,11 @@ export default class AcademyEditScreen extends React.Component {
                     />
 
                     <View style={ styles.mapElement }>
-                        <View style={{minHeight: 200}}>
+                        <View style={{minHeight: 200, marginTop: 10}}>
                             <GooglePlacesAutocomplete
+                              ref={c => this.googlePlacesAutocomplete = c}
                               placeholder={ translate('enterAddress') }
+                              placeholderTextColor={ colors.primaryText }
                               minLength={2}
                               autoFocus={false}
                               returnKeyType={'default'}
@@ -313,7 +323,6 @@ export default class AcademyEditScreen extends React.Component {
                                     color: colors.terciaryText,
                                     elevation: 10,
                                     minHeight:0,
-                                    zIndex: 999
                                 },
                                 listView: {
                                     backgroundColor: 'rgba(255,255,255,1)',
@@ -323,7 +332,7 @@ export default class AcademyEditScreen extends React.Component {
                                     backgroundColor: 'rgba(255,255,255,1)'
                                 },
                                   textInputContainer: {
-                                    backgroundColor: 'rgba(0,0,0,0)',
+                                    backgroundColor: colors.primaryBackground,
                                           borderTopWidth: 0,
                                           borderBottomWidth: 0,
                                           width: '100%',
@@ -334,8 +343,11 @@ export default class AcademyEditScreen extends React.Component {
                                   marginLeft: 0,
                                   marginRight: 0,
                                   height: 38,
-                                  color: '#5d5d5d',
+                                  color: colors.primaryText,
+                                  backgroundColor: colors.primaryBackground,
                                   fontSize: 16,
+                                  borderBottomWidth: 1,
+                                  borderBottomColor: colors.primaryText
                                 },
                                 predefinedPlacesDescription: {
                                   color: '#1faadb',
@@ -381,6 +393,7 @@ export default class AcademyEditScreen extends React.Component {
                           />
                   </Animated.View>
                 </View>
+              </KeyboardInputWrapper>
               </View>
       );
     }
@@ -430,9 +443,10 @@ const styles = StyleSheet.create({
       zIndex:1000
     },
   headerTitle: {
-      fontWeight: "bold",
       fontSize: 25,
-      color: "white"
+      color: colors.primaryText,
+      textAlign: 'left',
+      marginTop: 10
   },
   mapElement: {
         alignSelf: 'stretch',
@@ -441,6 +455,9 @@ const styles = StyleSheet.create({
   mapTextInput: {
   },
   locations: {
-      width: '100%'
+      width: '100%',
+      position: 'absolute',
+      marginTop: 60,
+      zIndex: -1
   }
 });

@@ -9,14 +9,15 @@ import { StyleSheet,
            TouchableOpacity,
            ImageBackground,
            Image,
-           TouchableHighlight
+           TouchableHighlight,
+           ScrollView
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import moment from 'moment';
 
 import { fonts, colors } from '../../styles';
-import { TextInput, Button, Dropdown } from '../../components';
+import { TextInput, Button, Dropdown, KeyboardInputWrapper } from '../../components';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import CheckBox from 'react-native-check-box'
 import { translate } from '../../translations/index.js';
@@ -42,6 +43,10 @@ export default class ClassEditScreen extends React.Component {
             {
                 value: 'weekly',
                 display: translate('weekly')
+            },
+            {
+                value: 'semiMonthly',
+                display: translate('semiMonthly')
             },
             {
                 value: 'monthly',
@@ -71,11 +76,17 @@ export default class ClassEditScreen extends React.Component {
         }
 
         onLocationSelected = (index) => {
-          this.state.editingClass.location = this.props.academy.locations[index];
+          if(!this.props.academy.locations) {
+                return;
+          }
+
+          let location = (index === this.props.academy.locations.length) ? {} : this.props.academy.locations[index];
+          this.state.editingClass.location = location || {};
 
           this.setState({
               editingClass: this.state.editingClass
           })
+
         }
 
         onInstructorSelected = (index) => {
@@ -124,7 +135,15 @@ export default class ClassEditScreen extends React.Component {
         }
 
         onCheckboxUpdate = () => {
-        this.state.editingClass.schedule.recurring = !this.state.editingClass.schedule.recurring;
+            this.state.editingClass.schedule.recurring = !this.state.editingClass.schedule.recurring;
+            this.setState({
+                editingClass: this.state.editingClass
+            })
+        }
+
+        onOnlineCheckboxUpdate = () => {
+            this.state.editingClass.supportOnlineClasses = !this.state.editingClass.supportOnlineClasses;
+
             this.setState({
                 editingClass: this.state.editingClass
             })
@@ -145,8 +164,8 @@ export default class ClassEditScreen extends React.Component {
                 this.setState({spinner: true});
                 let entity;
                 let isCreating = !(this.props.class && this.props.class._id);
-
                 if(this.state.editingClass._id) {
+                    console.log(this.state.editingClass)
                     entity = await this.props.updateClass(this.state.editingClass._id, this.state.editingClass);
                 } else {
                     entity = await this.props.createClass(this.state.editingClass);
@@ -201,7 +220,7 @@ export default class ClassEditScreen extends React.Component {
               interval: this.state.intervals[1].value
           },
           martialArt: this.props.academy.martialArts && this.props.academy.martialArts.length && this.props.academy.martialArts[0].name,
-          location: this.props.academy.locations && this.props.academy.locations.length && this.props.academy.locations[0]
+          location: (this.props.academy.locations && this.props.academy.locations.length && this.props.academy.locations[0]) || {}
         }
         let editingClass = this.props.class || defaults;
         editingClass.academyId = this.props.academy._id;
@@ -297,11 +316,12 @@ export default class ClassEditScreen extends React.Component {
 
       this.props.academy && this.props.academy.locations && this.props.academy.locations.forEach((loc, index) => {
         locations.push(loc.address);
-        if(editingClass.location && loc.address === editingClass.location.address) {
+        if(editingClass.location && (loc.address === editingClass.location.address)) {
             locationIndex = index;
         }
       });
 
+      locations.push(translate('noLocation'));
       this.props.academy && this.props.academy.instructors && this.props.academy.instructors.forEach((inst, index) => {
         instructors.push(inst.alias);
 
@@ -320,9 +340,9 @@ export default class ClassEditScreen extends React.Component {
       }
 
       let classSize = (this.state.editingClass.classSize !== null && this.state.editingClass.classSize !== undefined) ? this.state.editingClass.classSize.toString() : '';
+      let onlineClassSize = (this.state.editingClass.onlineClassSize !== null && this.state.editingClass.onlineClassSize !== undefined) ? this.state.editingClass.onlineClassSize.toString() : '';
 
       return (
-
         <View
                 style={styles.background}
               >
@@ -331,11 +351,18 @@ export default class ClassEditScreen extends React.Component {
               textContent={translate('loading')}
               textStyle={{color: colors.quaternaryText}}
             />
-                <View style={styles.container}>
+            <KeyboardInputWrapper>
+                <ScrollView style={styles.container}>
 
                   <Animated.View
                     style={[styles.section, styles.middle, this.fadeIn(700, -20)]}
                   >
+                    {!!(this.props.route.params && this.props.route.params.id) && (
+                        <Text style={styles.headerTitle}>{translate('updateClass')}</Text>
+                    )}
+                    {!(this.props.route.params && this.props.route.params.id) && (
+                        <Text style={styles.headerTitle}>{translate('createClass')}</Text>
+                    )}
 
                     <TextInput
                       placeholder={ translate('name') }
@@ -361,6 +388,26 @@ export default class ClassEditScreen extends React.Component {
                       keyboardType={'numeric'}
                     />
 
+                    <View style={{ flexDirection: 'row', alignSelf: 'flex-start', marginTop: 10}}>
+                        <CheckBox
+                            onClick={this.onOnlineCheckboxUpdate}
+                            isChecked={!!this.state.editingClass.supportOnlineClasses}
+                            checkBoxColor={colors.primaryText}
+                        />
+
+                        <Text style={{color: colors.primaryText }}> { translate('supportOnline') } </Text>
+                    </View>
+
+                    {!!this.state.editingClass.supportOnlineClasses && (
+                    <TextInput
+                      placeholder={ translate('onlineClassSize') }
+                      style={[styles.textInput, {marginTop: 0}]}
+                      value={onlineClassSize}
+                      onChangeText={val => this.onChangeText('onlineClassSize', val)}
+                      keyboardType={'numeric'}
+                    />
+                    )}
+
                     <View style={{alignSelf: 'stretch'}}>
                         <Dropdown
                             color={colors.primaryText}
@@ -375,7 +422,7 @@ export default class ClassEditScreen extends React.Component {
                             color={colors.primaryText}
                             style={styles.dropdown}
                             items={locations}
-                            selectedIndex={locationIndex}
+                            selectedIndex={locationIndex === -1 ? locations.length - 1 : locationIndex}
                             placeholder={ translate('selectLocation') }
                             onSelect={(index) => { this.onLocationSelected(index) }}
                         />
@@ -388,8 +435,6 @@ export default class ClassEditScreen extends React.Component {
                             placeholder={ translate('selectInstructor') }
                             onSelect={(index) => { this.onInstructorSelected(index) }}
                         />
-
-
                     </View>
 
                         <DateTimePickerModal
@@ -465,8 +510,8 @@ export default class ClassEditScreen extends React.Component {
                         </Animated.View>
 
                   </Animated.View>
-                </View>
-
+                </ScrollView>
+                </KeyboardInputWrapper>
                         <Button
                             bgColor={colors.secondaryBackground}
                             textColor={colors.secondaryText}
@@ -481,6 +526,7 @@ export default class ClassEditScreen extends React.Component {
                             caption={ translate('save') }
                             onPress={this.submit}
                           />
+
               </View>
       );
     }
@@ -489,8 +535,6 @@ export default class ClassEditScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-around',
     paddingHorizontal: 30,
   },
   background: {
@@ -526,9 +570,10 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryText
   },
   headerTitle: {
-      fontWeight: "bold",
       fontSize: 25,
-      color: "white"
+      color: colors.primaryText,
+      textAlign: 'left',
+      marginTop: 10
   },
   datepickerField: {
     justifyContent: 'space-between',

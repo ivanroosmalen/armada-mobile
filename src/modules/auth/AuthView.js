@@ -9,11 +9,12 @@ import {
   LayoutAnimation,
   TouchableOpacity,
   ImageBackground,
-  Linking
+  Linking,
+  TouchableWithoutFeedback
 } from 'react-native';
 
 import { fonts, colors } from '../../styles';
-import { TextInput, Button } from '../../components';
+import { TextInput, Button, KeyboardInputWrapper } from '../../components';
 import { translate, i18n } from '../../translations/index.js';
 import isEmail from 'validator/lib/isEmail';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -35,9 +36,11 @@ export default class AuthScreen extends React.Component {
     isKeyboardVisible: false,
     entity: {
                 email: '',
+                alias: '',
                 locale: i18n.locale
             },
             errors: {
+                aliasError: '',
                 emailError: ''
             },
             isValid: false,
@@ -67,6 +70,15 @@ export default class AuthScreen extends React.Component {
             this.state.isValid = false;
         } else {
             this.state.errors.emailError = '';
+        }
+
+        if(this.state.formState === FORM_STATES.REGISTER) {
+            if(!this.state.entity.alias) {
+                this.state.errors.aliasError = translate('aliasError');
+                this.state.isValid = false;
+            } else {
+                this.state.errors.aliasError = '';
+            }
         }
 
         this.setState({
@@ -170,6 +182,7 @@ export default class AuthScreen extends React.Component {
           textContent={translate('loading')}
           textStyle={{color: colors.quaternaryText}}
         />
+        <KeyboardInputWrapper>
         <View style={styles.container}>
           <View style={[styles.section, { paddingTop: 30 }]}>
             <Animated.Image
@@ -186,6 +199,20 @@ export default class AuthScreen extends React.Component {
           <Animated.View
             style={[styles.section, styles.middle, this.fadeIn(700, -20)]}
           >
+
+            {this.state.formState === FORM_STATES.REGISTER && (
+                <View style={{alignSelf: 'stretch'}}>
+                    <TextInput
+                      placeholder={ translate('alias') }
+                      style={styles.textInput}
+                      onChangeText={val => this.onChangeText('alias', val)}
+                    />
+
+                    <Text style={{ fontSize: 12, color: 'red'}}>
+                        {this.state.errors.aliasError}
+                    </Text>
+                </View>
+            )}
 
             <TextInput
               placeholder="Email"
@@ -233,11 +260,11 @@ export default class AuthScreen extends React.Component {
                             <Text style={{color: colors.primaryText, marginLeft: 30 }}> { translate('agree') } </Text>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignSelf: 'stretch'}}>
-                        <Text style={{fontSize: 20, color: 'white', textDecorationLine: 'underline',}}
+                        <Text style={{fontSize: 17, color: 'white', textDecorationLine: 'underline',}}
                             onPress={() => Linking.openURL('http://armada-app.com/privacy-policy')}>
                             {translate('privacyPolicy')}
                         </Text>
-                        <Text style={{fontSize: 20, color: 'white', textDecorationLine: 'underline',}}
+                        <Text style={{fontSize: 17, color: 'white', textDecorationLine: 'underline',}}
                             onPress={() => Linking.openURL('http://armada-app.com/terms-and-conditions')}>
                             {translate('tac')}
                         </Text>
@@ -322,6 +349,7 @@ export default class AuthScreen extends React.Component {
             </Animated.View>
           </Animated.View>
         </View>
+        </KeyboardInputWrapper>
       </View>
     );
   }

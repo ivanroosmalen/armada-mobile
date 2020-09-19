@@ -4,8 +4,8 @@ import { StyleSheet, View, Text, TouchableOpacity, Button, Alert, Animated, Refr
 import { colors, fonts } from '../../styles';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import ScheduleElement from './ScheduleElement';
+import { translate } from '../../translations/index.js';
 
 class ScheduleScreen extends React.Component {
 
@@ -72,7 +72,8 @@ class ScheduleScreen extends React.Component {
             attend={this.props.attend}
             unattend={this.props.unattend}
             onRefresh={() => this.onRefresh()}
-            refreshing={this.state.refreshing}/>
+            refreshing={this.state.refreshing}
+            navigation={this.props.navigation}/>
 
         {userIsOwner && (
         <TouchableOpacity

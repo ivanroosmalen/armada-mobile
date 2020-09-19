@@ -1,14 +1,23 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Button, Alert, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert, Dimensions } from 'react-native';
 import { ExpandableCalendar, AgendaList, CalendarProvider, WeekCalendar, Agenda, LocaleConfig } from 'react-native-calendars';
-
+import { Button } from '../../components';
 import { colors, fonts } from '../../styles';
 import moment from 'moment';
 import Toast from 'react-native-simple-toast';
 import { useNavigation } from '@react-navigation/native';
 import { translate, setLocateConfig } from '../../translations/index.js';
+import Modal from 'react-native-modal';
 
-  function renderEmptyDate() {
+class ScheduleElement extends React.Component {
+
+  state = {
+    attendDialogVisible: false,
+    currentItem: {},
+    navigation: {}
+  };
+
+  renderEmptyDate = () => {
     return (
       <View style={styles.emptyDate}>
         <Text>This is empty date!</Text>
@@ -16,7 +25,7 @@ import { translate, setLocateConfig } from '../../translations/index.js';
     );
   }
 
-  function getMarkedDates(items) {
+  getMarkedDates = (items) => {
     const marked = {};
     items.forEach(item => {
       if (item.data && item.data.length > 0 && !!item.data[0]) {
@@ -28,14 +37,41 @@ import { translate, setLocateConfig } from '../../translations/index.js';
     return marked;
   }
 
-   function renderItem({item}) {
+    buttonPressed = (item) => {
+        if(!this.props.loggedInUser) {
+            return;
+        }
+        if(item.isAttending) {
+            let data = {
+              classId: item.entityId
+            }
+
+            this.props.unattend(data);
+        } else if(item.supportOnlineClasses) {
+            if(item.isFull && item.onlineIsFull) {
+                Toast.showWithGravity(translate('classFull'), Toast.LONG, Toast.TOP);
+                return;
+            } else {
+                this.setState({ attendDialogVisible: true, currentItem: item });
+            }
+        } else {
+            if(item.isFull) {
+                Toast.showWithGravity(translate('classFull'), Toast.LONG, Toast.TOP);
+                return;
+            } else {
+                this.attend(item);
+            }
+        }
+    }
+
+   renderItem = ({item}, parent) => {
       if (!item) {
         return renderEmptyItem();
       }
 
       return (
         <TouchableOpacity
-          onPress={() => itemPressed(item)}
+          onPress={() => parent.itemPressed(item)}
           style={styles.item}
         >
           <View style={styles.dateTimeSection}>
@@ -46,55 +82,63 @@ import { translate, setLocateConfig } from '../../translations/index.js';
             <Text style={styles.itemTitleText}>{item.name}</Text>
           </View>
           <View style={styles.itemButtonContainer}>
-            <Button color={item.isAttending ? colors.primaryBackground : (item.isFull ? 'red' : colors.quaternaryBackground)} title={`${item.numberOfAttendees} ${translate('attending')}`} onPress={() => buttonPressed(item)}/>
+                    <Button
+                                    secondary
+                                    rounded
+                                    small
+                                    bgColor={ item.isAttending ? colors.primaryBackground : (item.isFull ? 'red' : colors.quaternaryBackground) }
+                                    textColor={colors.primaryText}
+                                    style={{ }}
+                                    caption={ `${item.numberOfAttendees} ${translate('attending')}` }
+                                    onPress={() => parent.buttonPressed(item)}
+                                  />
+
           </View>
         </TouchableOpacity>
       );
     }
 
-export default function ScheduleElement(props) {
-    setLocateConfig(LocaleConfig);
-
-    const navigation = useNavigation();
-
-    buttonPressed = (item) => {
-        if(!props.loggedInUser) {
-            return;
-        }
-        if(item.isAttending) {
-            let data = {
-              classId: item.entityId
-            }
-
-            props.unattend(data);
-        } else {
-            if(item.isFull) {
-                Toast.showWithGravity(translate('classFull'), Toast.LONG, Toast.TOP);
-                return;
-            }
-
+    attend = (item, online = false) => {
             let data = {
                 classId: item.entityId,
                 startDate: item.startDate,
-                endDate: item.endDate
+                endDate: item.endDate,
+                online
             }
 
-            props.attend(data);
-        }
+            this.props.attend(data);
+
+            this.setState({ attendDialogVisible: false});
     }
 
-    itemPressed = (item) => {
-      navigation.navigate('Class', { id: item.entityId, academyId: item.academyId, startDate: item.startDate, endDate: item.endDate })
+    itemPressed(item) {
+      this.state.navigation.navigate('Class', { id: item.entityId, academyId: item.academyId, startDate: item.startDate, endDate: item.endDate });
     }
 
-    let items = {};
-    props.classes && props.classes.forEach(classObj => {
+  async componentDidMount() {
+    setLocateConfig(LocaleConfig);
+
+    this.setState({
+        navigation: this.props.navigation
+    })
+  }
+
+  render() {
+
+let items = {};
+    this.props.classes && this.props.classes.forEach(classObj => {
         items[moment(classObj.schedule.startDate).format('YYYY-MM-DD')] = items[moment(classObj.schedule.startDate).format('YYYY-MM-DD')] || { title: moment(classObj.schedule.startDate).format('YYYY-MM-DD'), data: []};
         let startDate = moment(classObj.schedule.startDate);
         let endDate = moment(classObj.schedule.endDate);
         let duration = endDate.valueOf() && startDate.valueOf() ? endDate.valueOf() - startDate.valueOf() : 0;
         let timeDuration = moment.duration(duration);
-        let isAttending = !!(props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => (attendee._id === props.loggedInUser._id)))
+        let isAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => (attendee._id === this.props.loggedInUser._id)))
+
+        let attendees = classObj.attendees.filter(attendee => !attendee.online) || [];
+        let onlineAttendees = classObj.attendees.filter(attendee => !!attendee.online) || [];
+        let isFull = attendees && attendees.length === classObj.classSize;
+        let onlineIsFull = onlineAttendees && onlineAttendees.length === classObj.onlineClassSize;
+
         items[moment(classObj.schedule.startDate).format('YYYY-MM-DD')].data.push({
             name: classObj.name,
             description: classObj.description,
@@ -110,7 +154,9 @@ export default function ScheduleElement(props) {
             classSize: classObj.classSize,
             numberOfAttendees: classObj.attendees ? classObj.attendees.length : 0,
             isAttending,
-            isFull: classObj.classSize && classObj.attendees && classObj.classSize === classObj.attendees.length
+            isFull: isFull,
+            onlineIsFull: onlineIsFull,
+            supportOnlineClasses: classObj.supportOnlineClasses
         })
     })
 
@@ -118,11 +164,10 @@ export default function ScheduleElement(props) {
         return moment(a.title) - moment(b.title);
     });
 
-    let markedDates = getMarkedDates(displayItems)
+    let markedDates = this.getMarkedDates(displayItems)
 
     return (
       <View style={{flex: 1}}>
-
       <CalendarProvider
         date={displayItems[0] && displayItems[0].title}
         disabledOpacity={0.6}
@@ -152,21 +197,53 @@ export default function ScheduleElement(props) {
 
         <AgendaList
           sections={displayItems}
-          renderItem={renderItem}
+          renderItem={(data) => this.renderItem(data, this)}
           theme={{
             calendarBackground: colors.secondaryBackground,
             textSectionTitleColor: 'blue',
             textSectionTitleDisabledColor: 'blue',
           }}
-          onRefresh={() => props.onRefresh()}
-          refreshing={props.refreshing}
+          onRefresh={() => this.props.onRefresh()}
+          refreshing={this.props.refreshing}
         />
       </CalendarProvider>
 
+                        <Modal isVisible={this.state.attendDialogVisible} onBackdropPress={() => this.setState({ attendDialogVisible: false })}>
+                            <View>
+                              {!this.state.currentItem.isFull && (
+                                  <Button
+                                    secondary
+                                    rounded
+                                    small
+                                    bgColor={ colors.primaryBackground }
+                                    textColor={ colors.primaryText }
+                                    style={ styles.editDetailsButton }
+                                    caption={ translate('online') }
+                                    onPress={() => this.attend(this.state.currentItem, true)}
+                                  />
+                              )}
+
+                              {!this.state.currentItem.onlineIsFull && (
+                                  <Button
+                                    secondary
+                                    rounded
+                                    small
+                                    bgColor={ colors.primaryBackground }
+                                    textColor={ colors.primaryText }
+                                    style={ styles.editDetailsButton }
+                                    caption={ translate('inPerson') }
+                                    onPress={() => this.attend(this.state.currentItem, false)}
+                                  />
+                              )}
+                          </View>
+                        </Modal>
       </View>
     );
 
+  }
 }
+
+export default ScheduleElement;
 
 const styles = StyleSheet.create({
   calendar: {
@@ -200,7 +277,7 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     overflow: 'hidden',
-    width: Dimensions.get('window').width - 170,
+    width: Dimensions.get('window').width - 185,
   },
   itemTitleText: {
     color: colors.terciaryText,
@@ -211,8 +288,9 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width - 185
   },
   itemButtonContainer: {
-    width: 120,
-    paddingRight: 10
+    width: 135,
+    paddingRight: 10,
+    alignItems: 'stretch'
   },
   emptyItem: {
     paddingLeft: 20,
@@ -229,5 +307,10 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: 'white',
     textAlign: 'center'
-  }
+  },
+  editDetailsButton: {
+      width: 300,
+      alignSelf: 'center',
+      marginTop: 20
+    },
 });

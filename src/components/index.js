@@ -6,6 +6,7 @@ import GridRow from './GridRow';
 import TextInput from './TextInput';
 import SegmentedControl from './SegmentedControl';
 import Cards from './Cards';
+import KeyboardInputWrapper from './KeyboardInputWrapper';
 
 export {
   // ## Generator Components Exports
@@ -15,5 +16,6 @@ export {
   GridRow,
   TextInput,
   SegmentedControl,
-  Cards
+  Cards,
+  KeyboardInputWrapper
 };

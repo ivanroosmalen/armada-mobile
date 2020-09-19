@@ -1,16 +1,31 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Button, Animated } from 'react-native';
-
+import { StyleSheet, View, Text, TouchableOpacity, Animated } from 'react-native';
+import { Button } from '../../components';
 import { colors, fonts } from '../../styles';
 import moment from 'moment';
-
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Modal from 'react-native-modal';
 import ScheduleElement from './ScheduleElement';
 
 class UserScheduleScreen extends React.Component {
 
   state = {
     anim: new Animated.Value(0),
-    refreshing: false
+    refreshing: false,
+    academyDialogVisible: false
+  }
+
+  addClass(ownerAcademies) {
+     if(ownerAcademies.length === 1) {
+        this.editClass(ownerAcademies[0]._id);
+     } else if(ownerAcademies.length > 1) {
+        this.setState({ academyDialogVisible: true });
+     }
+  }
+
+  editClass(academyId) {
+    this.props.navigation.navigate('ClassEdit', { academyId: academyId })
+    this.setState({ academyDialogVisible: false });
   }
 
     async onRefresh() {
@@ -86,6 +101,9 @@ class UserScheduleScreen extends React.Component {
       }
 
   render() {
+    let isLoggedIn = this.props.loggedInUser;
+    let ownerAcademies = this.props.userAcademies.owner || [];
+
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
         <ScheduleElement
@@ -94,7 +112,37 @@ class UserScheduleScreen extends React.Component {
             attend={this.props.attend}
             unattend={this.props.unattend}
             onRefresh={() => this.onRefresh()}
-            refreshing={this.state.refreshing}/>
+            refreshing={this.state.refreshing}
+            navigation={this.props.navigation}/>
+
+        {!!ownerAcademies.length && (
+            <TouchableOpacity
+                onPress={() => this.addClass(ownerAcademies)}
+                style={ styles.addButton } >
+              <Icon
+                  name="plus-circle"
+                  style={styles.addIcon}
+                />
+            </TouchableOpacity>
+        )}
+
+                        <Modal isVisible={this.state.academyDialogVisible} onBackdropPress={() => this.setState({ academyDialogVisible: false })}>
+                            <View>
+                        {!!ownerAcademies.length && ownerAcademies.map(oa =>
+                                  <Button
+                                    secondary
+                                    rounded
+                                    small
+                                    bgColor={ colors.primaryBackground }
+                                    textColor={ colors.primaryText }
+                                    style={ styles.editDetailsButton }
+                                    caption={ oa.name }
+                                    onPress={() => this.editClass(oa._id)}
+                                  />
+                        )}
+
+                          </View>
+                        </Modal>
       </Animated.View>
     );
   }
@@ -106,5 +154,23 @@ export default UserScheduleScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  editDetailsButton: {
+      width: 300,
+      alignSelf: 'center',
+      marginTop: 20
+    },
+  addIcon: {
+        fontSize: 35,
+        backgroundColor: colors.iconBackground,
+        color: colors.secondaryIcon,
+        borderRadius: 20
+      },
+  addButton: {
+        position: 'absolute',
+        bottom: 15,
+        right: 15,
+        borderRadius: 20,
+        overflow: 'hidden'
   }
 });

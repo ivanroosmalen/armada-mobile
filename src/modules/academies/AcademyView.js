@@ -177,8 +177,6 @@ export default class AcademyScreen extends React.Component {
           })
 
           nextClass = classes.find(classObj => {
-            console.log(moment())
-            console.log(moment(classObj.schedule.startDate))
             return moment() < moment(classObj.schedule.startDate)
           }) || { schedule: {} }
       }
@@ -258,10 +256,10 @@ export default class AcademyScreen extends React.Component {
                           onSelect={(index) => this.menuOptionSelected(menuEntities[index])}
                           renderSeparator={() => (<View></View>)}
                         >
-                    <View>
-                      <Text>
-                      </Text>
-                    </View>
+                                <View>
+                                <Text>
+                                </Text>
+                                </View>
                    </ModalDropdown>
 
               </View>
@@ -274,7 +272,7 @@ export default class AcademyScreen extends React.Component {
                     <Text style={styles.itemLabel}>{ translate('styles') }</Text>
                     <View style={styles.multilineText}>
                         {academy && academy.martialArts && academy.martialArts.map(ma =>
-                        <Text style={styles.textContent}>
+                        <Text style={styles.textContent} key={ma.name}>
                              {ma.name}
                         </Text>
                         )}
@@ -287,18 +285,22 @@ export default class AcademyScreen extends React.Component {
                     <Text style={styles.itemLabel}>{ translate('nextClass') }</Text>
                     <View>
                         {!!classes && !!classes.length && (
-                            <TouchableOpacity style={styles.scheduleContent} onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}>
+                            <View style={styles.scheduleContent}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Class', { id: nextClass._id, academyId: this.props.academy._id, startDate: nextClass.schedule.startDate, endDate: nextClass.schedule.endDate })}>
                                 <Text style={styles.textContent}>
                                     {moment(nextClass.schedule.startDate).format('dddd DD MMM') }
                                 </Text>
-
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
+                                >
                                   <Icon
                                     name="calendar"
                                     size={30}
                                     color={colors.secondaryIcon}
                                   />
-
                             </TouchableOpacity>
+                            </View>
                         )}
 
                         {!classes || !classes.length && (
@@ -369,6 +371,26 @@ export default class AcademyScreen extends React.Component {
                               data={academy && academy.students}
                               renderItem={this._getRenderItemFunction}
                           />
+                        )}
+                        {isLoggedIn && !userIsOwner && !isStudent && !academyRequest && (
+                            <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.joinButton }
+                                caption={ translate('join') }
+                                onPress={() => this.menuOptionSelected('join')}
+                              />
+                        )}
+                        {isLoggedIn && !userIsOwner && academyRequest && !isStudent && (
+                            <Button
+                                secondary
+                                rounded
+                                small
+                                style={ styles.joinButton }
+                                caption={ translate('cancelRequest') }
+                                onPress={() => this.menuOptionSelected('cancelRequest')}
+                              />
                         )}
                   </View>
 
@@ -490,6 +512,8 @@ const styles = StyleSheet.create({
     width: 300,
     marginTop: 30,
     alignSelf: 'center'
+  },
+  joinButton: {
   },
   optionsMenu: {
     opacity: 1,

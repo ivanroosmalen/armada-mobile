@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import MonthPicker from 'react-native-month-year-picker';
 import moment from 'moment';
-import { RadioGroup, Dropdown } from '../../components';
+import { RadioGroup, Dropdown, KeyboardInputWrapper } from '../../components';
 import MultiSelect from 'react-native-multiple-select';
 import MatComIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { translate } from '../../translations/index.js';
@@ -206,14 +206,14 @@ export default class ProfileEditScreen extends React.Component {
 
       return (
 
-        <View
-                style={styles.background}
-              >
+        <View style={styles.background} >
+              <KeyboardInputWrapper>
                 <View style={styles.container}>
 
                   <Animated.View
                     style={[styles.section, styles.middle, this.fadeIn(700, -20)]}
                   >
+                    <Text style={styles.headerTitle}>{translate('editProfile')}</Text>
 
                     <TextInput
                       placeholder={ translate('alias') }
@@ -338,6 +338,7 @@ export default class ProfileEditScreen extends React.Component {
                           />
                   </Animated.View>
                 </View>
+                </KeyboardInputWrapper>
               </View>
       );
     }
@@ -392,9 +393,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
   },
   headerTitle: {
-      fontWeight: "bold",
       fontSize: 25,
-      color: "white"
+      color: colors.primaryText,
+      textAlign: 'left',
+      marginTop: 10
   },
   maSection: {
     marginTop: 20,

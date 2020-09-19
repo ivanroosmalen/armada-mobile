@@ -22,6 +22,7 @@ import { translate } from '../../translations/index.js';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
 import Spinner from 'react-native-loading-spinner-overlay';
+import openMap from 'react-native-open-maps';
 
 import UserElement from '../profile/UserElement';
 
@@ -31,6 +32,7 @@ export default class ClassScreen extends React.Component {
     editDialogVisible: false,
     deleteDialogVisible: false,
     deleteConfirmationDialogVisible: false,
+    attendDialogVisible: false,
     deleteSingleItem: true,
     menuOptions: [translate('edit'), translate('delete')],
     menuEntities: ['edit', 'delete'],
@@ -47,6 +49,10 @@ export default class ClassScreen extends React.Component {
         ]);
       this.setState({ refreshing: false })
     }
+
+  locationSelected(location) {
+    openMap({ query: location.address } )
+  }
 
   async componentDidMount() {
     await Promise.all([
@@ -116,41 +122,50 @@ export default class ClassScreen extends React.Component {
     }
 
     async onDeleteConfirmationPressed(confirm) {
-        let state = {
-            deleteConfirmationDialogVisible: false,
-            spinner: false
-        };
+             let state = {
+                 deleteConfirmationDialogVisible: false,
+                 spinner: false
+             };
 
-        if(confirm) {
-            this.setState({ spinner: true });
-            if(!this.props.class.schedule.recurring || !this.state.deleteSingleItem) {
-                await this.props.removeClass(this.props.class._id);
-            } else {
-                let classObj = this.props.class;
-                classObj.schedule.excludes = classObj.schedule.excludes || [];
-                classObj.schedule.excludes.push(moment(this.props.route.params.startDate).toDate())
+             if(confirm) {
+                 this.setState({ spinner: true });
+                 if(!this.props.class.schedule.recurring || !this.state.deleteSingleItem) {
+                     await this.props.removeClass(this.props.class._id);
+                 } else {
+                     let classObj = this.props.class;
+                     classObj.schedule.excludes = classObj.schedule.excludes || [];
+                     classObj.schedule.excludes.push(moment(this.props.route.params.startDate).toDate())
 
-                await this.props.updateClass(this.props.class._id, classObj);
-            }
+                     await this.props.updateClass(this.props.class._id, classObj);
+                 }
 
-            this.props.navigation.pop(1);
-        } else {
-            state.deleteSingleItem = false;
+                 this.props.navigation.pop(1);
+             } else {
+                 state.deleteSingleItem = false;
+             }
+
+             this.setState(state);
+         }
+
+    async attend(online = false) {
+        this.setState({ spinner: true });
+        let data = {
+            classId: this.props.class._id,
+            startDate: this.props.route.params.startDate,
+            endDate: this.props.route.params.endDate,
+            online
         }
+        await this.props.attend(data);
 
-        this.setState(state);
+        this.setState({ spinner: false, attendDialogVisible: false });
     }
 
   async onAttendPressed() {
-    this.setState({ spinner: true });
-    let data = {
-        classId: this.props.class._id,
-        startDate: this.props.route.params.startDate,
-        endDate: this.props.route.params.endDate
+    if(this.props.class.supportOnlineClasses) {
+        this.setState({ attendDialogVisible: true })
+    } else {
+        await this.attend();
     }
-    await this.props.attend(data);
-
-    this.setState({ spinner: false });
   }
 
   async onUnattendPressed() {
@@ -179,11 +194,16 @@ export default class ClassScreen extends React.Component {
       let userIsOwner = !!(this.props.loggedInUser && this.props.academy && this.props.academy.owners && this.props.academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
       let userIsStudent = !!(this.props.loggedInUser && this.props.academy && this.props.academy.students && this.props.academy.students.find(student => student._id === this.props.loggedInUser._id));
       let userIsAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => attendee._id === this.props.loggedInUser._id));
-      let classIsFull = classObj.attendees && classObj.attendees.length === classObj.classSize;
 
       if(moment(classObj.schedule.startDate).valueOf() !== moment(startDate).valueOf()) {
         classObj.attendees = [];
       }
+
+      let attendees = classObj.attendees.filter(attendee => !attendee.online) || [];
+      let onlineAttendees = classObj.attendees.filter(attendee => !!attendee.online) || [];
+
+      let classIsFull = attendees && attendees.length === classObj.classSize;
+      let onlineClassIsFull = onlineAttendees && onlineAttendees.length === classObj.onlineClassSize;
 
       return (
         <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
@@ -217,9 +237,15 @@ export default class ClassScreen extends React.Component {
               </View>
 
               <View style={styles.expandingRow}>
-                    <Text style={styles.location}>
-                         {classObj.location && classObj.location.address}
-                    </Text>
+                    {!!(classObj.location && classObj.location.address) && (
+                    <TouchableOpacity
+                        onPress={() => this.locationSelected(classObj.location)}
+                    >
+                        <Text style={styles.location}>
+                             {classObj.location && classObj.location.address}
+                        </Text>
+                    </TouchableOpacity>
+                    )}
               </View>
 
               <View style={styles.hr} />
@@ -240,13 +266,27 @@ export default class ClassScreen extends React.Component {
 
               {userIsStudent && (
                   <View style={styles.userRow}>
-                        <Text style={styles.itemLabel}>{ translate('attending') } ({classObj && classObj.attendees && classObj.attendees.length}{classIsFull && ' - full'})</Text>
+                        <Text style={styles.itemLabel}>{ translate('attending') } ({attendees && attendees.length}{classIsFull && ' - full'})</Text>
 
                         <FlatList
                               horizontal
                               keyExtractor={item => item._id }
                               style={ styles.imageContainer }
-                              data={classObj && classObj.attendees}
+                              data={attendees}
+                              renderItem={this._getRenderItemFunction}
+                          />
+                  </View>
+              )}
+
+              {userIsStudent && classObj.supportOnlineClasses && (
+                  <View style={styles.userRow}>
+                        <Text style={styles.itemLabel}>{ translate('attendingOnline') } ({onlineAttendees && onlineAttendees.length}{onlineClassIsFull && ' - full'})</Text>
+
+                        <FlatList
+                              horizontal
+                              keyExtractor={item => item._id }
+                              style={ styles.imageContainer }
+                              data={onlineAttendees}
                               renderItem={this._getRenderItemFunction}
                           />
                   </View>
@@ -254,7 +294,8 @@ export default class ClassScreen extends React.Component {
             </ScrollView>
 
                 <View style={styles.attendContainer}>
-                {!userIsAttending && userIsStudent && !classIsFull && (
+                {!userIsAttending && userIsStudent && !(classIsFull && onlineClassIsFull) && (
+                    <View>
                       <Button
                         secondary
                         rounded
@@ -265,6 +306,7 @@ export default class ClassScreen extends React.Component {
                         caption={ translate('attend') }
                         onPress={ () => (this.onAttendPressed()) }
                       />
+                    </View>
                 )}
 
                 {userIsAttending && userIsStudent && (
@@ -295,22 +337,51 @@ export default class ClassScreen extends React.Component {
                           <ModalDropdown ref={(el) => {this.optionsMenu = el}}
                                   options={ this.state.menuOptions }
                                   renderRow={text => (
-                                    <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText }}>
-                                      <Text>{text}</Text>
+                                    <View style={{ paddingHorizontal: 20, paddingVertical: 10, color: colors.terciaryText, backgroundColor: colors.primaryBackground }}>
+                                      <Text style={{color: colors.primaryText}}>{text}</Text>
                                     </View>
                                   )}
-                                  dropdownStyle={{ height: 80 }}
+                                  dropdownStyle={{ height: 80}}
                                   onSelect={(index) => this.menuOptionSelected(this.state.menuEntities[index])}
                                   renderSeparator={() => (<View></View>)}
                                 >
-                            <View>
-                              <Text>
-                              </Text>
-                            </View>
+                                <View>
+                                <Text>
+                                </Text>
+                                </View>
                            </ModalDropdown>
-
                       </View>
                     )}
+
+                        <Modal isVisible={this.state.attendDialogVisible} onBackdropPress={() => (this.setState({ attendDialogVisible: false }))}>
+                            <View>
+                              {!classIsFull && (
+                                  <Button
+                                    secondary
+                                    rounded
+                                    small
+                                    bgColor={ colors.primaryBackground }
+                                    textColor={ colors.primaryText }
+                                    style={ styles.editDetailsButton }
+                                    caption={ translate('online') }
+                                    onPress={() => this.attend(true)}
+                                  />
+                              )}
+
+                              {!onlineClassIsFull && (
+                                  <Button
+                                    secondary
+                                    rounded
+                                    small
+                                    bgColor={ colors.primaryBackground }
+                                    textColor={ colors.primaryText }
+                                    style={ styles.editDetailsButton }
+                                    caption={ translate('inPerson') }
+                                    onPress={() => this.attend(false)}
+                                  />
+                              )}
+                          </View>
+                        </Modal>
 
                         <Modal isVisible={this.state.editDialogVisible} onBackdropPress={() => (this.setState({ editDialogVisible: false }))}>
                             <View>

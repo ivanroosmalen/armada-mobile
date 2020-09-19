@@ -250,7 +250,7 @@ export default class HomeScreen extends React.Component {
                             bgColor={ colors.primaryBackground }
                             textColor={ colors.primaryText }
                             style={ styles.createAcademyButton }
-                            caption={ translate('createAcademy') }
+                            caption={ translate('createYourAcademy') }
                             onPress={() => this.props.navigation.navigate('Auth')}
                           />
                     )}
@@ -263,7 +263,7 @@ export default class HomeScreen extends React.Component {
                             bgColor={ colors.primaryBackground }
                             textColor={ colors.primaryText }
                             style={ styles.createAcademyButton }
-                            caption={ translate('createAcademy') }
+                            caption={ translate('createYourAcademy') }
                             onPress={() => this.props.navigation.navigate('AcademyCreate')}
                           />
                     )}
