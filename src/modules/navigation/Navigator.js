@@ -169,6 +169,24 @@ function CustomDrawerContent(props) {
               onPress={() => props.navigation.navigate('UserSchedule', { id: currentUser._id })}
             />
 
+            <DrawerItem
+              key={`notifications`}
+              label={() => (
+                <View
+                  style={styles.menuLabelFlex}>
+                    <Icon
+                              name="bullhorn"
+                              style={{
+                                fontSize: 20,
+                                color: colors.primaryIcon
+                              }}
+                            />
+                  <Text style={styles.menuTitle}>{ translate('myNotifications') || 'My Notifications' }</Text>
+                </View>
+              )}
+              onPress={() => props.navigation.navigate('NotificationList')}
+            />
+
             { isAcademyOwner && (
             <DrawerItem
               key={`requests`}
@@ -179,10 +197,10 @@ function CustomDrawerContent(props) {
                               name="account-alert-outline"
                               style={{
                                 fontSize: 20,
-                                color: hasAcademyRequests ? 'red': colors.primaryIcon
+                                color: hasAcademyRequests ? colors.quintenaryText : colors.primaryIcon
                               }}
                             />
-                  <Text style={{  marginLeft: 10, color: hasAcademyRequests ? 'red': 'white' }}>{ translate('membershipRequests')  || 'Membership Requests' }</Text>
+                  <Text style={{  marginLeft: 10, color: hasAcademyRequests ? colors.quintenaryText : colors.primaryText }}>{ translate('membershipRequests')  || 'Membership Requests' }</Text>
                 </View>
               )}
               onPress={() => props.navigation.navigate('AcademyRequestList')}
@@ -293,7 +311,7 @@ export default function App(props) {
 const styles = StyleSheet.create({
   menuTitle: {
     marginLeft: 10,
-    color: '#fff'
+    color: colors.primaryText
   },
   menuLabelFlex: {
     display: 'flex',

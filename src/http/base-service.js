@@ -72,7 +72,6 @@ class BaseService {
         };
 
         return this.makeRequest(httpConfig, options);
-
     }
 
 
@@ -82,7 +81,7 @@ class BaseService {
             url: this.buildURL([ id ]),
             data: entity
         };
-
+    console.log(httpConfig)
         return this.makeRequest(httpConfig, options).then(() => {
             if(getEntity) return this.get(id);
         });

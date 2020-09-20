@@ -8,6 +8,7 @@ const colors = {
   terciaryText: '#2e2d2d',
   quaternaryBackground: '#a8a8a8',
   quaternaryText: '#a8a8a8',
+  quintenaryText: 'red',
   primaryIcon: '#efefef',
   secondaryIcon: '#2e2d2d',
   iconBackground: '#f5f5f5',

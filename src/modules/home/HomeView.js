@@ -16,9 +16,11 @@ import { translate } from '../../translations/index.js';
 import GetLocation from 'react-native-get-location'
 import { Button } from '../../components';
 import settings from '../../settings.js'
-
+import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AcademyElement from '../academies/AcademyElement';
 import AcademyRequestElement from '../academies/AcademyRequestElement';
+import NotificationElement from '../notifications/NotificationElement';
 
 export default class HomeScreen extends React.Component {
 
@@ -85,21 +87,33 @@ export default class HomeScreen extends React.Component {
     }
     await Promise.all(dataRequests);
 
-    let academyTypeObjs = ['student', 'instructor', 'owner']
+    let academyTypeObjs = ['owner', 'instructor', 'student']
+    let ownerAcademyIds = [];
+    let studentInstructorAcademyIds = [];
     let userAcademiesById = {};
         academyTypeObjs.forEach(academyTypeObj => {
             if(this.props.userAcademies && this.props.userAcademies[academyTypeObj] && this.props.userAcademies[academyTypeObj].length) {
                 this.props.userAcademies[academyTypeObj].forEach(academy => {
                     userAcademiesById[academy._id] = academy;
+
+                    if(academyTypeObj === 'owner') {
+                        ownerAcademyIds.push(academy._id)
+                    } else {
+//                        if(ownerAcademyIds.indexOf(academy._id) === -1) {
+                            studentInstructorAcademyIds.push(academy._id)
+//                        }
+                    }
                 })
             }
         })
 
-     let userAcademies = Object.values(userAcademiesById);
+    if(studentInstructorAcademyIds.length) {
+        this.props.getNotifications({academyIds: studentInstructorAcademyIds.join(',')})
+    }
 
     this.setState({
         location,
-        allUserAcademies: userAcademies
+        allUserAcademies: Object.values(userAcademiesById)
     });
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
@@ -108,20 +122,32 @@ export default class HomeScreen extends React.Component {
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.userAcademies !== this.props.userAcademies || prevProps.academies !== this.props.academies) {
 
-            let academyTypeObjs = ['student', 'instructor', 'owner']
-            let userAcademiesById = {};
-                academyTypeObjs.forEach(academyTypeObj => {
-                    if(this.props.userAcademies && this.props.userAcademies[academyTypeObj] && this.props.userAcademies[academyTypeObj].length) {
-                        this.props.userAcademies[academyTypeObj].forEach(academy => {
-                            userAcademiesById[academy._id] = academy;
-                        })
-                    }
-                })
+        let academyTypeObjs = ['owner', 'instructor', 'student']
+        let ownerAcademyIds = [];
+        let studentInstructorAcademyIds = [];
+        let userAcademiesById = {};
+            academyTypeObjs.forEach(academyTypeObj => {
+                if(this.props.userAcademies && this.props.userAcademies[academyTypeObj] && this.props.userAcademies[academyTypeObj].length) {
+                    this.props.userAcademies[academyTypeObj].forEach(academy => {
+                        userAcademiesById[academy._id] = academy;
 
-             let userAcademies = Object.values(userAcademiesById);
+                        if(academyTypeObj === 'owner') {
+                            ownerAcademyIds.push(academy._id)
+                        } else {
+                            if(ownerAcademyIds.indexOf(academy._id) === -1) {
+                                studentInstructorAcademyIds.push(academy._id)
+                            }
+                        }
+                    })
+                }
+            })
+
+        if(studentInstructorAcademyIds.length) {
+            this.props.getNotifications({academyIds: studentInstructorAcademyIds.join(',')})
+        }
 
             this.setState({
-                allUserAcademies: userAcademies
+                allUserAcademies: Object.values(userAcademiesById)
             })
       }
     }
@@ -147,7 +173,6 @@ export default class HomeScreen extends React.Component {
       }
 
     _getRenderItemFunction = ({ item }) => {
-
         return (
                <AcademyElement
                     academy={item}
@@ -164,23 +189,38 @@ export default class HomeScreen extends React.Component {
             approveAcademyRequest={this.props.approveAcademyRequest}
             key={item._id}
        />
+    );
+  };
 
+  _getRenderNotificationFunction = ({ item }) => {
+    return (
+       <NotificationElement
+            notification={item}
+            broadcast={() => {}}
+            deleteMessage={() => {}}
+            key={item._id}
+            isOwner={false}
+            titleColor={colors.terciaryText}
+            height={'auto'}
+       />
     );
   };
 
     render() {
+           let currentUser = this.props.loggedInUser;
            let hasAcademies = this.props.userAcademies && (this.props.userAcademies['student'] || this.props.userAcademies['instructor'] || this.props.userAcademies['instructor']);
            let displayedAcademies = hasAcademies ? this.state.allUserAcademies : this.props.academies;
            let academyRequests = (this.props && this.props.academyRequests) || [];
-
+           let notifications = this.props.notifications && this.props.notifications.length ? [this.props.notifications[0]] : [];
+           let todaysNotifications = this.props.notifications && this.props.notifications.length ? this.props.notifications.filter(notification => (moment(notification.createdDate) > moment().startOf('day'))) : [];
            return (
              <Animated.ScrollView
-                style={[this.fadeIn(0, 0)]}
+                style={[,this.fadeIn(0, 0)]}
                 contentContainerStyle={styles.container}
                 refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                 >
                 <View style={styles.section}>
-                {!academyRequests || !academyRequests.length && (
+                {!(academyRequests && academyRequests.length) && !(notifications && notifications.length) && (
                     <View>
                      <Text style={styles.header}>
                          {translate('welcome')}
@@ -192,15 +232,45 @@ export default class HomeScreen extends React.Component {
                  )}
 
                 {!!academyRequests && !!academyRequests.length && (
-                    <View>
-                     <Text style={styles.header}>
-                         {translate('academyRequests')}
-                     </Text>
+                    <View style={{flexShrink: 0, marginVertical: 10}}>
+                     <TouchableOpacity style={styles.headerContainer}
+                        onPress={() => {this.props.navigation.navigate('AcademyRequestList')}}>
+                         <Text style={styles.header}>
+                             {translate('academyRequests')} ({academyRequests.length})
+                         </Text>
+                      <Icon
+                        name="menu-right"
+                        size={25}
+                        color={colors.secondaryIcon}
+                      />
+                     </TouchableOpacity>
                         <FlatList
                           keyExtractor={item => item._id }
                           style={{ backgroundColor: colors.terciaryBackground, paddingHorizontal: 15 }}
-                          data={this.props.academyRequests || []}
+                          data={this.props.academyRequests ? [this.props.academyRequests[0]] : []}
                           renderItem={this._getRenderAcademyRequestFunction}
+                        />
+                    </View>
+                 )}
+
+                {!!notifications && !!notifications.length && (
+                    <View style={{flexShrink: 1, marginVertical: 10}}>
+                     <TouchableOpacity style={styles.headerContainer}
+                        onPress={() => {this.props.navigation.navigate('NotificationList')}}>
+                     <Text style={styles.header}>
+                         {translate('latestNotification')} {todaysNotifications && todaysNotifications.length ? '('+todaysNotifications.length+' '+translate('today')+')' : '' }
+                     </Text>
+                      <Icon
+                        name="menu-right"
+                        size={25}
+                        color={colors.secondaryIcon}
+                      />
+                     </TouchableOpacity>
+                        <FlatList
+                          keyExtractor={item => item._id }
+                          style={{ backgroundColor: colors.terciaryBackground, marginHorizontal: 15 }}
+                          data={notifications || []}
+                          renderItem={this._getRenderNotificationFunction}
                         />
                     </View>
                  )}
@@ -220,10 +290,18 @@ export default class HomeScreen extends React.Component {
               </View>
 
               {!!(displayedAcademies && displayedAcademies.length) && (
-                  <View style={styles.academySection}>
+                  <View style={styles.academySection} ref={this._academyListElement}>
+                     <TouchableOpacity style={styles.headerContainer}
+                        onPress={() => {hasAcademies ? this.props.navigation.navigate('UserAcademies', { id: currentUser._id }) : this.props.navigation.navigate('Academies')}}>
                      <Text style={styles.header}>
                          {hasAcademies ? translate('yourAcademies') : translate('academiesNearYou')}
                      </Text>
+                      <Icon
+                        name="menu-right"
+                        size={25}
+                        color={colors.secondaryIcon}
+                      />
+                     </TouchableOpacity>
                              <FlatList
                                horizontal
                                keyExtractor={item => item._id }
@@ -300,8 +378,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   section: {
+    flexShrink: 1
   },
   academySection: {
+    flexShrink: 0,
     justifyContent: 'flex-end'
   },
   quarterSection: {
@@ -309,8 +389,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20
   },
   header: {
-    marginTop: 5,
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     paddingHorizontal: 15,
     color: colors.terciaryText
@@ -329,5 +408,10 @@ const styles = StyleSheet.create({
     width: 250,
     marginTop: 20,
     alignSelf: 'center'
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginRight: 10
   }
 });

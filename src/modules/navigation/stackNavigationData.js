@@ -19,6 +19,7 @@ import UpdatePasswordScreen from '../auth/UpdatePasswordContainer';
 import ForgotPasswordScreen from '../auth/ForgotPasswordContainer';
 import AuthScreen from '../auth/AuthViewContainer';
 import ContactScreen from '../contact/ContactViewContainer';
+import NotificationListScreen from '../notifications/NotificationListViewContainer';
 import { translate } from '../../translations/index.js';
 
 import { colors, fonts } from '../../styles';
@@ -220,6 +221,19 @@ const StackNavigationData = [
       name: 'AcademyRequestList',
       displayName: translate('membershipRequests'),
       component: AcademyRequestListScreen,
+      headerLeft: headerLeftComponent,
+      headerBackground: { source: headerBackground },
+      headerTitleStyle: {
+        fontFamily: fonts.primaryRegular,
+        color: colors.primaryText,
+        fontSize: 18,
+        height: 70
+      },
+    },
+    {
+      name: 'NotificationList',
+      displayName: translate('myNotifications'),
+      component: NotificationListScreen,
       headerLeft: headerLeftComponent,
       headerBackground: { source: headerBackground },
       headerTitleStyle: {

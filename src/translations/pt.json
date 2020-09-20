@@ -105,7 +105,7 @@
   "welcome": "Bem vindo a Armada",
   "howToUse": "Use este aplicativo para conectar sua academia aos seus membros. Expanda sua armada!",
   "yourAcademies": "Suas academias",
-  "academyRequests": "Você tem solicitações de academia",
+  "academyRequests": "Solicitações de academia",
   "noAcademies": "Não há academias na área selecionada",
   "noAcademiesNear": "Seja o primeiro a criar uma academia em sua área!",
   "browse": "Procura academias",
@@ -120,5 +120,13 @@
   "supportOnline": "Apoiar aulas online",
   "noLocation": "Sem localização",
   "online": "Online",
-  "inPerson": "Em pessoa"
+  "inPerson": "Em pessoa",
+  "myNotifications": "Minhas notificações",
+  "noNotifications": "Nenhum notificações",
+  "newNotifications": "Novas notificações",
+  "latestNotification": "Notificação mais recente",
+  "writeMessage": "Escreva sua mensagem",
+  "sendMessage": "Envie uma mensagem aos membros",
+  "send": "Envie",
+  "today": 'hoje'
 }

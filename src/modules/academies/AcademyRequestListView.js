@@ -88,7 +88,6 @@ export default class AcademyRequestListScreen extends React.Component {
                       style={{ backgroundColor: colors.terciaryBackground, paddingHorizontal: 15 }}
                       data={this.props.academyRequests || []}
                       renderItem={this._getRenderItemFunction}
-                      refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                     />
                 )}
           </Animated.ScrollView>

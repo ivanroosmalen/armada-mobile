@@ -165,7 +165,6 @@ export default class ClassEditScreen extends React.Component {
                 let entity;
                 let isCreating = !(this.props.class && this.props.class._id);
                 if(this.state.editingClass._id) {
-                    console.log(this.state.editingClass)
                     entity = await this.props.updateClass(this.state.editingClass._id, this.state.editingClass);
                 } else {
                     entity = await this.props.createClass(this.state.editingClass);

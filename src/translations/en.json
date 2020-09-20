@@ -105,7 +105,7 @@
   "welcome": "Welcome to Armada",
   "howToUse": "Use this app to connect your academy to its members. Expand your armada!",
   "yourAcademies": "Your academies",
-  "academyRequests": "You have academy requests",
+  "academyRequests": "Academy requests",
   "noAcademies": "There are no academies in selected area",
   "noAcademiesNear": "Be the first to create an academy in your area!",
   "browse": "Browse academies",
@@ -120,5 +120,12 @@
   "supportOnline": "Support online classes",
   "noLocation": "No location",
   "online": "Online",
-  "inPerson": "In Person"
+  "inPerson": "In Person",
+  "myNotifications": "My notifications",
+  "noNotifications": "No notifications",
+  "latestNotification": "Latest notification",
+  "writeMessage": "Write your message",
+  "sendMessage": "Send members a message",
+  "send": "Send",
+  "today": 'today'
 }

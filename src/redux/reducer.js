@@ -8,6 +8,7 @@ import academyRequests from './academyRequests/academyRequest-reducers';
 import martialArts from './martialArts/martialArt-reducers';
 import scheduleItems from './scheduleItems/scheduleItem-reducers';
 import classes from './classes/class-reducers';
+import notifications from './notifications/notification-reducers';
 
 const appReducer = combineReducers({
   // ## Generator Reducers
@@ -17,7 +18,8 @@ const appReducer = combineReducers({
   academies,
   academyRequests,
   scheduleItems,
-  classes
+  classes,
+  notifications
 });
 
 const rootReducer = (state, action) => {

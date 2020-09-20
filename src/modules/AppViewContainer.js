@@ -29,8 +29,8 @@ export default compose(
           user = await store.dispatch(get(user._id));
           store.dispatch(setLoggedInUser(user));
           store.dispatch(setJwt(jwt));
-          store.dispatch(getUserAcademies(user._id));
           store.dispatch(list({ complete: false }));
+          store.dispatch(getUserAcademies(user._id));
       }
     },
   }),
