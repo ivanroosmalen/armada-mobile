@@ -59,6 +59,12 @@ export default class NotificationListScreen extends React.Component {
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
 
+    async componentDidUpdate(prevProps, prevState) {
+      if (prevProps.notifications.length !== this.props.notifications.length) {
+        await this.getData()
+      }
+    }
+
   addNotification(ownerAcademies) {
      if(ownerAcademies.length === 1) {
         this.broadcast({ academy: { _id: ownerAcademies[0]._id, name: ownerAcademies[0].name } });

@@ -88,7 +88,6 @@ export default class HomeScreen extends React.Component {
     await Promise.all(dataRequests);
 
     let academyTypeObjs = ['owner', 'instructor', 'student']
-    let ownerAcademyIds = [];
     let studentInstructorAcademyIds = [];
     let userAcademiesById = {};
         academyTypeObjs.forEach(academyTypeObj => {
@@ -96,12 +95,8 @@ export default class HomeScreen extends React.Component {
                 this.props.userAcademies[academyTypeObj].forEach(academy => {
                     userAcademiesById[academy._id] = academy;
 
-                    if(academyTypeObj === 'owner') {
-                        ownerAcademyIds.push(academy._id)
-                    } else {
-//                        if(ownerAcademyIds.indexOf(academy._id) === -1) {
-                            studentInstructorAcademyIds.push(academy._id)
-//                        }
+                    if(academyTypeObj !== 'owner') {
+                        studentInstructorAcademyIds.push(academy._id)
                     }
                 })
             }
@@ -113,7 +108,7 @@ export default class HomeScreen extends React.Component {
 
     this.setState({
         location,
-        allUserAcademies: Object.values(userAcademiesById)
+        allUserAcademies: Object.values(userAcademiesById),
     });
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
@@ -123,7 +118,6 @@ export default class HomeScreen extends React.Component {
       if (prevProps.userAcademies !== this.props.userAcademies || prevProps.academies !== this.props.academies) {
 
         let academyTypeObjs = ['owner', 'instructor', 'student']
-        let ownerAcademyIds = [];
         let studentInstructorAcademyIds = [];
         let userAcademiesById = {};
             academyTypeObjs.forEach(academyTypeObj => {
@@ -131,13 +125,9 @@ export default class HomeScreen extends React.Component {
                     this.props.userAcademies[academyTypeObj].forEach(academy => {
                         userAcademiesById[academy._id] = academy;
 
-                        if(academyTypeObj === 'owner') {
-                            ownerAcademyIds.push(academy._id)
-                        } else {
-                            if(ownerAcademyIds.indexOf(academy._id) === -1) {
-                                studentInstructorAcademyIds.push(academy._id)
-                            }
-                        }
+                    if(academyTypeObj !== 'owner') {
+                        studentInstructorAcademyIds.push(academy._id)
+                    }
                     })
                 }
             })
