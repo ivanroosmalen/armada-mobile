@@ -125,7 +125,8 @@ export default class HomeScreen extends React.Component {
 
     let data = null;
     let maxAttendanceValue = 0;
-    if(this.props.loggedInUser && this.props.userAttendanceMetrics && this.props.userAttendanceMetrics.length) {
+
+    if(this.props.loggedInUser && this.props.userAttendanceMetrics && this.props.userAttendanceMetrics.byWeek && Object.keys(this.props.userAttendanceMetrics.byWeek).length) {
         data = {
           labels: Object.keys(this.props.userAttendanceMetrics.byWeek).map(date => date.substring(5,10)),
           datasets: [
