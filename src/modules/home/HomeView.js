@@ -22,12 +22,26 @@ import AcademyElement from '../academies/AcademyElement';
 import AcademyRequestElement from '../academies/AcademyRequestElement';
 import NotificationElement from '../notifications/NotificationElement';
 
+import { LineChart } from "react-native-chart-kit";
+
 export default class HomeScreen extends React.Component {
 
     state = {
         displayedAcademies: [],
         anim: new Animated.Value(0),
-        refreshing: false
+        refreshing: false,
+        data: null,
+        chartConfig: {
+          backgroundGradientFrom: colors.secondaryBackground,
+          backgroundGradientFromOpacity: 1,
+          backgroundGradientTo: colors.secondaryBackground,
+          backgroundGradientToOpacity: 1,
+          color: () => colors.secondaryText,
+          strokeWidth: 2,
+          useShadowColorFromDataset: false
+        },
+        maxAttendanceValue: 0
+
       }
 
     async onRefresh() {
@@ -82,8 +96,11 @@ export default class HomeScreen extends React.Component {
     ];
 
     if(this.props.loggedInUser) {
+        let startDate = moment().subtract(12, 'weeks').format('YYYY-MM-DD');
+        let endDate = moment().format('YYYY-MM-DD');
         dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
-        dataRequests.push(this.props.getAcademyRequests({ complete: false }))
+        dataRequests.push(this.props.getAcademyRequests({ complete: false })),
+        dataRequests.push(this.props.getUserAttendanceMetrics({ startDate, endDate }))
     }
     await Promise.all(dataRequests);
 
@@ -106,9 +123,28 @@ export default class HomeScreen extends React.Component {
         this.props.getNotifications({academyIds: studentInstructorAcademyIds.join(',')})
     }
 
+    let data = null;
+    let maxAttendanceValue = 0;
+    if(this.props.loggedInUser && this.props.userAttendanceMetrics && this.props.userAttendanceMetrics.length) {
+        data = {
+          labels: Object.keys(this.props.userAttendanceMetrics.byWeek).map(date => date.substring(5,10)),
+          datasets: [
+            {
+              data: Object.values(this.props.userAttendanceMetrics.byWeek),
+              color: () => colors.secondaryText,
+              strokeWidth: 1
+            }
+          ]
+        };
+
+        maxAttendanceValue = Math.max(...Object.values(this.props.userAttendanceMetrics.byWeek))
+    }
+
     this.setState({
         location,
         allUserAcademies: Object.values(userAcademiesById),
+        data,
+        maxAttendanceValue
     });
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
@@ -203,6 +239,7 @@ export default class HomeScreen extends React.Component {
            let academyRequests = (this.props && this.props.academyRequests) || [];
            let notifications = this.props.notifications && this.props.notifications.length ? [this.props.notifications[0]] : [];
            let todaysNotifications = this.props.notifications && this.props.notifications.length ? this.props.notifications.filter(notification => (moment(notification.createdDate) > moment().startOf('day'))) : [];
+
            return (
              <Animated.ScrollView
                 style={[,this.fadeIn(0, 0)]}
@@ -210,7 +247,7 @@ export default class HomeScreen extends React.Component {
                 refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                 >
                 <View style={styles.section}>
-                {!(academyRequests && academyRequests.length) && !(notifications && notifications.length) && (
+                {!(academyRequests && academyRequests.length) && !(notifications && notifications.length) && !this.state.maxAttendanceValue && (
                     <View>
                      <Text style={styles.header}>
                          {translate('welcome')}
@@ -219,6 +256,24 @@ export default class HomeScreen extends React.Component {
                         {translate('howToUse')}
                      </Text>
                     </View>
+                 )}
+
+                {!academyRequests.length && !!this.state.maxAttendanceValue && !!this.state.data && (
+                     <View style={{flexShrink: 0, marginVertical: 10}}>
+                         <Text style={styles.header}>
+                             {translate('weeklyAttendance')} ({this.props.userAttendanceMetrics.total} {translate('total')})
+                         </Text>
+                        <LineChart
+                          data={this.state.data}
+                          chartConfig={this.state.chartConfig}
+                          width={Dimensions.get("window").width}
+                          height={100}
+                          withVerticalLabels={false}
+                          withHorizontalLines={true}
+                          withVerticalLines={false}
+                          segments={this.state.maxAttendanceValue}
+                        />
+                     </View>
                  )}
 
                 {!!academyRequests && !!academyRequests.length && (
@@ -284,7 +339,7 @@ export default class HomeScreen extends React.Component {
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {hasAcademies ? this.props.navigation.navigate('UserAcademies', { id: currentUser._id }) : this.props.navigation.navigate('Academies')}}>
                      <Text style={styles.header}>
-                         {hasAcademies ? translate('yourAcademies') : translate('academiesNearYou')}
+                         {hasAcademies ? translate('yourAcademies') + ' ('+displayedAcademies.length+')' : translate('academiesNearYou')}
                      </Text>
                       <Icon
                         name="menu-right"

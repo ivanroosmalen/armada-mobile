@@ -127,5 +127,7 @@
   "writeMessage": "Write your message",
   "sendMessage": "Send members a message",
   "send": "Send",
-  "today": 'today'
+  "today": 'today',
+  "weeklyAttendance": "Weekly attendance",
+  "total": "total"
 }

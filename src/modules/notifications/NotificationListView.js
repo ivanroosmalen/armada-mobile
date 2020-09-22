@@ -326,7 +326,8 @@ const styles = StyleSheet.create({
     },
   textAreaInput: {
     alignSelf: 'stretch',
-    height:200
+    height:200,
+    backgroundColor: colors.primaryBackground
   },
   sendTitle: {
     fontSize: 20,

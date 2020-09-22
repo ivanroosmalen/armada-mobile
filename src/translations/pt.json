@@ -128,5 +128,7 @@
   "writeMessage": "Escreva sua mensagem",
   "sendMessage": "Envie uma mensagem aos membros",
   "send": "Envie",
-  "today": 'hoje'
+  "today": 'hoje',
+  "weeklyAttendance": "Comparecimento semanal",
+  "total": "total"
 }

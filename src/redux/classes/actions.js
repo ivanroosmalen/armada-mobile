@@ -5,6 +5,7 @@ const service = new ClassService('classes');
 const CLASSES = 'CLASSES';
 const CLASS = 'CLASS';
 const QUERY_PARAMS = 'QUERY_PARAMS';
+const USER_ATTENDANCE_METRICS = 'USER_ATTENDANCE_METRICS';
 
 export function list(params, options) {
   return async function(dispatch) {
@@ -67,5 +68,13 @@ export function remove(id, options) {
   return async function(dispatch, getState) {
     await service.remove(id, options);
     dispatch(list(getState().classes.queryParams))
+  }
+}
+
+export function getUserAttendanceMetrics(params) {
+  return async function(dispatch, getState) {
+    let response = await service.getUserAttendanceMetrics(params);
+    dispatch({type: USER_ATTENDANCE_METRICS, data: response.data.entity});
+    return response.data.entity;
   }
 }
