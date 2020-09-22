@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-let classState = { classes: [], class: null, queryParams: {}, userAttendanceMetrics: [] };
+let classState = { classes: [], class: null, queryParams: {}, userAttendanceMetrics: {} };
 
 const classReducer = (state = classState, action) => {
      switch (action.type) {

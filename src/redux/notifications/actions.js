@@ -16,7 +16,8 @@ export function list(params, options) {
 export function get(id, params, options) {
   return async function(dispatch) {
     let response = await service.get(id, params, options);
-    dispatch({type: NOTIFICATION, data: response.data.entity});
+    let entity = response && response.data && response.data.entity || {};
+    dispatch({type: NOTIFICATION, data: entity});
   }
 }
 

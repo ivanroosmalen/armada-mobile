@@ -74,7 +74,8 @@ export function remove(id, options) {
 export function getUserAttendanceMetrics(params) {
   return async function(dispatch, getState) {
     let response = await service.getUserAttendanceMetrics(params);
-    dispatch({type: USER_ATTENDANCE_METRICS, data: response.data.entity});
-    return response.data.entity;
+    let entity = response && response.data && response.data.entity || {};
+    dispatch({type: USER_ATTENDANCE_METRICS, data: entity});
+    return entity;
   }
 }
