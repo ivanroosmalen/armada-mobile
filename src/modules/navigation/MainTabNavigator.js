@@ -17,7 +17,6 @@ export default class MainTabNavigator extends React.Component {
   }
 
   async getData() {
-    console.log('okkkk')
     let currentUser = this.props.loggedInUser;
     if(currentUser) {
         await this.props.getUserAcademies(currentUser._id);
