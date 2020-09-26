@@ -333,7 +333,7 @@ export default class ProfileEditScreen extends React.Component {
                              right: 10,
                              zIndex: 100
                              }}
-                            caption={ 'Save' }
+                            caption={ translate('save') }
                             onPress={this.submit}
                           />
                   </Animated.View>

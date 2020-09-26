@@ -213,7 +213,20 @@ export default class ProfileScreen extends React.Component {
           )}
 
           {!(user.martialArts && user.martialArts.length) && (
-            <Text style={styles.itemLabel, styles.noData}>No profile data </Text>
+                <View style={{alignItems: 'center', paddingTop: 20}}>
+                    <Button
+                            bgColor={colors.primaryBackground}
+                            textColor={colors.primaryText}
+                            secondary
+                            rounded
+                            style={{
+                                width: 200,
+
+                             }}
+                            caption={ translate('editProfile') }
+                            onPress={() => (this.props.navigation.navigate('ProfileEdit', { id: this.props.loggedInUser._id }))}
+                          />
+                </View>
           )}
         </Animated.View>
       );
