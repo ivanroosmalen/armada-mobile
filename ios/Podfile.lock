@@ -268,7 +268,7 @@ PODS:
     - React
   - RNScreens (2.10.1):
     - React
-  - RNSVG (9.13.6):
+  - RNSVG (12.1.0):
     - React
   - RNVectorIcons (6.7.0):
     - React
@@ -479,7 +479,7 @@ SPEC CHECKSUMS:
   RNLocalize: b6df30cc25ae736d37874f9bce13351db2f56796
   RNReanimated: 89f5e0a04d1dd52fbf27e7e7030d8f80a646a3fc
   RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
-  RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
+  RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNVectorIcons: 368d6d8b8301224e5ffb6254191f4f8876c2be0d
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
