@@ -29,7 +29,6 @@ export default function AcademyRequestElement(props) {
    }
 
   return (
-
     <View key={item._id} style={styles.row}>
                 <TouchableOpacity onPress={() => navigation.navigate('Profile', {id: item.user._id})}>
                     <Image
@@ -68,14 +67,13 @@ export default function AcademyRequestElement(props) {
   );
 }
 
-
-
 const styles = StyleSheet.create({
     row: {
         flexDirection: 'row',
         paddingTop: 10,
         paddingBottom: 10,
-        paddingRight: 65
+        paddingRight: 65,
+        backgroundColor: colors.secondaryBackground
     },
     avatar: {
         width: 60,

@@ -19,9 +19,8 @@ import settings from '../../settings.js'
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AcademyElement from '../academies/AcademyElement';
-import AcademyRequestElement from '../academies/AcademyRequestElement';
 import NotificationElement from '../notifications/NotificationElement';
-
+import ScheduleElement from '../schedule/ScheduleElement';
 import { LineChart } from "react-native-chart-kit";
 
 export default class HomeScreen extends React.Component {
@@ -40,38 +39,85 @@ export default class HomeScreen extends React.Component {
           strokeWidth: 2,
           useShadowColorFromDataset: false
         },
-        maxAttendanceValue: 0
-
+        maxAttendanceValue: 0,
+        allUserAcademies: [],
+        academies: []
       }
 
     async onRefresh() {
       this.setState({ refreshing: true })
-        let dataRequests = [
-            this.props.getAcademies()
-        ];
-        if(this.props.loggedInUser) {
-             dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
-             dataRequests.push(this.props.getAcademyRequests({ complete: false }))
-        }
-             await Promise.all(dataRequests);
-
-             let academyTypeObjs = ['student', 'instructor', 'owner']
-             let userAcademiesById = {};
-                 academyTypeObjs.forEach(academyTypeObj => {
-                     if(this.props.userAcademies && this.props.userAcademies[academyTypeObj] && this.props.userAcademies[academyTypeObj].length) {
-                         this.props.userAcademies[academyTypeObj].forEach(academy => {
-                             userAcademiesById[academy._id] = academy;
-                         })
-                     }
-                 })
-
-              let userAcademies = Object.values(userAcademiesById);
-
-             this.setState({
-                 allUserAcademies: userAcademies
-             });
+      await this.getData();
       this.setState({ refreshing: false })
     }
+
+  async getData(params = null) {
+    let dataRequests = [
+        this.props.getAcademies(params)
+    ];
+
+    if(this.props.loggedInUser) {
+        let startDate = moment().subtract(12, 'weeks').format('YYYY-MM-DD');
+        let endDate = moment().format('YYYY-MM-DD');
+        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
+        dataRequests.push(this.props.getUserAttendanceMetrics({ startDate, endDate }))
+    }
+    await Promise.all(dataRequests);
+
+    let academies = this.props.userAcademies || {};
+    let academyTypeObjs = ['owner', 'instructor', 'student']
+    let studentInstructorAcademyIds = [];
+    let userAcademiesById = {};
+    academyTypeObjs.forEach(academyTypeObj => {
+        if(academies && academies[academyTypeObj] && academies[academyTypeObj].length) {
+            academies[academyTypeObj].forEach(academy => {
+                userAcademiesById[academy._id] = academy;
+
+                if(academyTypeObj !== 'owner') {
+                    studentInstructorAcademyIds.push(academy._id)
+                }
+            })
+        }
+    })
+
+    let academyIds = [];
+    academies.student && academies.student.forEach(academy => {
+        academyIds.push(academy._id)
+    });
+
+    this.props.getClasses({
+        academyId: academyIds.join(','),
+        startDate: moment().utc().format('YYYY-MM-DD'),
+        endDate: moment().add(7, 'days').format('YYYY-MM-DD'),
+    });
+
+    if(this.props.userAcademies && this.props.userAcademies['student'] && this.props.userAcademies['student'].length) {
+        this.props.getNotifications({academyIds: this.props.userAcademies['student'].map(academy => academy._id).join(',')})
+    }
+
+    let data = null;
+    let maxAttendanceValue = 0;
+    if(this.props.loggedInUser && this.props.userAttendanceMetrics && this.props.userAttendanceMetrics.byWeek && Object.keys(this.props.userAttendanceMetrics.byWeek).length) {
+        data = {
+          labels: Object.keys(this.props.userAttendanceMetrics.byWeek).map(date => date.substring(5,10)),
+          datasets: [
+            {
+              data: Object.values(this.props.userAttendanceMetrics.byWeek),
+              color: () => colors.secondaryText,
+              strokeWidth: 1
+            }
+          ]
+        };
+
+        maxAttendanceValue = Math.max(...Object.values(this.props.userAttendanceMetrics.byWeek))
+    }
+
+    this.setState({
+        allUserAcademies: Object.values(userAcademiesById),
+        data,
+        maxAttendanceValue,
+        academies: this.props.academies || []
+    });
+  }
 
   async componentDidMount() {
     let location = {};
@@ -91,92 +137,14 @@ export default class HomeScreen extends React.Component {
       currentLng: location.longitude
     }
 
-    let dataRequests = [
-        this.props.getAcademies(params)
-    ];
+    await this.getData(params);
 
-    if(this.props.loggedInUser) {
-        let startDate = moment().subtract(12, 'weeks').format('YYYY-MM-DD');
-        let endDate = moment().format('YYYY-MM-DD');
-        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
-        dataRequests.push(this.props.getAcademyRequests({ complete: false })),
-        dataRequests.push(this.props.getUserAttendanceMetrics({ startDate, endDate }))
-    }
-    await Promise.all(dataRequests);
-
-    let academyTypeObjs = ['owner', 'instructor', 'student']
-    let studentInstructorAcademyIds = [];
-    let userAcademiesById = {};
-        academyTypeObjs.forEach(academyTypeObj => {
-            if(this.props.userAcademies && this.props.userAcademies[academyTypeObj] && this.props.userAcademies[academyTypeObj].length) {
-                this.props.userAcademies[academyTypeObj].forEach(academy => {
-                    userAcademiesById[academy._id] = academy;
-
-                    if(academyTypeObj !== 'owner') {
-                        studentInstructorAcademyIds.push(academy._id)
-                    }
-                })
-            }
-        })
-
-    if(studentInstructorAcademyIds.length) {
-        this.props.getNotifications({academyIds: studentInstructorAcademyIds.join(',')})
-    }
-
-    let data = null;
-    let maxAttendanceValue = 0;
-
-    if(this.props.loggedInUser && this.props.userAttendanceMetrics && this.props.userAttendanceMetrics.byWeek && Object.keys(this.props.userAttendanceMetrics.byWeek).length) {
-        data = {
-          labels: Object.keys(this.props.userAttendanceMetrics.byWeek).map(date => date.substring(5,10)),
-          datasets: [
-            {
-              data: Object.values(this.props.userAttendanceMetrics.byWeek),
-              color: () => colors.secondaryText,
-              strokeWidth: 1
-            }
-          ]
-        };
-
-        maxAttendanceValue = Math.max(...Object.values(this.props.userAttendanceMetrics.byWeek))
-    }
-
-    this.setState({
-        location,
-        allUserAcademies: Object.values(userAcademiesById),
-        data,
-        maxAttendanceValue
-    });
+    this.setState({ location })
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.userAcademies !== this.props.userAcademies || prevProps.academies !== this.props.academies) {
-
-        let academyTypeObjs = ['owner', 'instructor', 'student']
-        let studentInstructorAcademyIds = [];
-        let userAcademiesById = {};
-            academyTypeObjs.forEach(academyTypeObj => {
-                if(this.props.userAcademies && this.props.userAcademies[academyTypeObj] && this.props.userAcademies[academyTypeObj].length) {
-                    this.props.userAcademies[academyTypeObj].forEach(academy => {
-                        userAcademiesById[academy._id] = academy;
-
-                    if(academyTypeObj !== 'owner') {
-                        studentInstructorAcademyIds.push(academy._id)
-                    }
-                    })
-                }
-            })
-
-        if(studentInstructorAcademyIds.length) {
-            this.props.getNotifications({academyIds: studentInstructorAcademyIds.join(',')})
-        }
-
-            this.setState({
-                allUserAcademies: Object.values(userAcademiesById)
-            })
-      }
     }
 
     fadeIn(delay, from = 0) {
@@ -209,16 +177,6 @@ export default class HomeScreen extends React.Component {
         );
       };
 
-  _getRenderAcademyRequestFunction = ({ item }) => {
-    return (
-       <AcademyRequestElement
-            academyRequest={item}
-            approveAcademyRequest={this.props.approveAcademyRequest}
-            key={item._id}
-       />
-    );
-  };
-
   _getRenderNotificationFunction = ({ item }) => {
     return (
        <NotificationElement
@@ -235,11 +193,12 @@ export default class HomeScreen extends React.Component {
 
     render() {
            let currentUser = this.props.loggedInUser;
-           let hasAcademies = this.props.userAcademies && (this.props.userAcademies['student'] || this.props.userAcademies['instructor'] || this.props.userAcademies['instructor']);
+           let hasAcademies = this.state.allUserAcademies && this.state.allUserAcademies.length;
            let displayedAcademies = hasAcademies ? this.state.allUserAcademies : this.props.academies;
-           let academyRequests = (this.props && this.props.academyRequests) || [];
            let notifications = this.props.notifications && this.props.notifications.length ? [this.props.notifications[0]] : [];
            let todaysNotifications = this.props.notifications && this.props.notifications.length ? this.props.notifications.filter(notification => (moment(notification.createdDate) > moment().startOf('day'))) : [];
+           let maxAttendanceValue = this.state.maxAttendanceValue;
+           let classes = this.props.classes;
 
            return (
              <Animated.ScrollView
@@ -248,7 +207,7 @@ export default class HomeScreen extends React.Component {
                 refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                 >
                 <View style={styles.section}>
-                {!(academyRequests && academyRequests.length) && !(notifications && notifications.length) && !this.state.maxAttendanceValue && (
+                {!(notifications && notifications.length) && !this.state.maxAttendanceValue && (
                     <View>
                      <Text style={styles.header}>
                          {translate('welcome')}
@@ -259,47 +218,30 @@ export default class HomeScreen extends React.Component {
                     </View>
                  )}
 
-                {!academyRequests.length && !!this.state.maxAttendanceValue && !!this.state.data && (
+                {!!this.state.data && (
                      <View style={{flexShrink: 0, marginVertical: 10}}>
                          <Text style={styles.header}>
                              {translate('weeklyAttendance')} ({this.props.userAttendanceMetrics.total} {translate('total')})
                          </Text>
-                        <LineChart
-                          data={this.state.data}
-                          chartConfig={this.state.chartConfig}
-                          width={Dimensions.get("window").width}
-                          height={100}
-                          withVerticalLabels={false}
-                          withHorizontalLines={true}
-                          withVerticalLines={false}
-                          segments={this.state.maxAttendanceValue}
-                        />
+                         <View style={{marginTop: 10, marginLeft: -30}}>
+                            <LineChart
+                              data={this.state.data}
+                              chartConfig={this.state.chartConfig}
+                              width={Dimensions.get("window").width + 30}
+                              height={100}
+                              withVerticalLabels={false}
+                              withHorizontalLines={true}
+                              withVerticalLines={true}
+                              withInnerLines={false}
+                              segments={maxAttendanceValue}
+                              yAxisInterval={1}
+                              formatYLabel={(value) => (parseInt(value))}
+                            />
+                        </View>
                      </View>
                  )}
 
-                {!!academyRequests && !!academyRequests.length && (
-                    <View style={{flexShrink: 0, marginVertical: 10}}>
-                     <TouchableOpacity style={styles.headerContainer}
-                        onPress={() => {this.props.navigation.navigate('AcademyRequestList')}}>
-                         <Text style={styles.header}>
-                             {translate('academyRequests')} ({academyRequests.length})
-                         </Text>
-                      <Icon
-                        name="menu-right"
-                        size={25}
-                        color={colors.secondaryIcon}
-                      />
-                     </TouchableOpacity>
-                        <FlatList
-                          keyExtractor={item => item._id }
-                          style={{ backgroundColor: colors.terciaryBackground, paddingHorizontal: 15 }}
-                          data={this.props.academyRequests ? [this.props.academyRequests[0]] : []}
-                          renderItem={this._getRenderAcademyRequestFunction}
-                        />
-                    </View>
-                 )}
-
-                {!!notifications && !!notifications.length && (
+                {!!(notifications && notifications.length) && (
                     <View style={{flexShrink: 1, marginVertical: 10}}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {this.props.navigation.navigate('NotificationList')}}>
@@ -335,7 +277,32 @@ export default class HomeScreen extends React.Component {
                 )}
               </View>
 
-              {!!(displayedAcademies && displayedAcademies.length) && (
+              {!!(classes && classes.length) && (
+                    <View style={{flexShrink: 0, marginVertical: 10, flex: !!(notifications && notifications.length) ? 0 : 1, height: !!(notifications && notifications.length) ? 250 : 0}}>
+                     <TouchableOpacity style={styles.headerContainer}
+                        onPress={() => {this.props.navigation.navigate('UserAcademies', { id: this.props.loggedInUser._id })}}>
+                     <Text style={styles.header}>
+                         {translate('mySchedule') }
+                     </Text>
+                      <Icon
+                        name="menu-right"
+                        size={25}
+                        color={colors.secondaryIcon}
+                      />
+                     </TouchableOpacity>
+                    <ScheduleElement
+                        classes={this.props.classes}
+                        loggedInUser={this.props.loggedInUser}
+                        attend={this.props.attend}
+                        unattend={this.props.unattend}
+                        refreshing={false}
+                        navigation={this.props.navigation}
+                        hideWeekView={true}/>
+                    </View>
+              )}
+
+
+              {!(classes && classes.length) && !!(displayedAcademies && displayedAcademies.length) && (
                   <View style={styles.academySection} ref={this._academyListElement}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {hasAcademies ? this.props.navigation.navigate('UserAcademies', { id: currentUser._id }) : this.props.navigation.navigate('Academies')}}>
@@ -359,7 +326,7 @@ export default class HomeScreen extends React.Component {
                   </View>
               )}
 
-              {!(displayedAcademies && displayedAcademies.length) && (
+              {!(classes && classes.length) && !(displayedAcademies && displayedAcademies.length) && (
                 <View style={styles.academySection}>
                   <View>
                      <Text style={styles.content}>

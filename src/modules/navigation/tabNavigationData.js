@@ -1,5 +1,6 @@
 import HomeScreen from '../home/HomeViewContainer';
 import AcademyListScreen from '../academies/AcademyListViewContainer';
+import OwnerDashboardScreen from '../home/OwnerDashboardViewContainer';
 import { TouchableOpacity, Image } from 'react-native';
 
 const headerLeftComponent = (props) => {
@@ -29,6 +30,13 @@ const tabNavigationData = [
     component: HomeScreen,
     icon: 'home',
     headerLeft: null,
+  },
+  {
+    name: 'managerDashboard',
+    component: OwnerDashboardScreen,
+    icon: 'view-dashboard',
+    headerLeft: null,
+    ifOwner: true
   },
   {
       name: 'academies',

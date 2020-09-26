@@ -173,6 +173,7 @@ let items = {};
         disabledOpacity={0.6}
       >
 
+    {!this.props.hideWeekView && (
           <WeekCalendar
             firstDay={1}
             markedDates={markedDates}
@@ -194,6 +195,7 @@ let items = {};
                 textDayHeaderFontSize: 16
           }}
           />
+      )}
 
         <AgendaList
           sections={displayItems}

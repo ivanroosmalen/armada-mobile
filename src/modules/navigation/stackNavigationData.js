@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Image } from 'react-native';
 
-import TabNavigator from './MainTabNavigator';
+import TabNavigator from './MainTabNavigatorContainer';
 import HomeScreen from '../home/HomeViewContainer';
 import AcademyScreen from '../academies/AcademyViewContainer';
 import AcademyEditScreen from '../academies/AcademyEditViewContainer';

@@ -32,6 +32,15 @@ class ClassService extends BaseService {
             };
             return this.makeRequest(httpConfig, {});
     }
+
+    async getTotalAttendanceMetrics(params = {}) {
+            const httpConfig = {
+                method: 'GET',
+                url: this.buildURL(['metrics', 'totalAttendance']),
+                params: params
+            };
+            return this.makeRequest(httpConfig, {});
+    }
 }
 
 export default ClassService;

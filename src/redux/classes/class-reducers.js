@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-let classState = { classes: [], class: null, queryParams: {}, userAttendanceMetrics: {} };
+let classState = { classes: [], class: null, queryParams: {}, userAttendanceMetrics: {}, totalAttendanceMetrics: {} };
 
 const classReducer = (state = classState, action) => {
      switch (action.type) {
@@ -15,6 +15,9 @@ const classReducer = (state = classState, action) => {
            break;
          case 'USER_ATTENDANCE_METRICS':
            state = { ...state, userAttendanceMetrics: action.data };
+           break;
+         case 'TOTAL_ATTENDANCE_METRICS':
+           state = { ...state, totalAttendanceMetrics: action.data };
            break;
         default:
           break

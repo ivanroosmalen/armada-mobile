@@ -129,5 +129,7 @@
   "send": "Send",
   "today": 'today',
   "weeklyAttendance": "Weekly attendance",
-  "total": "total"
+  "dailyAttendance": "Daily attendance",
+  "total": "total",
+  "managerDashboard": "Manager Dashboard"
 }

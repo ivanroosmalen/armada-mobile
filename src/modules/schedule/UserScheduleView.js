@@ -29,7 +29,12 @@ class UserScheduleScreen extends React.Component {
   }
 
     async onRefresh() {
-      this.setState({ refreshing: true })
+      this.setState({ refreshing: true });
+      await this.getData();
+      this.setState({ refreshing: false });
+    }
+
+    async getData() {
         await this.props.getUserAcademies(this.props.loggedInUser._id);
         let academies = this.props.userAcademies || {};
         let academyIds = [];
@@ -47,35 +52,14 @@ class UserScheduleScreen extends React.Component {
 
         let data = {
             academyId: academyIds.join(','),
-            startDate: moment().format('YYYY-MM-DD'),
+            startDate: moment().utc().format('YYYY-MM-DD'),
             endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
         }
         await this.props.list(data);
-      this.setState({ refreshing: false })
     }
 
   async componentDidMount() {
-    await this.props.getUserAcademies(this.props.loggedInUser._id);
-    let academies = this.props.userAcademies || {};
-    let academyIds = [];
-    academies.owner && academies.owner.forEach(academy => {
-        academyIds.push(academy._id)
-    });
-
-    academies.instructor && academies.instructor.forEach(academy => {
-        academyIds.push(academy._id)
-    });
-
-    academies.student && academies.student.forEach(academy => {
-        academyIds.push(academy._id)
-    });
-
-    let data = {
-        academyId: academyIds.join(','),
-        startDate: moment().format('YYYY-MM-DD'),
-        endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
-    }
-    await this.props.list(data);
+    await this.getData();
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }

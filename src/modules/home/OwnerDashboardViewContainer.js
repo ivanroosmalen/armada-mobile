@@ -2,9 +2,8 @@ import { compose, lifecycle } from 'recompose';
 import { connect } from 'react-redux';
 import { list, getUserAcademies } from '../../redux/academies/actions.js'
 import { list as getAcademyRequests, approve } from '../../redux/academyRequests/actions.js'
-import { list as getNotifications } from '../../redux/notifications/actions.js'
-import { getUserAttendanceMetrics, list as getClasses, attend, unattend } from '../../redux/classes/actions.js'
-import HomeScreen from './HomeView';
+import { getTotalAttendanceMetrics } from '../../redux/classes/actions.js'
+import OwnerDashboardScreen from './OwnerDashboardView';
 
 export default compose(
 connect(
@@ -14,19 +13,13 @@ connect(
       academies: state.academies.academies,
       userAcademies: state.academies.userAcademies,
       academyRequests: state.academyRequests.academyRequests,
-      notifications: state.notifications.notifications,
-      userAttendanceMetrics: state.classes.userAttendanceMetrics,
-      classes: state.classes.classes,
+      totalAttendanceMetrics: state.classes.totalAttendanceMetrics,
     })},
     dispatch => ({
       getAcademies: (params) => dispatch(list(params)),
       getUserAcademies: (id, params) => dispatch(getUserAcademies(id, params)),
       getAcademyRequests: (params) => dispatch(getAcademyRequests(params)),
       approveAcademyRequest: (id, data) => dispatch(approve(id, data)),
-      getNotifications: (params) => dispatch(getNotifications(params)),
-      getUserAttendanceMetrics: (params) => dispatch(getUserAttendanceMetrics(params)),
-      getClasses: (params) => dispatch(getClasses(params)),
-      attend: (data) => dispatch(attend(data)),
-      unattend: (data) => dispatch(unattend(data)),
+      getTotalAttendanceMetrics: (params) => dispatch(getTotalAttendanceMetrics(params))
     })
-  ))(HomeScreen);
+  ))(OwnerDashboardScreen);

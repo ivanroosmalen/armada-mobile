@@ -6,44 +6,73 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { store } from '../../redux/store.js';
 import tabNavigationData from './tabNavigationData';
 import { translate } from '../../translations/index.js';
+import { getUserAcademies } from '../../redux/users/actions';
 
 const Tab = createBottomTabNavigator();
 
-export default function BottomTabs() {
+export default class MainTabNavigator extends React.Component {
 
-  const headerLeft = () => {
+  state = {
+    isAcademyOwner: false
+  }
+
+  async getData() {
+    console.log('okkkk')
+    let currentUser = this.props.loggedInUser;
+    if(currentUser) {
+        await this.props.getUserAcademies(currentUser._id);
+        let userAcademies = this.props.userAcademies;
+        let isAcademyOwner = !!(userAcademies && userAcademies.owner && userAcademies.owner.length);
+        this.setState({ isAcademyOwner });
+    }
+  }
+
+  async componentDidMount() {
+     await this.getData()
+  }
+
+  async componentDidUpdate(prevProps, prevState) {
+    if(this.props.userAcademies && this.props.userAcademies.owner && prevProps.userAcademies && prevProps.userAcademies.owner && this.props.userAcademies.owner.length !== prevProps.userAcademies.owner.length) {
+        await this.getData()
+    }
+  }
+
+  headerLeft = () => {
     return (
     <View style={{width: 40}}>
     </View>
     )
   }
 
-  return (
-    <Tab.Navigator>
-      {tabNavigationData.map((item, idx) => (
-        <Tab.Screen 
-          key={`tab_item${idx+1}`}
-          name={translate(item.name)}
-          component={item.component}
-          options={{
-              headerLeft: item.headerLeft || headerLeft,
-              tabBarIcon: ({ focused }) => (
-                <View style={styles.tabBarItemContainer}>
-                  <Icon
-                                            name={item.icon}
-                                            style={{
-                                              fontSize: 30,
-                                              color: colors.secondaryIcon
-                                            }}
-                                          />
-                </View>
-              ),
-              tabBarLabel: ({ focused }) => <Text style={{ fontSize: 14, color: focused ? colors.secondaryText : colors.secondaryIcon }}>{ translate(item.name) }</Text>
-            }}
-        />        
-      ))}
-    </Tab.Navigator>
-  );
+    render() {
+      return (
+        <Tab.Navigator>
+          {tabNavigationData.filter(item => ((item.ifOwner && this.state.isAcademyOwner) || !item.ifOwner)).map((item, idx) => (
+            <Tab.Screen
+              key={`tab_item${idx+1}`}
+              name={translate(item.name)}
+              component={item.component}
+              options={{
+                  headerLeft: item.headerLeft || this.headerLeft,
+                  tabBarIcon: ({ focused }) => (
+                    <View style={styles.tabBarItemContainer}>
+                      <Icon
+                                                name={item.icon}
+                                                style={{
+                                                  fontSize: 30,
+                                                  color: colors.secondaryIcon
+                                                }}
+                                              />
+                    </View>
+                  ),
+                  tabBarLabel: ({ focused }) => <Text style={{ fontSize: 14, color: focused ? colors.secondaryText : colors.secondaryIcon }}>{ translate(item.name) }</Text>
+                }}
+            />
+          ))}
+        </Tab.Navigator>
+      );
+    }
+
 };
 
 const styles = StyleSheet.create({

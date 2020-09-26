@@ -130,5 +130,7 @@
   "send": "Envie",
   "today": 'hoje',
   "weeklyAttendance": "Comparecimento semanal",
-  "total": "total"
+  "dailyAttendance": "Comparecimento diário",
+  "total": "total",
+  "managerDashboard": "Painel do Gerente"
 }

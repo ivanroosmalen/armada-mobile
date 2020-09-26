@@ -6,6 +6,7 @@ const CLASSES = 'CLASSES';
 const CLASS = 'CLASS';
 const QUERY_PARAMS = 'QUERY_PARAMS';
 const USER_ATTENDANCE_METRICS = 'USER_ATTENDANCE_METRICS';
+const TOTAL_ATTENDANCE_METRICS = 'TOTAL_ATTENDANCE_METRICS';
 
 export function list(params, options) {
   return async function(dispatch) {
@@ -76,6 +77,15 @@ export function getUserAttendanceMetrics(params) {
     let response = await service.getUserAttendanceMetrics(params);
     let entity = response && response.data && response.data.entity || {};
     dispatch({type: USER_ATTENDANCE_METRICS, data: entity});
+    return entity;
+  }
+}
+
+export function getTotalAttendanceMetrics(params) {
+  return async function(dispatch, getState) {
+    let response = await service.getTotalAttendanceMetrics(params);
+    let entity = response && response.data && response.data.entity || {};
+    dispatch({type: TOTAL_ATTENDANCE_METRICS, data: entity});
     return entity;
   }
 }

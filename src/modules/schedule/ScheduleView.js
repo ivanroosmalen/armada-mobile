@@ -18,7 +18,7 @@ class ScheduleScreen extends React.Component {
       this.setState({ refreshing: true })
         let data = {
             academyId: this.props.route.params.id,
-            startDate: moment().format('YYYY-MM-DD'),
+            startDate: moment().utc().format('YYYY-MM-DD'),
             endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
         }
         await this.props.list(data);
@@ -28,7 +28,7 @@ class ScheduleScreen extends React.Component {
   async componentDidMount() {
     let data = {
         academyId: this.props.route.params.id,
-        startDate: moment().format('YYYY-MM-DD'),
+        startDate: moment().utc().format('YYYY-MM-DD'),
         endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
     }
     await Promise.all([
