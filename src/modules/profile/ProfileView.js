@@ -212,7 +212,7 @@ export default class ProfileScreen extends React.Component {
           </View>
           )}
 
-          {!(user.martialArts && user.martialArts.length) && (
+          {!(user.martialArts && user.martialArts.length) && userIsOwner && (
                 <View style={{alignItems: 'center', paddingTop: 20}}>
                     <Button
                             bgColor={colors.primaryBackground}
