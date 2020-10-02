@@ -9,7 +9,7 @@ import {
   Animated,
   RefreshControl
 } from 'react-native';
-
+import * as RNLocalize from 'react-native-localize';
 import { fonts, colors } from '../../styles';
 import { Text } from '../../components/StyledText';
 import { translate } from '../../translations/index.js';
@@ -52,11 +52,11 @@ export default class OwnerDashboardScreen extends React.Component {
   async getData() {
     let dataRequests = [];
     if(this.props.loggedInUser) {
-        let startDate = moment().subtract(2, 'weeks').format('YYYY-MM-DD');
-        let endDate = moment().format('YYYY-MM-DD');
+        let startDate = moment().subtract(2, 'weeks').toISOString();
+        let endDate = moment().toISOString();
         dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
         dataRequests.push(this.props.getAcademyRequests({ complete: false })),
-        dataRequests.push(this.props.getTotalAttendanceMetrics({ startDate, endDate }))
+        dataRequests.push(this.props.getTotalAttendanceMetrics({ startDate, endDate, timezone: RNLocalize.getTimeZone() }))
     }
     await Promise.all(dataRequests);
 

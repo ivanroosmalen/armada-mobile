@@ -52,8 +52,8 @@ class UserScheduleScreen extends React.Component {
 
         let data = {
             academyId: academyIds.join(','),
-            startDate: moment().utc().format('YYYY-MM-DD'),
-            endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
+            startDate: moment().toISOString(),
+            endDate: moment().add(31, 'days').toISOString(),
         }
         await this.props.list(data);
     }

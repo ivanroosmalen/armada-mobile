@@ -242,6 +242,13 @@ export default class AcademyEditScreen extends React.Component {
                           onChangeText={val => this.onChangeText('name', val)}
                         />
 
+                        <TextInput
+                          placeholder={ translate('website') }
+                          style={styles.textInput}
+                          value={this.state.editingAcademy.website}
+                          onChangeText={val => this.onChangeText('website', val)}
+                        />
+
                     {!!this.state.errors.nameError &&
                         <Text style={{ fontSize: 12, color: 'red'}}>
                             {this.state.errors.nameError}

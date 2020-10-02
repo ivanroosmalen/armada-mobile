@@ -56,8 +56,8 @@ export default class HomeScreen extends React.Component {
     ];
 
     if(this.props.loggedInUser) {
-        let startDate = moment().subtract(12, 'weeks').format('YYYY-MM-DD');
-        let endDate = moment().format('YYYY-MM-DD');
+        let startDate = moment().subtract(12, 'weeks').toISOString();
+        let endDate = moment().toISOString();
         dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
         dataRequests.push(this.props.getUserAttendanceMetrics({ startDate, endDate }))
     }
@@ -86,7 +86,7 @@ export default class HomeScreen extends React.Component {
 
     this.props.getClasses({
         academyId: academyIds.join(','),
-        startDate: moment().utc().format('YYYY-MM-DD'),
+        startDate: moment().toISOString(),
         endDate: moment().add(7, 'days').format('YYYY-MM-DD'),
     });
 
@@ -280,7 +280,7 @@ export default class HomeScreen extends React.Component {
               {!!(classes && classes.length) && (
                     <View style={{flexShrink: 0, marginVertical: 10, flex: !!(notifications && notifications.length) ? 0 : 1, height: !!(notifications && notifications.length) ? 250 : 0}}>
                      <TouchableOpacity style={styles.headerContainer}
-                        onPress={() => {this.props.navigation.navigate('UserAcademies', { id: this.props.loggedInUser._id })}}>
+                        onPress={() => {this.props.navigation.navigate('UserSchedule', { id: this.props.loggedInUser._id })}}>
                      <Text style={styles.header}>
                          {translate('mySchedule') }
                      </Text>

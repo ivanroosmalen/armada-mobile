@@ -74,26 +74,36 @@ class ScheduleElement extends React.Component {
           onPress={() => parent.itemPressed(item)}
           style={styles.item}
         >
-          <View style={styles.dateTimeSection}>
-            <Text style={styles.itemHourText}>{item.time}</Text>
-            <Text style={styles.itemDurationText}>{item.durationHour ? item.durationHour+'h' : ''} {item.durationMinute ? item.durationMinute+'m' : ''}</Text>
-          </View>
-          <View style={styles.titleContainer}>
-            <Text style={styles.itemTitleText}>{item.name}</Text>
-          </View>
-          <View style={styles.itemButtonContainer}>
-                    <Button
-                                    secondary
-                                    rounded
-                                    small
-                                    bgColor={ item.isAttending ? colors.primaryBackground : (item.isFull ? 'red' : colors.quaternaryBackground) }
-                                    textColor={colors.primaryText}
-                                    style={{ }}
-                                    caption={ `${item.numberOfAttendees} ${translate('attending')}` }
-                                    onPress={() => parent.buttonPressed(item)}
-                                  />
+            <View style={styles.topPart}>
+              <View style={{flexDirection: 'column'}}>
+                <Text style={styles.itemHourText}>{item.time} ({item.durationHour ? item.durationHour+'h' : ''} {item.durationMinute ? item.durationMinute+'m' : ''})</Text>
+                <Text style={styles.itemMartialArt}>{item.martialArt}</Text>
+              </View>
+              <View style={styles.itemButtonContainer}>
+                        <Button
+                                        secondary
+                                        rounded
+                                        small
+                                        bgColor={ item.isAttending ? colors.primaryBackground : (item.isFull ? 'red' : colors.quaternaryBackground) }
+                                        textColor={colors.primaryText}
+                                        style={{ }}
+                                        caption={ `${item.numberOfAttendees} ${translate('attending')}` }
+                                        onPress={() => parent.buttonPressed(item)}
+                                      />
 
+              </View>
+              </View>
+          <View style={styles.middlePart}>
+              <View style={styles.titleContainer}>
+                <Text style={styles.itemTitleText}>{item.name}</Text>
+              </View>
           </View>
+
+          {!!(item.classLocation && item.classLocation.address) && (
+              <View style={styles.bottomPart}>
+                <Text style={styles.location}>{item.classLocation.address}</Text>
+              </View>
+          )}
         </TouchableOpacity>
       );
     }
@@ -152,6 +162,8 @@ let items = {};
             startDate: classObj.schedule.startDate,
             endDate: classObj.schedule.endDate,
             classSize: classObj.classSize,
+            classLocation: classObj.location,
+            martialArt: classObj.martialArt,
             numberOfAttendees: classObj.attendees ? classObj.attendees.length : 0,
             isAttending,
             isFull: isFull,
@@ -205,7 +217,7 @@ let items = {};
             textSectionTitleColor: 'blue',
             textSectionTitleDisabledColor: 'blue',
           }}
-          onRefresh={() => this.props.onRefresh()}
+          onRefresh={() => (this.props.refreshing && this.props.onRefresh())}
           refreshing={this.props.refreshing}
         />
       </CalendarProvider>
@@ -261,9 +273,24 @@ const styles = StyleSheet.create({
     backgroundColor: colors.terciaryBackground,
     borderBottomWidth: 1,
     borderBottomColor: 'lightgrey',
-    flexDirection: 'row',
     flex: 1,
     minHeight: 50,
+    paddingLeft: 20
+  },
+  topPart: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingBottom: 10
+  },
+  middlePart: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  bottomPart: {
+    flexDirection: 'column',
+    flex: 1,
+    paddingTop: 10
   },
   itemHourText: {
     color: colors.terciaryText
@@ -278,16 +305,20 @@ const styles = StyleSheet.create({
     width: 40
   },
   titleContainer: {
-    overflow: 'hidden',
-    width: Dimensions.get('window').width - 185,
   },
   itemTitleText: {
     color: colors.terciaryText,
-    paddingLeft: 15,
-    marginRight: 150,
     fontWeight: 'bold',
-    fontSize: 16,
-    width: Dimensions.get('window').width - 185
+    fontSize: 16
+  },
+  itemMartialArt: {
+    color: colors.quaternaryText,
+    fontWeight: 'bold'
+  },
+  location: {
+    fontSize: 12,
+    color: colors.quaternaryText,
+    fontWeight: 'bold'
   },
   itemButtonContainer: {
     width: 135,

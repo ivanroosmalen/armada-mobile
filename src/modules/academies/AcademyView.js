@@ -12,7 +12,8 @@ import {
   Dimensions,
   ImageBackground,
   Animated,
-  RefreshControl
+  RefreshControl,
+  Linking
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { colors, fonts } from '../../styles';
@@ -79,6 +80,14 @@ export default class AcademyScreen extends React.Component {
 
   locationSelected(location) {
     openMap({ query: location.address } )
+  }
+
+  async onSitePressed(website) {
+    const supported = await Linking.canOpenURL(website);
+
+    if (supported) {
+      await Linking.openURL(website);
+    }
   }
 
   menuOptionSelected(menuEntity) {
@@ -277,6 +286,18 @@ export default class AcademyScreen extends React.Component {
                         </Text>
                         )}
                     </View>
+              </View>
+
+              <View style={styles.hr} />
+
+              <View style={styles.expandingRow}>
+                    <Text style={styles.itemLabel}>{ translate('website') }</Text>
+                    <TouchableOpacity style={styles.multilineText}
+                        onPress={() => this.onSitePressed(academy.website)}>
+                        <Text style={styles.textContent}>
+                             {academy.website}
+                        </Text>
+                    </TouchableOpacity>
               </View>
 
               <View style={styles.hr} />
