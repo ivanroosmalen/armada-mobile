@@ -90,7 +90,7 @@ export default class ClassScreen extends React.Component {
                 if(this.props.class[this.props.route.params.id].schedule.recurring) {
                     this.setState({ editDialogVisible: true });
                 } else {
-                    this.props.navigation.navigate('ClassEdit', { id: this.props.class[this.props.route.params.id]._id, academyId: this.props.academy._id })
+                    this.props.navigation.navigate('ClassEdit', { id: this.props.class[this.props.route.params.id]._id, academyId: this.props.route.params.academyId })
                 }
             break;
             case 'delete':
@@ -107,7 +107,7 @@ export default class ClassScreen extends React.Component {
         this.setState({ editDialogVisible: false });
         this.props.navigation.navigate('ClassEdit', {
              id: this.props.class[this.props.route.params.id]._id,
-             academyId: this.props.academy._id,
+             academyId: this.props.route.params.academyId,
              startDate: this.props.route.params.startDate,
              endDate: this.props.route.params.endDate,
              singleItem
@@ -190,9 +190,10 @@ export default class ClassScreen extends React.Component {
       let classObj = this.props.class && this.props.class[this.props.route.params.id] ? this.props.class[this.props.route.params.id] : { schedule: {} };
       let startDate = this.props.route.params.startDate;
       let endDate = this.props.route.params.endDate;
+      let academy = this.props.academy ? this.props.academy[this.props.route.params.academyId] : {}
 
-      let userIsOwner = !!(this.props.loggedInUser && this.props.academy && this.props.academy.owners && this.props.academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
-      let userIsStudent = !!(this.props.loggedInUser && this.props.academy && this.props.academy.students && this.props.academy.students.find(student => student._id === this.props.loggedInUser._id));
+      let userIsOwner = !!(this.props.loggedInUser && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
+      let userIsStudent = !!(this.props.loggedInUser && academy.students && academy.students.find(student => student._id === this.props.loggedInUser._id));
       let userIsAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => attendee._id === this.props.loggedInUser._id));
 
       if(moment(classObj.schedule.startDate).valueOf() !== moment(startDate).valueOf()) {
@@ -204,7 +205,7 @@ export default class ClassScreen extends React.Component {
 
       let classIsFull = attendees && attendees.length === classObj.classSize;
       let onlineClassIsFull = onlineAttendees && onlineAttendees.length === classObj.onlineClassSize;
-      console.log(onlineAttendees)
+
       return (
         <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
              <Spinner

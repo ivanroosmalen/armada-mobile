@@ -17,10 +17,11 @@ connect(
       notifications: state.notifications.notifications,
       userAttendanceMetrics: state.classes.userAttendanceMetrics,
       classes: state.classes.classes,
-      classListUpdate: state.classes.classListUpdate
+      classListUpdate: state.classes.classListUpdate,
+      academyListUpdate: state.academies.academyListUpdate
     })},
     dispatch => ({
-      getAcademies: (params) => dispatch(list(params)),
+      getAcademies: (key, params) => dispatch(list(key, params)),
       getUserAcademies: (id, params) => dispatch(getUserAcademies(id, params)),
       getAcademyRequests: (params) => dispatch(getAcademyRequests(params)),
       approveAcademyRequest: (id, data) => dispatch(approve(id, data)),

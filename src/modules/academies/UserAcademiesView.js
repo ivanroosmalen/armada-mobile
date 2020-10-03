@@ -49,48 +49,45 @@ export default class UserAcademiesScreen extends React.Component {
 
   async onRefresh() {
     this.setState({ refreshing: true })
-    await this.props.getUserAcademies(this.props.route.params.id);
-
-    let setDisplayedAcademies = false;
-        this.state.academyTypeObjs.forEach(academyTypeObj => {
-            if(this.props.userAcademies && this.props.userAcademies[academyTypeObj.key] && this.props.userAcademies[academyTypeObj.key].length) {
-                if(!setDisplayedAcademies) {
-                    this.setState({
-                        displayedAcademies: this.props.userAcademies[academyTypeObj.key]
-                    })
-
-                    setDisplayedAcademies = true;
-                }
-            }
-        })
+    await this.getData();
     this.setState({ refreshing: false })
   }
 
   onSwitchType(index, type) {
     this.setState({
-      displayedAcademies: this.props.userAcademies[type],
+      displayedAcademies: this.props.userAcademies[this.props.route.params.id][type],
       selectedIndex: index
     })
   }
 
-  async componentDidMount() {
+  async getData() {
     await this.props.getUserAcademies(this.props.route.params.id);
 
     let setDisplayedAcademies = false;
         this.state.academyTypeObjs.forEach(academyTypeObj => {
-            if(this.props.userAcademies && this.props.userAcademies[academyTypeObj.key] && this.props.userAcademies[academyTypeObj.key].length) {
+            if(this.props.userAcademies && this.props.userAcademies[this.props.route.params.id] && this.props.userAcademies[this.props.route.params.id][academyTypeObj.key] && this.props.userAcademies[this.props.route.params.id][academyTypeObj.key].length) {
                 if(!setDisplayedAcademies) {
                     this.setState({
-                        displayedAcademies: this.props.userAcademies[academyTypeObj.key]
+                        displayedAcademies: this.props.userAcademies[this.props.route.params.id][academyTypeObj.key]
                     })
 
                     setDisplayedAcademies = true;
                 }
             }
         })
+  }
+
+  async componentDidMount() {
+    await this.getData();
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    async componentDidUpdate(prevProps, prevState) {
+      if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
+        await this.getData();
+      }
+    }
 
     fadeIn(delay, from = 0) {
         const { anim } = this.state;
@@ -125,7 +122,7 @@ export default class UserAcademiesScreen extends React.Component {
     let academyTypes = [];
     let academyTypeObjs = [];
     this.state.academyTypeObjs.forEach(academyTypeObj => {
-        if(this.props.userAcademies && this.props.userAcademies[academyTypeObj.key] && this.props.userAcademies[academyTypeObj.key].length) {
+        if(this.props.userAcademies && this.props.userAcademies[this.props.route.params.id] && this.props.userAcademies[this.props.route.params.id][academyTypeObj.key] && this.props.userAcademies[this.props.route.params.id][academyTypeObj.key].length) {
             academyTypes.push(academyTypeObj.displayName);
             academyTypeObjs.push(academyTypeObj.key);
         }

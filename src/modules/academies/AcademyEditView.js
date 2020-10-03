@@ -119,8 +119,8 @@ export default class AcademyEditScreen extends React.Component {
 
                 let academyId = '';
                 if(this.props.route.params && this.props.route.params.id) {
-                    await this.props.updateAcademy(this.props.academy._id, this.state.editingAcademy);
-                    academyId = this.props.academy._id
+                    await this.props.updateAcademy(this.props.route.params.id, this.state.editingAcademy);
+                    academyId = this.props.route.params.id
 
                     this.props.navigation.goBack();
                 } else {
@@ -151,7 +151,7 @@ export default class AcademyEditScreen extends React.Component {
         await this.getData();
 
         this.setState({
-            editingAcademy: this.props.academy || { martialArts: [] },
+            editingAcademy: this.props.academy && this.props.academy[this.props.route.params.id] || { martialArts: [] },
             martialArtList: this.props.martialArts && this.props.martialArts.map(ma => ({ name: ma.name })).sort(),
             spinner: false
         });

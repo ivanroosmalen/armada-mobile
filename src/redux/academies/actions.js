@@ -4,30 +4,28 @@ import { store } from '../store.js';
 const service = new AcademyService('academies');
 const ACADEMIES = 'ACADEMIES';
 const ACADEMY = 'ACADEMY';
+const ACADEMY_LIST_UPDATE = 'ACADEMY_LIST_UPDATE';
 const USER_ACADEMIES = 'USER_ACADEMIES';
-const QUERY_PARAMS = 'QUERY_PARAMS';
 
-export function list(params, options) {
+export function list(key = 'default', params, options) {
   return async function(dispatch) {
-    const state = store.getState();
-    if(!params) params = state.academies.queryParams;
     let response = await service.list(params, options);
-    dispatch({type: ACADEMIES, data: response.data.entity});
-    dispatch({type: QUERY_PARAMS, data: params});
+    dispatch({type: ACADEMIES, data: response.data.entity, key});
   }
 }
 
 export function get(id, params, options) {
   return async function(dispatch) {
     let response = await service.get(id, params, options);
-    dispatch({type: ACADEMY, data: response.data.entity});
+    dispatch({type: ACADEMY, data: response.data.entity, key: id});
   }
 }
 
 export function create(entity, options) {
   return async function(dispatch) {
     let response = await service.create(entity, options);
-    dispatch(list());
+    dispatch(get(response.data.entity._id))
+    dispatch({type: ACADEMY_LIST_UPDATE});
     return response.data.entity;
   }
 }
@@ -36,33 +34,38 @@ export function update(id, entity, options) {
   return async function(dispatch) {
     let response = await service.update(id, entity, options);
     dispatch({type: ACADEMY, data: response.data.entity});
-    dispatch(list());
+    await dispatch(get(id));
+    dispatch({type: ACADEMY_LIST_UPDATE});
   }
 }
 
 export function remove(id, options) {
   return async function(dispatch) {
     await service.remove(id, options);
+    dispatch({type: ACADEMY_LIST_UPDATE});
   }
 }
 
 export function updateProfileImage(id, data, options = {}) {
   return async function(dispatch) {
-    return service.updateProfileImage(id, data, options);
+    let result = service.updateProfileImage(id, data, options);
+    dispatch({type: ACADEMY_LIST_UPDATE});
+    await dispatch(get(id));
+    return result;
   }
 }
 
 export function getUserAcademies(id, params, options) {
   return async function(dispatch) {
     let response = await service.getUserAcademies(id, params, options);
-    dispatch({type: USER_ACADEMIES, data: response.data.entity});
+    dispatch({type: USER_ACADEMIES, data: response.data.entity, key: id});
   }
 }
 
 export function cancelMembership(id, options) {
   return async function(dispatch) {
     let response = await service.cancelMembership(id, options);
-    dispatch(get(id));
-    dispatch(list());
+    await dispatch(get(id));
+    dispatch({type: ACADEMY_LIST_UPDATE});
   }
 }

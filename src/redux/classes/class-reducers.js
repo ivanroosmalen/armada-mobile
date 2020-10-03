@@ -12,7 +12,6 @@ const classReducer = (state = classState, action) => {
         case 'CLASS':
            let classObj = state.class || {};
            classObj[action.key || 'default'] = action.data;
-           console.log(classObj[action.key])
            state = { ...state, class: Object.assign({}, classObj) };
            break;
          case 'CLASS_LIST_UPDATE':

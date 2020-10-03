@@ -78,7 +78,7 @@ export default class OwnerDashboardScreen extends React.Component {
     }
 
     this.setState({
-        academies: this.props.userAcademies['owner'] || [],
+        academies: this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id]['owner'] || [],
         academyRequests: this.props.academyRequests || [],
         data,
         totalAttendanceValue: this.props.totalAttendanceMetrics ? this.props.totalAttendanceMetrics.total : 0,
@@ -93,8 +93,7 @@ export default class OwnerDashboardScreen extends React.Component {
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.userAcademies && prevProps.userAcademies['owner'] && this.props.userAcademies && this.props.userAcademies['owner'] && prevProps.userAcademies['owner'].length !== this.props.userAcademies['owner'].length ||
-          prevProps.academyRequests.length !== this.props.academyRequests.length) {
+      if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
         await this.getData();
       }
     }

@@ -44,10 +44,11 @@ export default class NotificationListScreen extends React.Component {
 
   async getData() {
     await this.props.getUserAcademies(this.props.loggedInUser._id);
+    let userAcademies = this.props.userAcademies ? this.props.userAcademies[this.props.loggedInUser._id] : {};
     let academies = [];
-    this.props.userAcademies && this.props.userAcademies.owner && this.props.userAcademies.owner && academies.push.apply(academies, this.props.userAcademies.owner);
-    this.props.userAcademies && this.props.userAcademies.student && this.props.userAcademies.student && academies.push.apply(academies, this.props.userAcademies.student)
-    this.props.userAcademies && this.props.userAcademies.instructor && this.props.userAcademies.instructor && academies.push.apply(academies, this.props.userAcademies.instructor)
+    userAcademies.owner && userAcademies.owner && academies.push.apply(academies, userAcademies.owner);
+    userAcademies.student && userAcademies.student && academies.push.apply(academies, userAcademies.student)
+    userAcademies.instructor && userAcademies.instructor && academies.push.apply(academies, userAcademies.instructor)
     if(academies.length) {
         await this.props.getNotifications({academyIds: academies.map(ua => ua._id).join(',')})
     }
@@ -58,12 +59,6 @@ export default class NotificationListScreen extends React.Component {
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
-
-    async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.notifications && this.props.notifications && prevProps.notifications.length !== this.props.notifications.length) {
-        await this.getData()
-      }
-    }
 
   addNotification(ownerAcademies) {
      if(ownerAcademies.length === 1) {
@@ -172,7 +167,7 @@ export default class NotificationListScreen extends React.Component {
   render() {
     let notifications = (this.props && this.props.notifications) || [];
     let isLoggedIn = this.props.loggedInUser;
-    let ownerAcademies = this.props.userAcademies && this.props.userAcademies.owner || [];
+    let ownerAcademies = this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id].owner || [];
 
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, 0)]}>

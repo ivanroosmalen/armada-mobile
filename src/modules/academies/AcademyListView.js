@@ -36,17 +36,18 @@ export default class AcademyListScreen extends React.Component {
     refreshable: false,
     mapLoaded: false,
     region: {},
-    refreshing: false
+    refreshing: false,
+    academyQuery: {}
   }
 
   async onRefresh() {
     this.setState({ refreshing: true })
-    await this.props.getAcademies();
+    await this.props.getAcademies('academy-list', this.state.academyQuery);
     this.setState({ refreshing: false })
   }
 
   onMarkerSelect(location) {
-        let selectedAcademy = this.props.academies.find(academy => (academy._id === location.academyId));
+        let selectedAcademy = this.props.academies['academy-list'].find(academy => (academy._id === location.academyId));
 
         this.setState({
             displayedAcademies: [selectedAcademy]
@@ -58,7 +59,7 @@ export default class AcademyListScreen extends React.Component {
 
   onMapSelect() {
         this.setState({
-            displayedAcademies: this.props.academies,
+            displayedAcademies: this.props.academies['academy-list'],
         })
 
         this._flatList  && this._flatList.scrollToOffset({ offset: 0, animated: false })
@@ -70,7 +71,7 @@ export default class AcademyListScreen extends React.Component {
         }
 
         if(this.state.showMap) {
-            newState.displayedAcademies = this.props.academies
+            newState.displayedAcademies = this.props.academies['academy-list']
         }
         this.setState(newState)
   }
@@ -94,12 +95,13 @@ export default class AcademyListScreen extends React.Component {
     let latMax = this.state.region.latitude + this.state.region.latitudeDelta / 2;
     let lngMin = this.state.region.longitude + this.state.region.longitudeDelta / 2;
     let lngMax = this.state.region.longitude - this.state.region.longitudeDelta / 2;
-
-    await this.props.getAcademies({latMin, latMax, lngMin, lngMax});
+    let query = {latMin, latMax, lngMin, lngMax};
+    await this.props.getAcademies('academy-list', query);
 
     this.setState({
-        displayedAcademies: this.props.academies,
-        refreshable: false
+        displayedAcademies: this.props.academies['academy-list'],
+        refreshable: false,
+        academyQuery: query
     })
 
     this._flatList  && this._flatList.scrollToOffset({ offset: 0, animated: false })
@@ -123,11 +125,12 @@ export default class AcademyListScreen extends React.Component {
       currentLng: location.longitude
     }
 
-    await this.props.getAcademies(params);
+    await this.props.getAcademies('academy-list', params);
 
     this.setState({
         location,
-        displayedAcademies: this.props.academies
+        displayedAcademies: this.props.academies['academy-list'],
+        academyQuery: params
     })
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
@@ -154,9 +157,10 @@ export default class AcademyListScreen extends React.Component {
       }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.academies !== this.props.academies) {
+      if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
+        await this.props.getAcademies('academy-list', this.state.academyQuery);
         this.setState({
-            displayedAcademies: this.props.academies
+            displayedAcademies: this.props.academies['academy-list']
         })
       }
     }
@@ -177,7 +181,7 @@ export default class AcademyListScreen extends React.Component {
     let location = this.state.location;
     let locations = [];
 
-    this.props.academies && this.props.academies.forEach(academy => {
+    this.props.academies && this.props.academies['academy-list'] && this.props.academies['academy-list'].forEach(academy => {
         academy.locations && academy.locations.forEach(location => {
             if(location.geo && location.geo.coordinates && location.geo.coordinates.length) {
                 location.academyName = academy.name;

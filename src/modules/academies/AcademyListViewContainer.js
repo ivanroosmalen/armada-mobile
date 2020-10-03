@@ -10,9 +10,10 @@ export default compose(
     state => {
     return ({
       loggedInUser: state.users.loggedInUser,
-      academies: state.academies.academies
+      academies: state.academies.academies,
+      academyListUpdate: state.academies.academyListUpdate
     })},
     dispatch => ({
-      getAcademies: (params) => dispatch(list(params))
+      getAcademies: (key, params) => dispatch(list(key, params))
     }),
   ))(AcademyListView);

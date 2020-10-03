@@ -56,14 +56,12 @@ export default class AcademyScreen extends React.Component {
         ImagePicker.showImagePicker(options, async file => {
           if (file.uri) {
             this.setState({ spinner: true })
-            let response = await this.props.updateProfileImage(this.props.academy._id, { contentType: file.type });
+            let response = await this.props.updateProfileImage(this.props.route.params.id, { contentType: file.type });
             let uploadUrl = response.data.entity;
 
             if(uploadUrl) {
                 await s3Service.uploadImage(file, uploadUrl);
             }
-
-            await this.props.getAcademy(this.props.route.params.id);
 
             this.setState({ spinner: false })
           }
@@ -75,6 +73,10 @@ export default class AcademyScreen extends React.Component {
   }
 
   async onSitePressed(website) {
+    if(!website) {
+        return;
+    }
+
     const supported = await Linking.canOpenURL(website);
 
     if (supported) {
@@ -85,7 +87,7 @@ export default class AcademyScreen extends React.Component {
   menuOptionSelected(menuEntity) {
         switch(menuEntity) {
             case 'edit':
-                this.props.navigation.navigate('AcademyEdit', { id: this.props.academy && this.props.academy._id });
+                this.props.navigation.navigate('AcademyEdit', { id: this.props.route.params.id });
             break;
             case 'updateImage':
                 setTimeout(() => {
@@ -106,7 +108,7 @@ export default class AcademyScreen extends React.Component {
 
   async createAcademyRequest() {
     this.setState({ spinner: true });
-    await this.props.createAcademyRequest({ academy: { _id: this.props.academy._id, name: this.props.academy.name } });
+    await this.props.createAcademyRequest({ academy: { _id: this.props.route.params.id, name: this.props.academy[this.props.route.params.id].name } });
     this.setState({ spinner: false });
   }
 
@@ -118,7 +120,7 @@ export default class AcademyScreen extends React.Component {
 
   async cancelMembership() {
     this.setState({ spinner: true });
-    await this.props.cancelMembership(this.props.academy._id);
+    await this.props.cancelMembership(this.props.route.params.id);
     this.setState({ cancelMembershipDialog: false, spinner: false })
   }
 
@@ -169,8 +171,9 @@ export default class AcademyScreen extends React.Component {
 
     );
   };
+
   render() {
-      let academy = this.props.academy;
+      let academy = this.props.academy ? this.props.academy[this.props.route.params.id] : {};
       let classes = this.props.classes && this.props.classes[`academy-${this.props.route.params.id}`];
       let nextClass = { schedule: {} };
       if(classes) {
@@ -289,9 +292,9 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.expandingRow}>
                     <Text style={styles.itemLabel}>{ translate('website') }</Text>
                     <TouchableOpacity style={styles.multilineText}
-                        onPress={() => this.onSitePressed(academy.website)}>
+                        onPress={() => this.onSitePressed(academy && academy.website)}>
                         <Text style={styles.textContent}>
-                             {academy.website}
+                             {academy && academy.website}
                         </Text>
                     </TouchableOpacity>
               </View>
@@ -303,13 +306,13 @@ export default class AcademyScreen extends React.Component {
                     <View>
                         {!!(classes && classes.length) && (
                             <View style={styles.scheduleContent}>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Class', { id: nextClass._id, academyId: this.props.academy._id, startDate: nextClass.schedule.startDate, endDate: nextClass.schedule.endDate })}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('Class', { id: nextClass._id, academyId: this.props.route.params.id, startDate: nextClass.schedule.startDate, endDate: nextClass.schedule.endDate })}>
                                 <Text style={styles.textContent}>
                                     {moment(nextClass.schedule.startDate).format('dddd DD MMM') }
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
+                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.route.params.id })}
                                 >
                                   <Icon
                                     name="calendar"
@@ -328,7 +331,7 @@ export default class AcademyScreen extends React.Component {
 
                                 {!!userIsOwner && (
                                 <TouchableOpacity
-                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.academy._id })}
+                                    onPress={() => this.props.navigation.navigate('Schedule', { id: this.props.route.params.id })}
                                 >
                                   <Icon
                                     name="calendar"

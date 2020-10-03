@@ -55,7 +55,7 @@ function CustomDrawerContent(props) {
   const state = store.getState();
   let currentUser = state.users.loggedInUser;
 
-  let userAcademies = state.academies.userAcademies;
+  let userAcademies = state.academies.userAcademies && state.academies.userAcademies[currentUser._id];
   let isAcademyOwner = !!(userAcademies && userAcademies.owner && userAcademies.owner.length)
   let academyRequests = state.academyRequests.academyRequests;
   let hasAcademyRequests = !!(academyRequests && academyRequests.length)

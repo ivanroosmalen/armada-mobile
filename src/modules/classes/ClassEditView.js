@@ -68,7 +68,7 @@ export default class ClassEditScreen extends React.Component {
         }
 
         onMartialArtSelected = (index) => {
-          this.state.editingClass.martialArt = this.props.academy.martialArts[index].name;
+          this.state.editingClass.martialArt = this.props.academy[this.props.route.params.academyId].martialArts[index].name;
 
           this.setState({
               editingClass: this.state.editingClass
@@ -76,11 +76,11 @@ export default class ClassEditScreen extends React.Component {
         }
 
         onLocationSelected = (index) => {
-          if(!this.props.academy.locations) {
+          if(!this.props.academy[this.props.route.params.academyId].locations) {
                 return;
           }
 
-          let location = (index === this.props.academy.locations.length) ? {} : this.props.academy.locations[index];
+          let location = (index === this.props.academy[this.props.route.params.academyId].locations.length) ? {} : this.props.academy[this.props.route.params.academyId].locations[index];
           this.state.editingClass.location = location || {};
 
           this.setState({
@@ -90,7 +90,7 @@ export default class ClassEditScreen extends React.Component {
         }
 
         onInstructorSelected = (index) => {
-          let instructor = this.props.academy.instructors[index];
+          let instructor = this.props.academy[this.props.route.params.academyId].instructors[index];
           let inst = {
             _id: instructor._id,
             alias: instructor.alias,
@@ -199,7 +199,8 @@ export default class ClassEditScreen extends React.Component {
       async prepareData() {
         await this.getData();
 
-        let instructor = this.props.academy.instructors[0];
+        let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {}
+        let instructor = academy && academy.instructors ? academy.instructors[0] : {};
         let instructors = [];
         if(instructor) {
             instructors = [{
@@ -218,11 +219,11 @@ export default class ClassEditScreen extends React.Component {
               endDate: new Date(),
               interval: this.state.intervals[1].value
           },
-          martialArt: this.props.academy.martialArts && this.props.academy.martialArts.length && this.props.academy.martialArts[0].name,
-          location: (this.props.academy.locations && this.props.academy.locations.length && this.props.academy.locations[0]) || {}
+          martialArt: academy.martialArts && academy.martialArts.length && academy.martialArts[0].name,
+          location: (academy.locations && academy.locations.length && academy.locations[0]) || {}
         }
         let editingClass = this.props.class[this.props.route.params.id] || defaults;
-        editingClass.academyId = this.props.academy._id;
+        editingClass.academyId = academy._id;
 
         if(this.props.route.params.singleItem) {
             editingClass.parentId = editingClass._id;
@@ -264,6 +265,7 @@ export default class ClassEditScreen extends React.Component {
       componentWillUnmount() {
         this.keyboardDidShowListener && this.keyboardDidShowListener.remove();
         this.keyboardDidHideListener && this.keyboardDidHideListener.remove();
+        this.props.navigation.removeListener('willFocus')
       }
 
       _keyboardDidShow() {
@@ -298,6 +300,7 @@ export default class ClassEditScreen extends React.Component {
 
   render() {
       const { editingClass } = this.state;
+      let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {}
       let martialArts = [];
       let martialArtIndex = -1;
       let locations = [];
@@ -305,7 +308,7 @@ export default class ClassEditScreen extends React.Component {
       let instructors = [];
       let instructorIndex = -1;
       let intervalIndex = -1;
-      this.props.academy && this.props.academy.martialArts && this.props.academy.martialArts.forEach((ma, index) => {
+      academy.martialArts && academy.martialArts.forEach((ma, index) => {
         martialArts.push(ma.name);
 
         if(editingClass.martialArt && ma.name === editingClass.martialArt) {
@@ -313,7 +316,7 @@ export default class ClassEditScreen extends React.Component {
         }
       });
 
-      this.props.academy && this.props.academy.locations && this.props.academy.locations.forEach((loc, index) => {
+      academy.locations && academy.locations.forEach((loc, index) => {
         locations.push(loc.address);
         if(editingClass.location && (loc.address === editingClass.location.address)) {
             locationIndex = index;
@@ -321,7 +324,7 @@ export default class ClassEditScreen extends React.Component {
       });
 
       locations.push(translate('noLocation'));
-      this.props.academy && this.props.academy.instructors && this.props.academy.instructors.forEach((inst, index) => {
+      academy.instructors && academy.instructors.forEach((inst, index) => {
         instructors.push(inst.alias);
 
         if(editingClass.instructors && editingClass.instructors.length && inst.alias === editingClass.instructors[0].alias) {

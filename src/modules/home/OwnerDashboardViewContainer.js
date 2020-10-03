@@ -14,9 +14,10 @@ connect(
       userAcademies: state.academies.userAcademies,
       academyRequests: state.academyRequests.academyRequests,
       totalAttendanceMetrics: state.classes.totalAttendanceMetrics,
+      academyListUpdate: state.academies.academyListUpdate
     })},
     dispatch => ({
-      getAcademies: (params) => dispatch(list(params)),
+      getAcademies: (key, params) => dispatch(list(key, params)),
       getUserAcademies: (id, params) => dispatch(getUserAcademies(id, params)),
       getAcademyRequests: (params) => dispatch(getAcademyRequests(params)),
       approveAcademyRequest: (id, data) => dispatch(approve(id, data)),

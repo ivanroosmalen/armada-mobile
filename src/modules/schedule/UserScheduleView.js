@@ -36,7 +36,7 @@ class UserScheduleScreen extends React.Component {
 
     async getData() {
         await this.props.getUserAcademies(this.props.loggedInUser._id);
-        let academies = this.props.userAcademies || {};
+        let academies = this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] || {};
         let academyIds = [];
         academies.owner && academies.owner.forEach(academy => {
             academyIds.push(academy._id)
@@ -56,7 +56,7 @@ class UserScheduleScreen extends React.Component {
                 startDate: moment().toISOString(),
                 endDate: moment().add(31, 'days').toISOString(),
             }
-            await this.props.list(`currentUser`, data);
+            await this.props.list(this.props.loggedInUser._id, data);
         }
     }
 
@@ -65,6 +65,12 @@ class UserScheduleScreen extends React.Component {
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    async componentDidUpdate(prevProps, prevState) {
+      if (prevProps.classListUpdate !== this.props.classListUpdate) {
+        await this.getData(this.state.academyQuery);
+      }
+    }
 
     fadeIn(delay, from = 0) {
         const { anim } = this.state;
@@ -88,8 +94,8 @@ class UserScheduleScreen extends React.Component {
 
   render() {
     let isLoggedIn = this.props.loggedInUser;
-    let ownerAcademies = this.props.userAcademies ? this.props.userAcademies.owner : [];
-    let classes = this.props.classes && this.props.loggedInUser && this.props.classes['currentUser'];
+    let ownerAcademies = this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] ? this.props.userAcademies[this.props.loggedInUser._id].owner : [];
+    let classes = this.props.classes && this.props.loggedInUser && this.props.classes[this.props.loggedInUser._id];
 
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>

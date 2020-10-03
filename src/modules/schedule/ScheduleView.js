@@ -65,7 +65,7 @@ class ScheduleScreen extends React.Component {
       }
 
   render() {
-    let academy = this.props.academy;
+    let academy = this.props.academy ? this.props.academy[this.props.route.params.id] : {};
     let classes = this.props.classes && this.props.classes[`academy-${this.props.route.params.id}`]
     let isLoggedIn = this.props.loggedInUser;
     let userIsOwner = !!(isLoggedIn && academy && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id))

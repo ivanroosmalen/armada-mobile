@@ -42,19 +42,20 @@ export default class HomeScreen extends React.Component {
         maxAttendanceValue: 0,
         allUserAcademies: [],
         academies: [],
-        academyIds: []
+        academyIds: [],
+        academyQuery: {}
       }
 
 
     async onRefresh() {
       this.setState({ refreshing: true })
-      await this.getData();
+      await this.getData(this.state.academyQuery);
       this.setState({ refreshing: false })
     }
 
   async getData(params = null) {
     let dataRequests = [
-        this.props.getAcademies(params)
+        this.props.getAcademies('home-list', params)
     ];
 
     if(this.props.loggedInUser) {
@@ -65,18 +66,13 @@ export default class HomeScreen extends React.Component {
     }
     await Promise.all(dataRequests);
 
-    let academies = this.props.userAcademies || {};
+    let academies = this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] || {};
     let academyTypeObjs = ['owner', 'instructor', 'student']
-    let studentInstructorAcademyIds = [];
     let userAcademiesById = {};
     academyTypeObjs.forEach(academyTypeObj => {
         if(academies && academies[academyTypeObj] && academies[academyTypeObj].length) {
             academies[academyTypeObj].forEach(academy => {
                 userAcademiesById[academy._id] = academy;
-
-                if(academyTypeObj !== 'owner') {
-                    studentInstructorAcademyIds.push(academy._id)
-                }
             })
         }
     })
@@ -87,15 +83,15 @@ export default class HomeScreen extends React.Component {
     });
 
     if(this.props.loggedInUser) {
-        this.props.getClasses('currentUser', {
+        this.props.getClasses(this.props.loggedInUser._id, {
             academyId: academyIds.join(','),
             startDate: moment().toISOString(),
             endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
         });
     }
 
-    if(this.props.userAcademies && this.props.userAcademies['student'] && this.props.userAcademies['student'].length) {
-        this.props.getNotifications({academyIds: this.props.userAcademies['student'].map(academy => academy._id).join(',')})
+    if(academies['student'] && academies['student'].length) {
+        this.props.getNotifications({academyIds: academies['student'].map(academy => academy._id).join(',')})
     }
 
     let data = null;
@@ -119,7 +115,6 @@ export default class HomeScreen extends React.Component {
         allUserAcademies: Object.values(userAcademiesById),
         data,
         maxAttendanceValue,
-        academies: this.props.academies || [],
         academyIds
     });
   }
@@ -144,20 +139,14 @@ export default class HomeScreen extends React.Component {
 
     await this.getData(params);
 
-    this.setState({ location })
+    this.setState({ location, academyQuery: params })
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.classListUpdate !== this.props.classListUpdate) {
-        if(this.props.loggedInUser) {
-            await this.props.getClasses('currentUser', {
-                academyId: this.state.academyIds.join(','),
-                startDate: moment().toISOString(),
-                endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
-            });
-        }
+      if (prevProps.classListUpdate !== this.props.classListUpdate || prevProps.academyListUpdate !== this.props.academyListUpdate) {
+        await this.getData(this.state.academyQuery);
       }
     }
 
@@ -208,11 +197,11 @@ export default class HomeScreen extends React.Component {
     render() {
            let currentUser = this.props.loggedInUser;
            let hasAcademies = this.state.allUserAcademies && this.state.allUserAcademies.length;
-           let displayedAcademies = hasAcademies ? this.state.allUserAcademies : this.props.academies;
+           let displayedAcademies = hasAcademies ? this.state.allUserAcademies : (this.props.academies && this.props.academies['home-list']);
            let notifications = this.props.notifications && this.props.notifications.length ? [this.props.notifications[0]] : [];
            let todaysNotifications = this.props.notifications && this.props.notifications.length ? this.props.notifications.filter(notification => (moment(notification.createdDate) > moment().startOf('day'))) : [];
            let maxAttendanceValue = this.state.maxAttendanceValue;
-           let classes = this.props.classes && this.props.loggedInUser ? this.props.classes['currentUser'] : [];
+           let classes = this.props.classes && this.props.loggedInUser ? this.props.classes[this.props.loggedInUser._id] : [];
 
            return (
              <Animated.ScrollView
@@ -305,7 +294,7 @@ export default class HomeScreen extends React.Component {
                       />
                      </TouchableOpacity>
                     <ScheduleElement
-                        classes={this.props.classes['currentUser']}
+                        classes={this.props.classes[this.props.loggedInUser._id]}
                         loggedInUser={this.props.loggedInUser}
                         attend={this.props.attend}
                         unattend={this.props.unattend}
