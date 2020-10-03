@@ -55,7 +55,7 @@ function CustomDrawerContent(props) {
   const state = store.getState();
   let currentUser = state.users.loggedInUser;
 
-  let userAcademies = state.academies.userAcademies && state.academies.userAcademies[currentUser._id];
+  let userAcademies = currentUser && state.academies.userAcademies && state.academies.userAcademies[currentUser._id];
   let isAcademyOwner = !!(userAcademies && userAcademies.owner && userAcademies.owner.length)
   let academyRequests = state.academyRequests.academyRequests;
   let hasAcademyRequests = !!(academyRequests && academyRequests.length)
@@ -87,7 +87,7 @@ function CustomDrawerContent(props) {
                 <Text style={styles.userName}>{currentUser.alias || 'Edit profile'}</Text>
             </View>
           )}
-          onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}
+          onPress={() => props.navigation.navigate('Profile', { id: currentUser._id })}
           />
           </View>
 
@@ -130,7 +130,7 @@ function CustomDrawerContent(props) {
                   <Text style={styles.menuTitle}>{ translate('myProfile') }</Text>
                 </View>
               )}
-              onPress={() => props.navigation.navigate('Profile', { id: state.users.loggedInUser._id })}
+              onPress={() => props.navigation.navigate('Profile', { id: currentUser._id })}
             />
 
             <DrawerItem

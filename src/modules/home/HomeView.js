@@ -66,7 +66,7 @@ export default class HomeScreen extends React.Component {
     }
     await Promise.all(dataRequests);
 
-    let academies = this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] || {};
+    let academies = this.props.loggedInUser && this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] || {};
     let academyTypeObjs = ['owner', 'instructor', 'student']
     let userAcademiesById = {};
     academyTypeObjs.forEach(academyTypeObj => {
