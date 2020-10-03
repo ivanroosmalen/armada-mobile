@@ -136,7 +136,7 @@ class ScheduleElement extends React.Component {
   render() {
 
 let items = {};
-    this.props.classes && this.props.classes.forEach(classObj => {
+    this.props.classes && this.props.classes.length && this.props.classes.forEach(classObj => {
         items[moment(classObj.schedule.startDate).format('YYYY-MM-DD')] = items[moment(classObj.schedule.startDate).format('YYYY-MM-DD')] || { title: moment(classObj.schedule.startDate).format('YYYY-MM-DD'), data: []};
         let startDate = moment(classObj.schedule.startDate);
         let endDate = moment(classObj.schedule.endDate);

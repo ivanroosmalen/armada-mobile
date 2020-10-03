@@ -10,10 +10,11 @@ export default compose(
     state => ({
       loggedInUser: state.users.loggedInUser,
       classes: state.classes.classes,
+      classListUpdate: state.classes.classListUpdate,
       userAcademies: state.academies.userAcademies
     }),
     dispatch => ({
-      list: params => dispatch(list(params)),
+      list: ( key, params ) => dispatch(list(key, params)),
       attend: (data) => dispatch(attend(data)),
       unattend: (data) => dispatch(unattend(data)),
       getUserAcademies: (id, params) => dispatch(getUserAcademies(id, params))

@@ -93,7 +93,7 @@ export default class OwnerDashboardScreen extends React.Component {
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.userAcademies['owner'].length !== this.props.userAcademies['owner'].length ||
+      if (prevProps.userAcademies && prevProps.userAcademies['owner'] && this.props.userAcademies && this.props.userAcademies['owner'] && prevProps.userAcademies['owner'].length !== this.props.userAcademies['owner'].length ||
           prevProps.academyRequests.length !== this.props.academyRequests.length) {
         await this.getData();
       }

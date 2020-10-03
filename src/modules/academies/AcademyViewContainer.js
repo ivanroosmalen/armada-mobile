@@ -19,7 +19,7 @@ export default compose(
     dispatch => ({
       getAcademy: (id) => dispatch(get(id)),
       updateProfileImage: (id, data) => dispatch(updateProfileImage(id, data)),
-      list: (params) => dispatch(list(params)),
+      list: (key, params) => {dispatch(list(key, params))},
       createAcademyRequest: (data) => dispatch(create(data)),
       removeAcademyRequest: (id) => dispatch(remove(id)),
       getByAcademyId: (id, params) => dispatch(getByAcademyId(id, params)),

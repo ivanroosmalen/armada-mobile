@@ -1,17 +1,22 @@
 import { combineReducers } from 'redux';
 
-let classState = { classes: [], class: null, queryParams: {}, userAttendanceMetrics: {}, totalAttendanceMetrics: {} };
+let classState = { classes: {}, class: {}, classListUpdate: false, userAttendanceMetrics: {}, totalAttendanceMetrics: {} };
 
 const classReducer = (state = classState, action) => {
      switch (action.type) {
         case 'CLASSES':
-           state = { ...state, classes: action.data };
+           let classes = state.classes || {};
+           classes[action.key || 'default'] = action.data;
+           state = { ...state, classes: Object.assign({}, classes) };
            break;
         case 'CLASS':
-           state = { ...state, class: action.data };
+           let classObj = state.class || {};
+           classObj[action.key || 'default'] = action.data;
+           console.log(classObj[action.key])
+           state = { ...state, class: Object.assign({}, classObj) };
            break;
-         case 'QUERY_PARAMS':
-           state = { ...state, queryParams: action.data };
+         case 'CLASS_LIST_UPDATE':
+           state = { ...state, classListUpdate: !state.classListUpdate };
            break;
          case 'USER_ATTENDANCE_METRICS':
            state = { ...state, userAttendanceMetrics: action.data };

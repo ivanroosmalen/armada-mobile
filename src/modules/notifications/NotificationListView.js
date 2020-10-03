@@ -60,7 +60,7 @@ export default class NotificationListScreen extends React.Component {
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.notifications.length !== this.props.notifications.length) {
+      if (prevProps.notifications && this.props.notifications && prevProps.notifications.length !== this.props.notifications.length) {
         await this.getData()
       }
     }

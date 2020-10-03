@@ -44,15 +44,7 @@ export default class AcademyScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
-        await Promise.all([
-            this.props.getAcademy(this.props.route.params.id),
-            this.props.list({
-                academyId: this.props.route.params.id,
-                startDate: moment().format('YYYY-MM-DD'),
-                endDate: moment().add(31, 'days').format('YYYY-MM-DD')
-            }),
-            this.props.getByAcademyId(this.props.route.params.id, { complete: false, approved: false })
-        ])
+      await this.getData();
       this.setState({ refreshing: false })
     }
 
@@ -130,16 +122,20 @@ export default class AcademyScreen extends React.Component {
     this.setState({ cancelMembershipDialog: false, spinner: false })
   }
 
-  async componentDidMount() {
+  async getData() {
     await Promise.all([
-        this.props.getAcademy(this.props.route.params.id),
-        this.props.list({
-            academyId: this.props.route.params.id,
-            startDate: moment().format('YYYY-MM-DD'),
-            endDate: moment().add(31, 'days').format('YYYY-MM-DD')
-        }),
-        this.props.getByAcademyId(this.props.route.params.id, { complete: false, approved: false })
-    ])
+            this.props.getAcademy(this.props.route.params.id),
+            this.props.list(`academy-${this.props.route.params.id}`, {
+                academyId: this.props.route.params.id,
+                startDate: moment().format('YYYY-MM-DD'),
+                endDate: moment().add(31, 'days').format('YYYY-MM-DD')
+            }),
+            this.props.getByAcademyId(this.props.route.params.id, { complete: false, approved: false })
+        ])
+  }
+
+  async componentDidMount() {
+    await this.getData();
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
@@ -175,7 +171,7 @@ export default class AcademyScreen extends React.Component {
   };
   render() {
       let academy = this.props.academy;
-      let classes = this.props.classes;
+      let classes = this.props.classes && this.props.classes[`academy-${this.props.route.params.id}`];
       let nextClass = { schedule: {} };
       if(classes) {
           classes.sort((a, b) => {
@@ -305,7 +301,7 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.expandingRow}>
                     <Text style={styles.itemLabel}>{ translate('nextClass') }</Text>
                     <View>
-                        {!!classes && !!classes.length && (
+                        {!!(classes && classes.length) && (
                             <View style={styles.scheduleContent}>
                             <TouchableOpacity onPress={() => this.props.navigation.navigate('Class', { id: nextClass._id, academyId: this.props.academy._id, startDate: nextClass.schedule.startDate, endDate: nextClass.schedule.endDate })}>
                                 <Text style={styles.textContent}>
@@ -324,7 +320,7 @@ export default class AcademyScreen extends React.Component {
                             </View>
                         )}
 
-                        {!classes || !classes.length && (
+                        {!(classes && classes.length) && (
                             <View style={styles.scheduleContent}>
                                 <Text style={styles.textContent}>
                                     { translate('noSchedule') }

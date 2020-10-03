@@ -163,7 +163,7 @@ export default class ClassEditScreen extends React.Component {
             if(this.validate()) {
                 this.setState({spinner: true});
                 let entity;
-                let isCreating = !(this.props.class && this.props.class._id);
+                let isCreating = !(this.props.class && this.props.class[this.props.route.params.id] && this.props.class[this.props.route.params.id]._id);
                 if(this.state.editingClass._id) {
                     entity = await this.props.updateClass(this.state.editingClass._id, this.state.editingClass);
                 } else {
@@ -183,7 +183,7 @@ export default class ClassEditScreen extends React.Component {
       }
 
       async getData() {
-        this.props.clearClass();
+        this.props.clearClass(this.props.route.params.id);
 
         let dataRequests = [
             this.props.getAcademy(this.props.route.params.academyId)
@@ -221,7 +221,7 @@ export default class ClassEditScreen extends React.Component {
           martialArt: this.props.academy.martialArts && this.props.academy.martialArts.length && this.props.academy.martialArts[0].name,
           location: (this.props.academy.locations && this.props.academy.locations.length && this.props.academy.locations[0]) || {}
         }
-        let editingClass = this.props.class || defaults;
+        let editingClass = this.props.class[this.props.route.params.id] || defaults;
         editingClass.academyId = this.props.academy._id;
 
         if(this.props.route.params.singleItem) {

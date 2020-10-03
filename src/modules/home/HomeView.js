@@ -41,8 +41,10 @@ export default class HomeScreen extends React.Component {
         },
         maxAttendanceValue: 0,
         allUserAcademies: [],
-        academies: []
+        academies: [],
+        academyIds: []
       }
+
 
     async onRefresh() {
       this.setState({ refreshing: true })
@@ -84,11 +86,13 @@ export default class HomeScreen extends React.Component {
         academyIds.push(academy._id)
     });
 
-    this.props.getClasses({
-        academyId: academyIds.join(','),
-        startDate: moment().toISOString(),
-        endDate: moment().add(7, 'days').format('YYYY-MM-DD'),
-    });
+    if(this.props.loggedInUser) {
+        this.props.getClasses('currentUser', {
+            academyId: academyIds.join(','),
+            startDate: moment().toISOString(),
+            endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
+        });
+    }
 
     if(this.props.userAcademies && this.props.userAcademies['student'] && this.props.userAcademies['student'].length) {
         this.props.getNotifications({academyIds: this.props.userAcademies['student'].map(academy => academy._id).join(',')})
@@ -115,7 +119,8 @@ export default class HomeScreen extends React.Component {
         allUserAcademies: Object.values(userAcademiesById),
         data,
         maxAttendanceValue,
-        academies: this.props.academies || []
+        academies: this.props.academies || [],
+        academyIds
     });
   }
 
@@ -145,6 +150,15 @@ export default class HomeScreen extends React.Component {
   }
 
     async componentDidUpdate(prevProps, prevState) {
+      if (prevProps.classListUpdate !== this.props.classListUpdate) {
+        if(this.props.loggedInUser) {
+            await this.props.getClasses('currentUser', {
+                academyId: this.state.academyIds.join(','),
+                startDate: moment().toISOString(),
+                endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
+            });
+        }
+      }
     }
 
     fadeIn(delay, from = 0) {
@@ -198,7 +212,7 @@ export default class HomeScreen extends React.Component {
            let notifications = this.props.notifications && this.props.notifications.length ? [this.props.notifications[0]] : [];
            let todaysNotifications = this.props.notifications && this.props.notifications.length ? this.props.notifications.filter(notification => (moment(notification.createdDate) > moment().startOf('day'))) : [];
            let maxAttendanceValue = this.state.maxAttendanceValue;
-           let classes = this.props.classes;
+           let classes = this.props.classes && this.props.loggedInUser ? this.props.classes['currentUser'] : [];
 
            return (
              <Animated.ScrollView
@@ -277,7 +291,7 @@ export default class HomeScreen extends React.Component {
                 )}
               </View>
 
-              {!!(classes && classes.length) && (
+              {!!(classes && classes.length && this.props.loggedInUser) && (
                     <View style={{flexShrink: 0, marginVertical: 10, flex: !!(notifications && notifications.length) ? 0 : 1, height: !!(notifications && notifications.length) ? 250 : 0}}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {this.props.navigation.navigate('UserSchedule', { id: this.props.loggedInUser._id })}}>
@@ -291,7 +305,7 @@ export default class HomeScreen extends React.Component {
                       />
                      </TouchableOpacity>
                     <ScheduleElement
-                        classes={this.props.classes}
+                        classes={this.props.classes['currentUser']}
                         loggedInUser={this.props.loggedInUser}
                         attend={this.props.attend}
                         unattend={this.props.unattend}

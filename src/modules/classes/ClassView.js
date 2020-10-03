@@ -43,11 +43,15 @@ export default class ClassScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
+        await this.getData();
+      this.setState({ refreshing: false })
+    }
+
+    async getData() {
         await Promise.all([
             this.props.getAcademy(this.props.route.params.academyId),
             this.props.getClass(this.props.route.params.id)
         ]);
-      this.setState({ refreshing: false })
     }
 
   locationSelected(location) {
@@ -55,10 +59,7 @@ export default class ClassScreen extends React.Component {
   }
 
   async componentDidMount() {
-    await Promise.all([
-        this.props.getAcademy(this.props.route.params.academyId),
-        this.props.getClass(this.props.route.params.id)
-    ]);
+    await this.getData();
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
@@ -86,14 +87,14 @@ export default class ClassScreen extends React.Component {
   menuOptionSelected(menuEntity) {
         switch(menuEntity) {
             case 'edit':
-                if(this.props.class.schedule.recurring) {
+                if(this.props.class[this.props.route.params.id].schedule.recurring) {
                     this.setState({ editDialogVisible: true });
                 } else {
-                    this.props.navigation.navigate('ClassEdit', { id: this.props.class._id, academyId: this.props.academy._id })
+                    this.props.navigation.navigate('ClassEdit', { id: this.props.class[this.props.route.params.id]._id, academyId: this.props.academy._id })
                 }
             break;
             case 'delete':
-                if(this.props.class.schedule.recurring) {
+                if(this.props.class[this.props.route.params.id].schedule.recurring) {
                     this.setState({ deleteDialogVisible: true });
                 } else {
                     this.setState({ deleteConfirmationDialogVisible: true });
@@ -105,7 +106,7 @@ export default class ClassScreen extends React.Component {
   onDetailedEditPressed(singleItem) {
         this.setState({ editDialogVisible: false });
         this.props.navigation.navigate('ClassEdit', {
-             id: this.props.class._id,
+             id: this.props.class[this.props.route.params.id]._id,
              academyId: this.props.academy._id,
              startDate: this.props.route.params.startDate,
              endDate: this.props.route.params.endDate,
@@ -129,14 +130,14 @@ export default class ClassScreen extends React.Component {
 
              if(confirm) {
                  this.setState({ spinner: true });
-                 if(!this.props.class.schedule.recurring || !this.state.deleteSingleItem) {
-                     await this.props.removeClass(this.props.class._id);
+                 if(!this.props.class[this.props.route.params.id].schedule.recurring || !this.state.deleteSingleItem) {
+                     await this.props.removeClass(this.props.class[this.props.route.params.id]._id);
                  } else {
-                     let classObj = this.props.class;
+                     let classObj = this.props.class[this.props.route.params.id];
                      classObj.schedule.excludes = classObj.schedule.excludes || [];
                      classObj.schedule.excludes.push(moment(this.props.route.params.startDate).toDate())
 
-                     await this.props.updateClass(this.props.class._id, classObj);
+                     await this.props.updateClass(this.props.class[this.props.route.params.id]._id, classObj);
                  }
 
                  this.props.navigation.pop(1);
@@ -150,18 +151,17 @@ export default class ClassScreen extends React.Component {
     async attend(online = false) {
         this.setState({ spinner: true });
         let data = {
-            classId: this.props.class._id,
+            classId: this.props.route.params.id,
             startDate: this.props.route.params.startDate,
             endDate: this.props.route.params.endDate,
             online
         }
         await this.props.attend(data);
-
         this.setState({ spinner: false, attendDialogVisible: false });
     }
 
   async onAttendPressed() {
-    if(this.props.class.supportOnlineClasses) {
+    if(this.props.class[this.props.route.params.id].supportOnlineClasses) {
         this.setState({ attendDialogVisible: true })
     } else {
         await this.attend();
@@ -171,7 +171,7 @@ export default class ClassScreen extends React.Component {
   async onUnattendPressed() {
       this.setState({ spinner: true });
       let data = {
-          classId: this.props.class._id
+          classId: this.props.class[this.props.route.params.id]._id
       }
       await this.props.unattend(data);
 
@@ -187,7 +187,7 @@ export default class ClassScreen extends React.Component {
   };
 
   render() {
-      let classObj = this.props.class || { schedule: {} };
+      let classObj = this.props.class && this.props.class[this.props.route.params.id] ? this.props.class[this.props.route.params.id] : { schedule: {} };
       let startDate = this.props.route.params.startDate;
       let endDate = this.props.route.params.endDate;
 
@@ -204,7 +204,7 @@ export default class ClassScreen extends React.Component {
 
       let classIsFull = attendees && attendees.length === classObj.classSize;
       let onlineClassIsFull = onlineAttendees && onlineAttendees.length === classObj.onlineClassSize;
-
+      console.log(onlineAttendees)
       return (
         <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
              <Spinner

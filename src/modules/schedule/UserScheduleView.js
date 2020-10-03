@@ -50,12 +50,14 @@ class UserScheduleScreen extends React.Component {
             academyIds.push(academy._id)
         });
 
-        let data = {
-            academyId: academyIds.join(','),
-            startDate: moment().toISOString(),
-            endDate: moment().add(31, 'days').toISOString(),
+        if(this.props.loggedInUser) {
+            let data = {
+                academyId: academyIds.join(','),
+                startDate: moment().toISOString(),
+                endDate: moment().add(31, 'days').toISOString(),
+            }
+            await this.props.list(`currentUser`, data);
         }
-        await this.props.list(data);
     }
 
   async componentDidMount() {
@@ -86,12 +88,13 @@ class UserScheduleScreen extends React.Component {
 
   render() {
     let isLoggedIn = this.props.loggedInUser;
-    let ownerAcademies = this.props.userAcademies.owner || [];
+    let ownerAcademies = this.props.userAcademies ? this.props.userAcademies.owner : [];
+    let classes = this.props.classes && this.props.loggedInUser && this.props.classes['currentUser'];
 
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
         <ScheduleElement
-            classes={this.props.classes}
+            classes={classes}
             loggedInUser={this.props.loggedInUser}
             attend={this.props.attend}
             unattend={this.props.unattend}

@@ -16,28 +16,33 @@ class ScheduleScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
-        let data = {
-            academyId: this.props.route.params.id,
-            startDate: moment().toISOString(),
-            endDate: moment().add(31, 'days').toISOString(),
-        }
-        await this.props.list(data);
+      await this.getData();
       this.setState({ refreshing: false })
     }
 
-  async componentDidMount() {
+  async getData() {
     let data = {
         academyId: this.props.route.params.id,
         startDate: moment().toISOString(),
         endDate: moment().add(31, 'days').toISOString(),
     }
     await Promise.all([
-        this.props.list(data),
+        this.props.list(`academy-${this.props.route.params.id}`, data),
         this.props.getAcademy(this.props.route.params.id)
     ]);
+  }
+
+  async componentDidMount() {
+    await this.getData();
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
+
+    async componentDidUpdate(prevProps, prevState) {
+      if (prevProps.classListUpdate !== this.props.classListUpdate) {
+        await this.getData();
+      }
+    }
 
     fadeIn(delay, from = 0) {
         const { anim } = this.state;
@@ -61,13 +66,14 @@ class ScheduleScreen extends React.Component {
 
   render() {
     let academy = this.props.academy;
+    let classes = this.props.classes && this.props.classes[`academy-${this.props.route.params.id}`]
     let isLoggedIn = this.props.loggedInUser;
     let userIsOwner = !!(isLoggedIn && academy && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
 
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
         <ScheduleElement
-            classes={this.props.classes}
+            classes={classes}
             loggedInUser={this.props.loggedInUser}
             attend={this.props.attend}
             unattend={this.props.unattend}

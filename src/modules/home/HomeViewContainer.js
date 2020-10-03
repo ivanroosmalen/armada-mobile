@@ -17,6 +17,7 @@ connect(
       notifications: state.notifications.notifications,
       userAttendanceMetrics: state.classes.userAttendanceMetrics,
       classes: state.classes.classes,
+      classListUpdate: state.classes.classListUpdate
     })},
     dispatch => ({
       getAcademies: (params) => dispatch(list(params)),
@@ -25,7 +26,7 @@ connect(
       approveAcademyRequest: (id, data) => dispatch(approve(id, data)),
       getNotifications: (params) => dispatch(getNotifications(params)),
       getUserAttendanceMetrics: (params) => dispatch(getUserAttendanceMetrics(params)),
-      getClasses: (params) => dispatch(getClasses(params)),
+      getClasses: (key, params) => dispatch(getClasses(key, params)),
       attend: (data) => dispatch(attend(data)),
       unattend: (data) => dispatch(unattend(data)),
     })
