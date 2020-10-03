@@ -190,7 +190,7 @@ export default class ClassScreen extends React.Component {
       let classObj = this.props.class && this.props.class[this.props.route.params.id] ? this.props.class[this.props.route.params.id] : { schedule: {} };
       let startDate = this.props.route.params.startDate;
       let endDate = this.props.route.params.endDate;
-      let academy = this.props.academy ? this.props.academy[this.props.route.params.academyId] : {}
+      let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {}
 
       let userIsOwner = !!(this.props.loggedInUser && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
       let userIsStudent = !!(this.props.loggedInUser && academy.students && academy.students.find(student => student._id === this.props.loggedInUser._id));
