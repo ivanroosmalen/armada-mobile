@@ -20,7 +20,7 @@ export default class MainTabNavigator extends React.Component {
     let currentUser = this.props.loggedInUser;
     if(currentUser) {
         await this.props.getUserAcademies(currentUser._id);
-        let userAcademies = this.props.userAcademies;
+        let userAcademies = this.props.userAcademies[currentUser._id];
         let isAcademyOwner = !!(userAcademies && userAcademies.owner && userAcademies.owner.length);
         this.setState({ isAcademyOwner });
     }
@@ -31,7 +31,7 @@ export default class MainTabNavigator extends React.Component {
   }
 
   async componentDidUpdate(prevProps, prevState) {
-    if(this.props.userAcademies && this.props.userAcademies.owner && prevProps.userAcademies && prevProps.userAcademies.owner && this.props.userAcademies.owner.length !== prevProps.userAcademies.owner.length) {
+    if(prevProps.academyListUpdate !== this.props.academyListUpdate || prevProps.loggedInUser !== this.props.loggedInUser) {
         await this.getData()
     }
   }
