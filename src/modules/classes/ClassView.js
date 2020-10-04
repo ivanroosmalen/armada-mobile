@@ -90,7 +90,7 @@ export default class ClassScreen extends React.Component {
                 if(this.props.class[this.props.route.params.id].schedule.recurring) {
                     this.setState({ editDialogVisible: true });
                 } else {
-                    this.props.navigation.navigate('ClassEdit', { id: this.props.class[this.props.route.params.id]._id, academyId: this.props.route.params.academyId })
+                    this.props.navigation.navigate('ClassEdit', { id: this.props.route.params.id, academyId: this.props.route.params.academyId })
                 }
             break;
             case 'delete':
@@ -106,7 +106,7 @@ export default class ClassScreen extends React.Component {
   onDetailedEditPressed(singleItem) {
         this.setState({ editDialogVisible: false });
         this.props.navigation.navigate('ClassEdit', {
-             id: this.props.class[this.props.route.params.id]._id,
+             id: this.props.route.params.id,
              academyId: this.props.route.params.academyId,
              startDate: this.props.route.params.startDate,
              endDate: this.props.route.params.endDate,
@@ -131,13 +131,13 @@ export default class ClassScreen extends React.Component {
              if(confirm) {
                  this.setState({ spinner: true });
                  if(!this.props.class[this.props.route.params.id].schedule.recurring || !this.state.deleteSingleItem) {
-                     await this.props.removeClass(this.props.class[this.props.route.params.id]._id);
+                     await this.props.removeClass(this.props.route.params.id);
                  } else {
                      let classObj = this.props.class[this.props.route.params.id];
                      classObj.schedule.excludes = classObj.schedule.excludes || [];
                      classObj.schedule.excludes.push(moment(this.props.route.params.startDate).toDate())
 
-                     await this.props.updateClass(this.props.class[this.props.route.params.id]._id, classObj);
+                     await this.props.updateClass(this.props.route.params.id, classObj);
                  }
 
                  this.props.navigation.pop(1);
@@ -156,7 +156,14 @@ export default class ClassScreen extends React.Component {
             endDate: this.props.route.params.endDate,
             online
         }
-        await this.props.attend(data);
+        let entity = await this.props.attend(data);
+
+        if(entity._id !== this.props.route.params.id) {
+            this.props.navigation.pop(1);
+            this.props.navigation.navigate('Class', { id: entity._id, academyId: this.props.route.params.academyId, startDate: entity.schedule.startDate, endDate: entity.schedule.endDate })
+        }
+
+
         this.setState({ spinner: false, attendDialogVisible: false });
     }
 
@@ -171,7 +178,7 @@ export default class ClassScreen extends React.Component {
   async onUnattendPressed() {
       this.setState({ spinner: true });
       let data = {
-          classId: this.props.class[this.props.route.params.id]._id
+          classId: this.props.route.params.id
       }
       await this.props.unattend(data);
 
