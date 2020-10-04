@@ -234,6 +234,7 @@ export default class NotificationListScreen extends React.Component {
                         </Modal>
 
                         <Modal isVisible={this.state.notificationDialogVisible} onBackdropPress={() => this.setState({ notificationDialogVisible: false })}>
+                            <KeyboardInputWrapper>
                             <View>
                                 <Text style={styles.academyName}>{ this.state.notification.academy && this.state.notification.academy.name }</Text>
                                 <Text style={styles.sendTitle}>{ translate('sendMessage') }</Text>
@@ -258,6 +259,7 @@ export default class NotificationListScreen extends React.Component {
                                 onPress={() => this.sendMessage()}
                               />
                           </View>
+                          </KeyboardInputWrapper>
                         </Modal>
 
                         <Modal isVisible={this.state.deleteNotificationDialogVisible} onBackdropPress={() => (this.setState({ deleteNotificationDialogVisible: false }))}>
