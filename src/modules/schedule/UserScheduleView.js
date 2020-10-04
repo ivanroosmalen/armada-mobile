@@ -94,7 +94,7 @@ class UserScheduleScreen extends React.Component {
 
   render() {
     let isLoggedIn = this.props.loggedInUser;
-    let ownerAcademies = this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] ? this.props.userAcademies[this.props.loggedInUser._id].owner : [];
+    let ownerAcademies = this.props.loggedInUser && this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] ? this.props.userAcademies[this.props.loggedInUser._id].owner : [];
     let classes = this.props.classes && this.props.loggedInUser && this.props.classes[this.props.loggedInUser._id];
 
     return (

@@ -145,7 +145,9 @@ export default class HomeScreen extends React.Component {
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.classListUpdate !== this.props.classListUpdate || prevProps.academyListUpdate !== this.props.academyListUpdate) {
+      if (prevProps.classListUpdate !== this.props.classListUpdate ||
+            prevProps.academyListUpdate !== this.props.academyListUpdate ||
+            prevProps.loggedInUser !== this.props.loggedInUser) {
         await this.getData(this.state.academyQuery);
       }
     }
