@@ -168,7 +168,6 @@ export default class NotificationListScreen extends React.Component {
 
   render() {
     let notifications = (this.props && this.props.notifications) || [];
-    let isLoggedIn = this.props.loggedInUser;
     let ownerAcademies = this.props.loggedInUser && this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id].owner || [];
 
     return (
@@ -235,7 +234,6 @@ export default class NotificationListScreen extends React.Component {
                         </Modal>
 
                         <Modal isVisible={this.state.notificationDialogVisible} onBackdropPress={() => this.setState({ notificationDialogVisible: false })}>
-                            <KeyboardInputWrapper>
                             <View>
                                 <Text style={styles.academyName}>{ this.state.notification.academy && this.state.notification.academy.name }</Text>
                                 <Text style={styles.sendTitle}>{ translate('sendMessage') }</Text>
@@ -260,7 +258,6 @@ export default class NotificationListScreen extends React.Component {
                                 onPress={() => this.sendMessage()}
                               />
                           </View>
-                          </KeyboardInputWrapper>
                         </Modal>
 
                         <Modal isVisible={this.state.deleteNotificationDialogVisible} onBackdropPress={() => (this.setState({ deleteNotificationDialogVisible: false }))}>
