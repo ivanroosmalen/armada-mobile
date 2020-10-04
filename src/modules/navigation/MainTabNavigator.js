@@ -32,7 +32,7 @@ export default class MainTabNavigator extends React.Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if(prevProps.academyListUpdate !== this.props.academyListUpdate || prevProps.loggedInUser !== this.props.loggedInUser) {
-        await this.getData()
+        this.getData()
     }
   }
 

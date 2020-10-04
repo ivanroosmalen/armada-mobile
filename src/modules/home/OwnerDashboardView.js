@@ -94,7 +94,7 @@ export default class OwnerDashboardScreen extends React.Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
-        await this.getData();
+        this.getData();
       }
     }
 

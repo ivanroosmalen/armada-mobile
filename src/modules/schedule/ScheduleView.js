@@ -40,7 +40,7 @@ class ScheduleScreen extends React.Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.classListUpdate !== this.props.classListUpdate) {
-        await this.getData();
+        this.getData();
       }
     }
 

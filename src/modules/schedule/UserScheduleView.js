@@ -68,7 +68,7 @@ class UserScheduleScreen extends React.Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.classListUpdate !== this.props.classListUpdate) {
-        await this.getData(this.state.academyQuery);
+        this.getData(this.state.academyQuery);
       }
     }
 
