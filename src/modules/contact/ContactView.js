@@ -31,7 +31,7 @@ export default class ContactScreen extends React.Component {
                 </Text>
 
                     <TouchableOpacity style={{flexDirection: 'row', marginTop: 20, justifyContent: 'center'}} onPress={() => this.copyEmail()}>
-                        <Text style={{paddingHorizontal: 10, fontSize: 18, textAlign: 'center', fontWeight: 'bold' }}>
+                        <Text style={{paddingHorizontal: 10, fontSize: 18, textAlign: 'center' }} textBreakStrategy="simple">
                             {'contact@armadama.com'}
                         </Text>
                         <Icon

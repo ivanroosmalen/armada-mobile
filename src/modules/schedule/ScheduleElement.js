@@ -94,9 +94,7 @@ class ScheduleElement extends React.Component {
               </View>
               </View>
           <View style={styles.middlePart}>
-              <View style={styles.titleContainer}>
-                <Text style={styles.itemTitleText}>{item.name}</Text>
-              </View>
+              <Text style={styles.itemTitleText} textBreakStrategy="simple">{item.name}</Text>
           </View>
 
           {!!(item.classLocation && item.classLocation.address) && (
@@ -309,7 +307,8 @@ const styles = StyleSheet.create({
   itemTitleText: {
     color: colors.terciaryText,
     fontWeight: 'bold',
-    fontSize: 16
+    fontSize: 16,
+    width: '100%'
   },
   itemMartialArt: {
     color: colors.quaternaryText,
