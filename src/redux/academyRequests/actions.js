@@ -49,8 +49,9 @@ export function update(id, entity, options) {
 
 export function approve(id, data, options) {
   return async function(dispatch) {
-    let response = await service.approve(id, data, options);
+    let result = await service.approve(id, data, options);
     dispatch(list({ complete: false }))
+    return result;
   }
 }
 

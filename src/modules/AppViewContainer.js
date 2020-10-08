@@ -27,10 +27,16 @@ export default compose(
       if(loggedInUserString && jwt) {
           let user = JSON.parse(loggedInUserString);
           user = await store.dispatch(get(user._id));
-          store.dispatch(setLoggedInUser(user));
           store.dispatch(setJwt(jwt));
+          store.dispatch(setLoggedInUser(user));
           store.dispatch(list({ complete: false }));
           store.dispatch(getUserAcademies(user._id));
+      }
+    },
+    async componentDidUpdate(prevProps, prevState) {
+      if(prevProps.loggedInUser !== this.props.loggedInUser && this.props.loggedInUser) {
+        store.dispatch(list({ complete: false }));
+        store.dispatch(getUserAcademies(prevProps.loggedInUser._id));
       }
     },
   }),

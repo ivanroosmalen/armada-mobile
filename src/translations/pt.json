@@ -144,6 +144,7 @@
   "createSubscription": "Criar um subscrição",
   "updateSubscription": "Atualize subscrição",
   "cancelSubscription": "Cancele subscrição",
-  "tooManyMembers": "\nSua contagem de membros é maior do que a quantidade solicitada"
+  "tooManyMembers": "Sua contagem de membros é maior do que a quantidade solicitada",
+  "memberLimitReached": "Limite de membros atingido"
 
 }

@@ -31,7 +31,6 @@ export function updatePaymentMethod(data, options) {
 
 export function createSubscription(data, options) {
   return async function(dispatch) {
-    console.log("SUBSCRIBE %j", data)
     let response = await service.createSubscription(data, options);
     return response.data.entity;
   }

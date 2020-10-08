@@ -14,18 +14,19 @@ import { colors, fonts } from '../../styles';
 import { useNavigation } from '@react-navigation/native';
 import { Button } from '../../components';
 import { translate } from '../../translations/index.js';
+import Toast from 'react-native-simple-toast';
 
 export default function AcademyRequestElement(props) {
    const item = props.academyRequest;
    const placeholderImage = 'https://armada-user-images.s3.amazonaws.com/default/profile.jpg'
    let navigation = useNavigation();
 
-   approveRequest = (approved) => {
-        props.approveAcademyRequest(item._id, { approved })
-   }
+   approveRequest = async (approved) => {
+        let result = await props.approveAcademyRequest(item._id, { approved });
 
-   denyRequest = (item) => {
-        navigation.navigate('Class', { id: item.entityId, academyId: item.academyId, startDate: item.startDate, endDate: item.endDate })
+        if(result.status === 403) {
+            Toast.showWithGravity(translate('memberLimitReached'), Toast.LONG, Toast.CENTER);
+        }
    }
 
   return (

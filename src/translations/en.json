@@ -143,5 +143,6 @@
   "createSubscription": "Create subscription",
   "updateSubscription": "Update subscription",
   "cancelSubscription": "Cancel subscription",
-  "tooManyMembers": "Your member count is higher than the requested amount"
+  "tooManyMembers": "Your member count is higher than the requested amount",
+  "memberLimitReached": "Member limit reached"
 }
