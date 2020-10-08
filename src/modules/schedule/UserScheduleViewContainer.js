@@ -14,10 +14,10 @@ export default compose(
       userAcademies: state.academies.userAcademies
     }),
     dispatch => ({
-      list: ( key, params ) => dispatch(list(key, params)),
+      list: ( key, params, options, fromCache ) => dispatch(list(key, params, options, fromCache)),
       attend: (data) => dispatch(attend(data)),
       unattend: (data) => dispatch(unattend(data)),
-      getUserAcademies: (id, params) => dispatch(getUserAcademies(id, params))
+      getUserAcademies: (id, params, fromCache) => dispatch(getUserAcademies(id, params, fromCache))
     })
   )
 )(UserScheduleScreen);

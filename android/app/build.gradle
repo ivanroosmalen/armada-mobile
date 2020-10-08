@@ -196,6 +196,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation 'com.android.support:design:27.1.0'
+    compile (project(':tipsi-stripe')) {
+        exclude group: 'com.google.android.gms'
+        exclude group: 'com.google.firebase'
+    }
 }
 
 // Run this once to be able to run the application with BUCK

@@ -16,11 +16,10 @@ class AcademyService extends BaseService {
                 return this.makeRequest(httpConfig, options)
             }
 
-    async getUserAcademies(id, params, options) {
+    async getUserAcademies(id, options) {
                 const httpConfig = {
                     method: 'GET',
-                    url: this.buildURL(['byUser', id]),
-                    params
+                    url: this.buildURL(['byUser', id])
                 };
 
                 return this.makeRequest(httpConfig, options)

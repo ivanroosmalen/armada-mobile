@@ -14,6 +14,6 @@ export default compose(
       academyListUpdate: state.academies.academyListUpdate
     })},
     dispatch => ({
-      getAcademies: (key, params) => dispatch(list(key, params))
+      getAcademies: (key, params, options, fromCache) => dispatch(list(key, params, options, fromCache))
     }),
   ))(AcademyListView);

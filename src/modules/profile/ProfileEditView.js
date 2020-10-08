@@ -143,7 +143,7 @@ export default class ProfileEditScreen extends React.Component {
         let martialArtList = this.props.martialArts.sort((a, b) => {
             return a.name < b.name ? -1 : 1;
         });
-        let user = this.props.user || {};
+        let user = this.props.user && this.props.user[this.props.loggedInUser._id] ? this.props.user[this.props.loggedInUser._id] : {};
         let martialArts = user.martialArts || [];
         let martialArtNames = martialArts.map(ma => ma.name)
         this.setState({

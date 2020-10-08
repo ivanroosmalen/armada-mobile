@@ -20,6 +20,9 @@ import ForgotPasswordScreen from '../auth/ForgotPasswordContainer';
 import AuthScreen from '../auth/AuthViewContainer';
 import ContactScreen from '../contact/ContactViewContainer';
 import NotificationListScreen from '../notifications/NotificationListViewContainer';
+import SubscriptionScreen from '../payments/SubscriptionViewContainer';
+import PaymentMethodScreen from '../payments/PaymentMethodViewContainer';
+
 import { translate } from '../../translations/index.js';
 
 import { colors, fonts } from '../../styles';
@@ -295,6 +298,32 @@ const StackNavigationData = [
       height: 70
     },
   },
+    {
+      name: 'Subscription',
+      displayName: translate('subscriptions'),
+      component: SubscriptionScreen,
+      headerLeft: headerLeftComponent,
+      headerBackground: { source: headerBackground },
+      headerTitleStyle: {
+        fontFamily: fonts.primaryRegular,
+        color: colors.primaryText,
+        fontSize: 18,
+        height: 70
+      },
+    },
+    {
+      name: 'PaymentMethod',
+      displayName: translate('paymentMethods'),
+      component: PaymentMethodScreen,
+      headerLeft: headerLeftComponent,
+      headerBackground: { source: headerBackground },
+      headerTitleStyle: {
+        fontFamily: fonts.primaryRegular,
+        color: colors.primaryText,
+        fontSize: 18,
+        height: 70
+      },
+    }
 ]
 
 export default StackNavigationData;

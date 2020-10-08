@@ -16,19 +16,19 @@ class ScheduleScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
-      await this.getData();
+      await this.getData(false);
       this.setState({ refreshing: false })
     }
 
-  async getData() {
+  async getData(fromCache = true) {
     let data = {
         academyId: this.props.route.params.id,
         startDate: moment().toISOString(),
         endDate: moment().add(31, 'days').toISOString(),
     }
     await Promise.all([
-        this.props.list(`academy-${this.props.route.params.id}`, data),
-        this.props.getAcademy(this.props.route.params.id)
+        this.props.list(`academy-${this.props.route.params.id}`, data, {}, fromCache),
+        this.props.getAcademy(this.props.route.params.id, {}, fromCache)
     ]);
   }
 
@@ -40,7 +40,7 @@ class ScheduleScreen extends React.Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.classListUpdate !== this.props.classListUpdate) {
-        this.getData();
+        this.getData(false);
       }
     }
 

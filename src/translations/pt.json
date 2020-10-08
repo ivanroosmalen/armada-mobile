@@ -133,5 +133,17 @@
   "dailyAttendance": "Comparecimento diário",
   "total": "total",
   "managerDashboard": "Painel do Gerente",
-  "website": "O site"
+  "website": "O site",
+  "subscriptions": "Subscrições",
+  "yourMemberLimit": "Seu limite de membros atualmente é de",
+  "updateYourSubscription": "Atualize sua subscrição",
+  "selectPaymentMethod": "Selecione o método de pagamento",
+  "createNewPaymentMethod": "Novo método de pagamento",
+  "paymentMethods": "Métodos de pagamento",
+  "createPaymentMethod": "Criar método de pagamento",
+  "createSubscription": "Criar um subscrição",
+  "updateSubscription": "Atualize subscrição",
+  "cancelSubscription": "Cancele subscrição",
+  "tooManyMembers": "\nSua contagem de membros é maior do que a quantidade solicitada"
+
 }

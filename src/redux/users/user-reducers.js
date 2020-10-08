@@ -5,10 +5,14 @@ let userState = { users: [], user: null };
 const userReducer = (state = userState, action) => {
      switch (action.type) {
         case 'USERS':
-           state = { ...state, users: action.data };
+           let users = state.users || {};
+           users[action.key || 'default'] = action.data;
+           state = { ...state, users: Object.assign({}, users) };
            break;
         case 'USER':
-           state = { ...state, user: action.data };
+           let user = state.user || {};
+           user[action.key || 'default'] = action.data;
+           state = { ...state, user: Object.assign({}, user) };
            break;
         case 'JWT':
            state = { ...state, jwt: action.data };

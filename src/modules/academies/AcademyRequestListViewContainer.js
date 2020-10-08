@@ -13,7 +13,7 @@ export default compose(
       academyRequests: state.academyRequests.academyRequests
     })},
     dispatch => ({
-      getAcademyRequests: (params) => dispatch(list(params)),
+      getAcademyRequests: (params, fromCache) => dispatch(list(params, fromCache)),
       approveAcademyRequest: (id, data) => dispatch(approve(id, data))
     }),
   ))(AcademyRequestListView);

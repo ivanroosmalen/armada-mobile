@@ -9,17 +9,31 @@ const LOGGED_IN_USER = 'LOGGED_IN_USER';
 const TRANSLATIONS = 'TRANSLATIONS';
 const LOGOUT = 'LOGOUT';
 
-export function list(params, options) {
-  return async function(dispatch) {
+export function list(key = 'default', params, options, fromCache = false) {
+  return async function(dispatch, getState) {
+    if(fromCache) {
+        let state = getState()
+        if(state.academies.academies && state.academies.academies[key]) {
+            return;
+        }
+    }
+
     let response = await userService.list(params, options);
-    dispatch({type: USERS, data: response.data.entity});
+    dispatch({type: USERS, data: response.data.entity, key});
   }
 }
 
-export function get(id, params, options) {
-  return async function(dispatch) {
-    let response = await userService.get(id, params, options);
-    dispatch({type: USER, data: response.data.entity});
+export function get(id, options, fromCache = false) {
+  return async function(dispatch, getState) {
+    if(fromCache) {
+        let state = getState()
+        if(state.academies.academy && state.academies.academy[id]) {
+            return;
+        }
+    }
+
+    let response = await userService.get(id, {}, options);
+    dispatch({type: USER, data: response.data.entity, key: id});
     return response.data.entity;
   }
 }
@@ -51,8 +65,8 @@ export function login(entity) {
     let jwt = response && response.data && response.data.entity && response.data.entity.jwt;
     let user = response && response.data && response.data.entity && response.data.entity.user;
 
-    await dispatch(setLoggedInUser(user));
     await dispatch(setJwt(jwt));
+    await dispatch(setLoggedInUser(user));
 
     return response;
   }
@@ -65,8 +79,8 @@ export function logout(entity) {
         userService.logout();
     }
 
-    await dispatch(setLoggedInUser(null));
     await dispatch(setJwt(null));
+    await dispatch(setLoggedInUser(null));
     await dispatch({type: LOGOUT});
   }
 }

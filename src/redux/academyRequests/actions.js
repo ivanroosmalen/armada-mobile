@@ -4,8 +4,14 @@ const service = new AcademyRequestService('academyRequests');
 const ACADEMY_REQUESTS = 'ACADEMY_REQUESTS';
 const ACADEMY_REQUEST = 'ACADEMY_REQUEST';
 
-export function list(params, options) {
-  return async function(dispatch) {
+export function list(params, options, fromCache = false) {
+  return async function(dispatch, getState) {
+    if(fromCache) {
+        let state = getState()
+        if(state.academyRequests.academyRequests && state.academyRequests.academyRequests.length) {
+            return;
+        }
+    }
     let response = await service.list(params, options);
     dispatch({type: ACADEMY_REQUESTS, data: response.data.entity});
   }

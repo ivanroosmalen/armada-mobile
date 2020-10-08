@@ -1,5 +1,4 @@
 import AcademyService from '../../http/academy-service.js';
-import { store } from '../store.js';
 
 const service = new AcademyService('academies');
 const ACADEMIES = 'ACADEMIES';
@@ -7,16 +6,30 @@ const ACADEMY = 'ACADEMY';
 const ACADEMY_LIST_UPDATE = 'ACADEMY_LIST_UPDATE';
 const USER_ACADEMIES = 'USER_ACADEMIES';
 
-export function list(key = 'default', params, options) {
-  return async function(dispatch) {
+export function list(key = 'default', params, options, fromCache = false) {
+  return async function(dispatch, getState) {
+    if(fromCache) {
+        let state = getState()
+        if(state.academies.academies && state.academies.academies[key]) {
+            return;
+        }
+    }
+
     let response = await service.list(params, options);
     dispatch({type: ACADEMIES, data: response.data.entity, key});
   }
 }
 
-export function get(id, params, options) {
-  return async function(dispatch) {
-    let response = await service.get(id, params, options);
+export function get(id, options, fromCache = false) {
+  return async function(dispatch, getState) {
+    if(fromCache) {
+        let state = getState()
+        if(state.academies.academy && state.academies.academy[id]) {
+            return;
+        }
+    }
+
+    let response = await service.get(id, {}, options);
     dispatch({type: ACADEMY, data: response.data.entity, key: id});
   }
 }
@@ -55,9 +68,16 @@ export function updateProfileImage(id, data, options = {}) {
   }
 }
 
-export function getUserAcademies(id, params, options) {
-  return async function(dispatch) {
-    let response = await service.getUserAcademies(id, params, options);
+export function getUserAcademies(id, options, fromCache = false) {
+  return async function(dispatch, getState) {
+    if(fromCache) {
+        let state = getState()
+
+        if(state.academies.userAcademies && state.academies.userAcademies[id]) {
+            return;
+        }
+    }
+    let response = await service.getUserAcademies(id, options);
     dispatch({type: USER_ACADEMIES, data: response.data.entity, key: id});
   }
 }

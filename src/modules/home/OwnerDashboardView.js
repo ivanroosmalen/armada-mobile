@@ -26,7 +26,6 @@ export default class OwnerDashboardScreen extends React.Component {
 
     state = {
         academies: [],
-        academyRequests: [],
         totalAttendanceValue: 0,
         maxAttendanceValue: 0,
         anim: new Animated.Value(0),
@@ -45,18 +44,18 @@ export default class OwnerDashboardScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
-      await this.getData();
+      await this.getData(false, false);
       this.setState({ refreshing: false })
     }
 
-  async getData() {
+  async getData(academiesFromCache = true, othersFromCache = true) {
     let dataRequests = [];
     if(this.props.loggedInUser) {
         let startDate = moment().subtract(2, 'weeks').toISOString();
         let endDate = moment().toISOString();
-        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
+        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id, {}, academiesFromCache))
         dataRequests.push(this.props.getAcademyRequests({ complete: false })),
-        dataRequests.push(this.props.getTotalAttendanceMetrics({ startDate, endDate, timezone: RNLocalize.getTimeZone() }))
+        dataRequests.push(this.props.getTotalAttendanceMetrics({ startDate, endDate, timezone: RNLocalize.getTimeZone() }, othersFromCache))
     }
     await Promise.all(dataRequests);
 
@@ -79,7 +78,6 @@ export default class OwnerDashboardScreen extends React.Component {
 
     this.setState({
         academies: this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id]['owner'] || [],
-        academyRequests: this.props.academyRequests || [],
         data,
         totalAttendanceValue: this.props.totalAttendanceMetrics ? this.props.totalAttendanceMetrics.total : 0,
         maxAttendanceValue
@@ -94,7 +92,11 @@ export default class OwnerDashboardScreen extends React.Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
-        this.getData();
+        this.getData(false);
+      }
+
+      if(prevProps.loggedInUser !== this.props.loggedInUser) {
+        this.getData(false, false);
       }
     }
 
@@ -142,7 +144,7 @@ export default class OwnerDashboardScreen extends React.Component {
            let currentUser = this.props.loggedInUser;
            let academies = this.state.academies;
            let hasAcademies = !!(academies && academies.length);
-           let academyRequests = this.state.academyRequests;
+           let academyRequests = this.props.academyRequests || [];
            let totalAttendanceValue = this.state.totalAttendanceValue;
            let maxAttendanceValue = this.state.maxAttendanceValue;
 
@@ -154,7 +156,7 @@ export default class OwnerDashboardScreen extends React.Component {
                 >
                 <View style={styles.section}>
 
-                {!!(academyRequests && academyRequests.length) && (
+                {!!(currentUser && academyRequests && academyRequests.length) && (
                     <View style={{flexShrink: 1, marginVertical: 10}}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {this.props.navigation.navigate('AcademyRequestList')}}>
@@ -176,7 +178,7 @@ export default class OwnerDashboardScreen extends React.Component {
                     </View>
                  )}
 
-                {!!this.state.data && (
+                {!!(currentUser && this.state.data) && (
                      <View style={{flexShrink: 0, marginVertical: 10}}>
                          <Text style={styles.header}>
                              {translate('dailyAttendance')} ({totalAttendanceValue} {translate('total')})
@@ -200,7 +202,7 @@ export default class OwnerDashboardScreen extends React.Component {
                  )}
               </View>
 
-              {hasAcademies && (
+              {currentUser && hasAcademies && (
                   <View style={styles.academySection} ref={this._academyListElement}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {hasAcademies ? this.props.navigation.navigate('UserAcademies', { id: currentUser._id }) : this.props.navigation.navigate('Academies')}}>

@@ -42,7 +42,7 @@ export default class AcademyListScreen extends React.Component {
 
   async onRefresh() {
     this.setState({ refreshing: true })
-    await this.props.getAcademies('academy-list', this.state.academyQuery);
+    await this.props.getAcademies('academy-list', this.state.academyQuery, {}, false);
     this.setState({ refreshing: false })
   }
 
@@ -125,7 +125,7 @@ export default class AcademyListScreen extends React.Component {
       currentLng: location.longitude
     }
 
-    await this.props.getAcademies('academy-list', params);
+    await this.props.getAcademies('academy-list', params, {}, true);
 
     this.setState({
         location,
@@ -158,7 +158,7 @@ export default class AcademyListScreen extends React.Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
-        await this.props.getAcademies('academy-list', this.state.academyQuery);
+        await this.props.getAcademies('academy-list', this.state.academyQuery, {}, false);
         this.setState({
             displayedAcademies: this.props.academies['academy-list']
         })
@@ -201,7 +201,7 @@ export default class AcademyListScreen extends React.Component {
                         style={styles.mapIcon}
                       />
                 </TouchableOpacity>
-            {this.state.showMap && (
+            {this.state.showMap && location && (
                 <View style={styles.mapParent}>
                 {this.state.refreshable && (
                 <TouchableOpacity onPress={() => this.searchAcademies()} style={styles.searchButton}>

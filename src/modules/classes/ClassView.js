@@ -43,14 +43,14 @@ export default class ClassScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
-        await this.getData();
+      await this.getData(false);
       this.setState({ refreshing: false })
     }
 
-    async getData() {
+    async getData(fromCache = true) {
         await Promise.all([
-            this.props.getAcademy(this.props.route.params.academyId),
-            this.props.getClass(this.props.route.params.id)
+            this.props.getAcademy(this.props.route.params.academyId, {}, fromCache),
+            this.props.getClass(this.props.route.params.id, {}, fromCache)
         ]);
     }
 
@@ -68,14 +68,14 @@ export default class ClassScreen extends React.Component {
         const { anim } = this.state;
         return {
           opacity: anim.interpolate({
-            inputRange: [delay, Math.min(delay + 500, 1000)],
+            inputRange: [delay, Math.min(delay + 500, 500)],
             outputRange: [0, 1],
             extrapolate: 'clamp',
           }),
           transform: [
             {
               translateY: anim.interpolate({
-                inputRange: [delay, Math.min(delay + 500, 1000)],
+                inputRange: [delay, Math.min(delay + 500, 500)],
                 outputRange: [from, 0],
                 extrapolate: 'clamp',
               }),

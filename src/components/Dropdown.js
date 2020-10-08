@@ -30,9 +30,12 @@ class RNSDropDown extends React.Component {
     const {
       items,
       color,
+      fontSize,
       onSelect,
       style,
       borderColor,
+      listBackgroundColor,
+      listTextColor,
       selectedIndex,
       placeholder,
     } = this.props;
@@ -59,14 +62,14 @@ class RNSDropDown extends React.Component {
           return params;
         }}
         renderRow={text => (
-          <View style={{ paddingHorizontal: 20, paddingVertical: 10 }}>
-            <Text style={{ color: colors.terciaryText }}>{text}</Text>
+          <View style={{ paddingHorizontal: 20, paddingVertical: 10, backgroundColor: listBackgroundColor }}>
+            <Text style={{ color: listTextColor ? listTextColor : colors.terciaryText }}>{text}</Text>
           </View>
         )}
         onSelect={onSelect}
       >
-        <View style={[styles.container, style && style, { borderBottomColor: colors.primaryText }]}>
-          <Text style={{ color, fontFamily: fonts.primaryRegular }}>
+        <View style={[styles.container, style && style, { borderBottomColor: borderColor ? borderColor : colors.primaryText }]}>
+          <Text style={{ color, fontFamily: fonts.primaryRegular, fontSize }}>
             {selectedIndex > -1 && items[selectedIndex]
               ? items[selectedIndex]
               : placeholder}

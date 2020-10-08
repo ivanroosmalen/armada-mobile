@@ -13,7 +13,7 @@ export default compose(
       user: state.users.user
     })},
     dispatch => ({
-      getUser: (id) => dispatch(get(id)),
+      getUser: (id, options, fromCache) => dispatch(get(id, options, fromCache)),
       updateProfileImage: (id, data) => dispatch(updateProfileImage(id, data))
     }),
   ))(ProfileView);

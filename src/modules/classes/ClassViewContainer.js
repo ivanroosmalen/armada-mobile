@@ -14,8 +14,8 @@ export default compose(
       class: state.classes.class
     })},
     dispatch => ({
-      getAcademy: (id) => dispatch(getAcademy(id)),
-      getClass: (id) => dispatch(get(id)),
+      getAcademy: (id, options, fromCache) => dispatch(getAcademy(id, options, fromCache)),
+      getClass: (id, options, fromCache) => dispatch(get(id, options, fromCache)),
       attend: (data) => dispatch(attend(data)),
       unattend: (data) => dispatch(unattend(data)),
       removeClass: (id) => dispatch(remove(id)),

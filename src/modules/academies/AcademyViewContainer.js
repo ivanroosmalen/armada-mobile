@@ -17,7 +17,7 @@ export default compose(
       academyRequest: state.academyRequests.academyRequest
     })},
     dispatch => ({
-      getAcademy: (id) => dispatch(get(id)),
+      getAcademy: (id, options, fromCache) => dispatch(get(id, options, fromCache)),
       updateProfileImage: (id, data) => dispatch(updateProfileImage(id, data)),
       list: (key, params) => {dispatch(list(key, params))},
       createAcademyRequest: (data) => dispatch(create(data)),

@@ -61,7 +61,7 @@ export default class ProfileScreen extends React.Component {
                 await s3Service.uploadImage(file, uploadUrl);
             }
 
-            await this.props.getUser(this.props.route.params.id);
+            await this.props.getUser(this.props.route.params.id, {}, false);
             this.setState({ spinner: false })
           }
         })
@@ -71,19 +71,19 @@ export default class ProfileScreen extends React.Component {
     this.setState({
         user: {}
     })
-    await this.props.getUser(this.props.route.params.id);
+    await this.props.getUser(this.props.route.params.id, {}, true);
     this.setState({
         userIsOwner: this.props.loggedInUser && (this.props.route.params.id === this.props.loggedInUser._id),
-        user: this.props.user
+        user: this.props.user && this.props.user[this.props.route.params.id] ? this.props.user[this.props.route.params.id] : {}
     })
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.user !== this.props.user) {
+      if (prevProps.user && this.props.user && prevProps.user[this.props.route.params.id] !== this.props.user[this.props.route.params.id]) {
         this.setState({
-            user: this.props.user
+            user: this.props.user[this.props.route.params.id] || {}
         })
       }
     }

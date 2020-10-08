@@ -13,7 +13,6 @@ connect(
       loggedInUser: state.users.loggedInUser,
       academies: state.academies.academies,
       userAcademies: state.academies.userAcademies,
-      academyRequests: state.academyRequests.academyRequests,
       notifications: state.notifications.notifications,
       userAttendanceMetrics: state.classes.userAttendanceMetrics,
       classes: state.classes.classes,
@@ -21,13 +20,11 @@ connect(
       academyListUpdate: state.academies.academyListUpdate
     })},
     dispatch => ({
-      getAcademies: (key, params) => dispatch(list(key, params)),
-      getUserAcademies: (id, params) => dispatch(getUserAcademies(id, params)),
-      getAcademyRequests: (params) => dispatch(getAcademyRequests(params)),
-      approveAcademyRequest: (id, data) => dispatch(approve(id, data)),
+      getAcademies: (key, params, options, fromCache) => dispatch(list(key, params, options, fromCache)),
+      getUserAcademies: (id, params, fromCache) => dispatch(getUserAcademies(id, params, fromCache)),
       getNotifications: (params) => dispatch(getNotifications(params)),
-      getUserAttendanceMetrics: (params) => dispatch(getUserAttendanceMetrics(params)),
-      getClasses: (key, params) => dispatch(getClasses(key, params)),
+      getUserAttendanceMetrics: (params, fromCache) => dispatch(getUserAttendanceMetrics(params, fromCache)),
+      getClasses: (key, params, options, fromCache) => dispatch(getClasses(key, params, options, fromCache)),
       attend: (data) => dispatch(attend(data)),
       unattend: (data) => dispatch(unattend(data)),
     })

@@ -17,10 +17,9 @@ connect(
       academyListUpdate: state.academies.academyListUpdate
     })},
     dispatch => ({
-      getAcademies: (key, params) => dispatch(list(key, params)),
-      getUserAcademies: (id, params) => dispatch(getUserAcademies(id, params)),
-      getAcademyRequests: (params) => dispatch(getAcademyRequests(params)),
+      getUserAcademies: (id, params, fromCache) => dispatch(getUserAcademies(id, params, fromCache)),
+      getAcademyRequests: (params, fromCache) => dispatch(getAcademyRequests(params, fromCache)),
       approveAcademyRequest: (id, data) => dispatch(approve(id, data)),
-      getTotalAttendanceMetrics: (params) => dispatch(getTotalAttendanceMetrics(params))
+      getTotalAttendanceMetrics: (params, fromCache) => dispatch(getTotalAttendanceMetrics(params, fromCache))
     })
   ))(OwnerDashboardScreen);

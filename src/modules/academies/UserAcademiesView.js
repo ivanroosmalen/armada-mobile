@@ -49,7 +49,7 @@ export default class UserAcademiesScreen extends React.Component {
 
   async onRefresh() {
     this.setState({ refreshing: true })
-    await this.getData();
+    await this.getData(false);
     this.setState({ refreshing: false })
   }
 
@@ -60,8 +60,8 @@ export default class UserAcademiesScreen extends React.Component {
     })
   }
 
-  async getData() {
-    await this.props.getUserAcademies(this.props.route.params.id);
+  async getData(fromCache = true) {
+    await this.props.getUserAcademies(this.props.route.params.id, {}, fromCache);
 
     let setDisplayedAcademies = false;
         this.state.academyTypeObjs.forEach(academyTypeObj => {
@@ -85,7 +85,7 @@ export default class UserAcademiesScreen extends React.Component {
 
     async componentDidUpdate(prevProps, prevState) {
       if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
-        this.getData();
+        this.getData(false);
       }
     }
 

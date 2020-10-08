@@ -49,20 +49,20 @@ export default class HomeScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
-      await this.getData(this.state.academyQuery);
+      await this.getData(this.state.academyQuery, false, false, false);
       this.setState({ refreshing: false })
     }
 
-  async getData(params = null) {
+  async getData(params = null, academiesFromCache = true, classesFromCache = true, othersFromCache = true) {
     let dataRequests = [
-        this.props.getAcademies('home-list', params)
+        this.props.getAcademies('home-list', params, {}, academiesFromCache)
     ];
 
     if(this.props.loggedInUser) {
         let startDate = moment().subtract(12, 'weeks').toISOString();
         let endDate = moment().toISOString();
-        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id))
-        dataRequests.push(this.props.getUserAttendanceMetrics({ startDate, endDate }))
+        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id, {}, academiesFromCache))
+        dataRequests.push(this.props.getUserAttendanceMetrics({ startDate, endDate }, othersFromCache))
     }
     await Promise.all(dataRequests);
 
@@ -87,7 +87,7 @@ export default class HomeScreen extends React.Component {
             academyId: academyIds.join(','),
             startDate: moment().toISOString(),
             endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
-        });
+        }, {}, classesFromCache);
     }
 
     if(academies['student'] && academies['student'].length) {
@@ -145,10 +145,16 @@ export default class HomeScreen extends React.Component {
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.classListUpdate !== this.props.classListUpdate ||
-            prevProps.academyListUpdate !== this.props.academyListUpdate ||
-            prevProps.loggedInUser !== this.props.loggedInUser) {
-        this.getData(this.state.academyQuery);
+      if (prevProps.academyListUpdate !== this.props.academyListUpdate) {
+        this.getData(this.state.academyQuery, false);
+      }
+
+      if (prevProps.classListUpdate !== this.props.classListUpdate) {
+        this.getData(this.state.academyQuery, true, false);
+      }
+
+      if(prevProps.loggedInUser !== this.props.loggedInUser) {
+        this.getData(this.state.academyQuery, false, false, false);
       }
     }
 
@@ -223,7 +229,7 @@ export default class HomeScreen extends React.Component {
                     </View>
                  )}
 
-                {!!this.state.data && (
+                {!!this.state.data && currentUser && (
                      <View style={{flexShrink: 0, marginVertical: 10}}>
                          <Text style={styles.header}>
                              {translate('weeklyAttendance')} ({this.props.userAttendanceMetrics.total} {translate('total')})
@@ -246,7 +252,7 @@ export default class HomeScreen extends React.Component {
                      </View>
                  )}
 
-                {!!(notifications && notifications.length) && (
+                {!!(notifications && notifications.length) && currentUser && (
                     <View style={{flexShrink: 1, marginVertical: 10}}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {this.props.navigation.navigate('NotificationList')}}>
@@ -268,7 +274,7 @@ export default class HomeScreen extends React.Component {
                     </View>
                  )}
 
-                {!this.props.loggedInUser && (
+                {!currentUser && (
                 <Button
                         secondary
                         rounded
@@ -282,7 +288,7 @@ export default class HomeScreen extends React.Component {
                 )}
               </View>
 
-              {!!(classes && classes.length && this.props.loggedInUser) && (
+              {!!(classes && classes.length && currentUser) && (
                     <View style={{flexShrink: 0, marginVertical: 10, flex: !!(notifications && notifications.length) ? 0 : 1, height: !!(notifications && notifications.length) ? 250 : 0}}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {this.props.navigation.navigate('UserSchedule', { id: this.props.loggedInUser._id })}}>
@@ -338,7 +344,7 @@ export default class HomeScreen extends React.Component {
                          {translate('noAcademiesNear')}
                      </Text>
 
-                    {!this.props.loggedInUser && (
+                    {!currentUser && (
                         <Button
                             secondary
                             rounded
@@ -351,7 +357,7 @@ export default class HomeScreen extends React.Component {
                           />
                     )}
 
-                    {!!this.props.loggedInUser && (
+                    {!!currentUser && (
                         <Button
                             secondary
                             rounded

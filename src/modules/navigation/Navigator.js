@@ -54,7 +54,7 @@ async function selectImage(props) {
 function CustomDrawerContent(props) {
   const state = store.getState();
   let currentUser = state.users.loggedInUser;
-
+  let isDemoUser = currentUser && currentUser.email === 'demo@armadama.com';
   let userAcademies = currentUser && state.academies.userAcademies && state.academies.userAcademies[currentUser._id];
   let isAcademyOwner = !!(userAcademies && userAcademies.owner && userAcademies.owner.length)
   let academyRequests = state.academyRequests.academyRequests;
@@ -210,6 +210,26 @@ function CustomDrawerContent(props) {
       )}
 
       <View style={styles.divider} />
+
+        { isAcademyOwner && !isDemoUser && (
+            <DrawerItem
+              key={`requests`}
+              label={() => (
+                <View
+                  style={styles.menuLabelFlex}>
+                    <Icon
+                              name="file-document-edit"
+                              style={{
+                                fontSize: 20,
+                                color: colors.primaryIcon
+                              }}
+                            />
+                  <Text style={{  marginLeft: 10, color: colors.primaryText }}>{ translate('subscriptions')  || 'Subscriptions' }</Text>
+                </View>
+              )}
+              onPress={() => props.navigation.navigate('Subscription')}
+            />
+        )}
 
       {currentUser && (
         <View>

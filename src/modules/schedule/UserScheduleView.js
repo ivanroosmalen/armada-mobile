@@ -30,12 +30,12 @@ class UserScheduleScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true });
-      await this.getData();
+      await this.getData(false);
       this.setState({ refreshing: false });
     }
 
-    async getData() {
-        await this.props.getUserAcademies(this.props.loggedInUser._id);
+    async getData(fromCache = true) {
+        await this.props.getUserAcademies(this.props.loggedInUser._id, fromCache);
         let academies = this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] || {};
         let academyIds = [];
         academies.owner && academies.owner.forEach(academy => {
@@ -56,7 +56,7 @@ class UserScheduleScreen extends React.Component {
                 startDate: moment().toISOString(),
                 endDate: moment().add(31, 'days').toISOString(),
             }
-            await this.props.list(this.props.loggedInUser._id, data);
+            await this.props.list(this.props.loggedInUser._id, data, {}, fromCache);
         }
     }
 
@@ -67,8 +67,9 @@ class UserScheduleScreen extends React.Component {
   }
 
     async componentDidUpdate(prevProps, prevState) {
-      if (prevProps.classListUpdate !== this.props.classListUpdate) {
-        this.getData(this.state.academyQuery);
+      if (prevProps.classListUpdate !== this.props.classListUpdate ||
+            (prevProps.loggedInUser !== this.props.loggedInUser && this.props.loggedInUser)) {
+        this.getData(false);
       }
     }
 

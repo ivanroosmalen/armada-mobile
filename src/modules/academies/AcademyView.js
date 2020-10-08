@@ -44,7 +44,7 @@ export default class AcademyScreen extends React.Component {
 
     async onRefresh() {
       this.setState({ refreshing: true })
-      await this.getData();
+      await this.getData(false);
       this.setState({ refreshing: false })
     }
 
@@ -124,9 +124,9 @@ export default class AcademyScreen extends React.Component {
     this.setState({ cancelMembershipDialog: false, spinner: false })
   }
 
-  async getData() {
+  async getData(fromCache = true) {
     await Promise.all([
-            this.props.getAcademy(this.props.route.params.id),
+            this.props.getAcademy(this.props.route.params.id, {}, fromCache),
             this.props.list(`academy-${this.props.route.params.id}`, {
                 academyId: this.props.route.params.id,
                 startDate: moment().format('YYYY-MM-DD'),
