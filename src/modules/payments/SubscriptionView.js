@@ -19,7 +19,7 @@ import { TextInput, Button, KeyboardInputWrapper, Dropdown } from '../../compone
 import settings from '../../settings.js';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { translate } from '../../translations/index.js';
+import { translate, i18n } from '../../translations/index.js';
 import Spinner from 'react-native-loading-spinner-overlay';
 import stripe from 'tipsi-stripe'
 import Toast from 'react-native-simple-toast';
@@ -125,10 +125,11 @@ export default class NotificationListScreen extends React.Component {
     let requestBody = {
         priceId: this.state.products[this.state.productIndex].price.id,
         academyId: this.state.academies[this.state.academyIndex]._id,
-        paymentMethodId: this.state.paymentMethods[this.state.paymentMethodIndex].id
+        paymentMethodId: this.state.paymentMethods[this.state.paymentMethodIndex].id,
+        locale: i18n.locale
     }
 
-    if(parseInt(this.state.products[this.state.productIndex].product.metadata.members) < this.state.academies[this.state.academyIndex].memberLimit) {
+    if(parseInt(this.state.products[this.state.productIndex].product.metadata.members) < this.state.academies[this.state.academyIndex].students.length) {
         Toast.showWithGravity(translate('tooManyMembers'), Toast.LONG, Toast.BOTTOM);
         this.setState({ spinner: false })
         return;
@@ -152,6 +153,7 @@ export default class NotificationListScreen extends React.Component {
     this.setState({ spinner: true })
     let requestBody = {
         academyId: this.state.academies[this.state.academyIndex]._id,
+        locale: i18n.locale
     }
 
     try {
