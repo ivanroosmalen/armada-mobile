@@ -46,7 +46,7 @@ export default class NotificationListScreen extends React.Component {
   }
 
   async getAcademy(index, fromCache = true) {
-        let userAcademies = this.props.userAcademies[this.props.loggedInUser._id];
+        let userAcademies = this.props.loggedInUser && this.props.userAcademies[this.props.loggedInUser._id] || {};
         if(userAcademies && userAcademies.owner && userAcademies.owner.length) {
             let academyId = userAcademies.owner[index]._id;
             await Promise.all([

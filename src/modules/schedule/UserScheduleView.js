@@ -35,7 +35,7 @@ class UserScheduleScreen extends React.Component {
     }
 
     async getData(fromCache = true) {
-        await this.props.getUserAcademies(this.props.loggedInUser._id, fromCache);
+        this.props.loggedInUser && await this.props.getUserAcademies(this.props.loggedInUser._id, fromCache);
         let academies = this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] || {};
         let academyIds = [];
         academies.owner && academies.owner.forEach(academy => {

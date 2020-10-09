@@ -77,7 +77,7 @@ export default class OwnerDashboardScreen extends React.Component {
     }
 
     this.setState({
-        academies: this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id]['owner'] || [],
+        academies: this.props.loggedInUser && this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id]['owner'] || [],
         data,
         totalAttendanceValue: this.props.totalAttendanceMetrics ? this.props.totalAttendanceMetrics.total : 0,
         maxAttendanceValue
