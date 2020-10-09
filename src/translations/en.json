@@ -144,5 +144,6 @@
   "updateSubscription": "Update subscription",
   "cancelSubscription": "Cancel subscription",
   "tooManyMembers": "Your member count is higher than the requested amount",
-  "memberLimitReached": "Member limit reached"
+  "memberLimitReached": "Member limit reached",
+  "pleaseWait": "One moment please..."
 }

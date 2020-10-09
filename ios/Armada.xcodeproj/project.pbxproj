@@ -28,6 +28,7 @@
 		C27FBFDB12034472897F8CB9 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CF871DC00C4A468BB043F632 /* Lato-Regular.ttf */; };
 		CA5A7C8036FE47B0BDE01EA7 /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC477E0AC8F54F1BBC658478 /* Lato-Bold.ttf */; };
 		D14F0260250EEADC00210F85 /* AppCenter-Config.plist in Resources */ = {isa = PBXBuildFile; fileRef = D14F025F250EEADC00210F85 /* AppCenter-Config.plist */; };
+		D175AB6D25303B6A00A9FC40 /* TPSStripe in Resources */ = {isa = PBXBuildFile; fileRef = D175AB6C25303B6A00A9FC40 /* TPSStripe */; };
 		D17F4EF924FEA0D4008B4C8A /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = D17F4EF824FEA0D4008B4C8A /* main.jsbundle */; };
 		D17F4EFB24FEA0DB008B4C8A /* assets in Resources */ = {isa = PBXBuildFile; fileRef = D17F4EFA24FEA0DB008B4C8A /* assets */; };
 		E35BD30ADBBE43FB97FE667C /* Lato-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A5B3ACF96CD341A8B1ED4CCB /* Lato-Italic.ttf */; };
@@ -89,6 +90,7 @@
 		C68BBBE32340884C5363FE3A /* Pods-Armada-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Armada-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-Armada-tvOSTests/Pods-Armada-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		CF871DC00C4A468BB043F632 /* Lato-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-Regular.ttf"; path = "../assets/fonts/Lato-Regular.ttf"; sourceTree = "<group>"; };
 		D14F025F250EEADC00210F85 /* AppCenter-Config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = "AppCenter-Config.plist"; path = "Armada/AppCenter-Config.plist"; sourceTree = "<group>"; };
+		D175AB6C25303B6A00A9FC40 /* TPSStripe */ = {isa = PBXFileReference; lastKnownFileType = folder; name = TPSStripe; path = "../node_modules/tipsi-stripe/ios/TPSStripe"; sourceTree = "<group>"; };
 		D17F4EF824FEA0D4008B4C8A /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		D17F4EFA24FEA0DB008B4C8A /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		DB47AE6058534E84A8C10F16 /* Lato-Semibold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-Semibold.ttf"; path = "../assets/fonts/Lato-Semibold.ttf"; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				D175AB6C25303B6A00A9FC40 /* TPSStripe */,
 				D17F4EFA24FEA0DB008B4C8A /* assets */,
 				D17F4EF824FEA0D4008B4C8A /* main.jsbundle */,
 				13B07FAE1A68108700A75B9A /* Armada */,
@@ -395,6 +398,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D17F4EFB24FEA0DB008B4C8A /* assets in Resources */,
+				D175AB6D25303B6A00A9FC40 /* TPSStripe in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				D14F0260250EEADC00210F85 /* AppCenter-Config.plist in Resources */,
@@ -701,7 +705,7 @@
 			baseConfigurationReference = A0D17C8E9D2EB5776AE458C7 /* Pods-Armada.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEAD_CODE_STRIPPING = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -717,7 +721,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -734,7 +738,7 @@
 			baseConfigurationReference = AA07717A762A94187A4CEA08 /* Pods-Armada.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				DEVELOPMENT_TEAM = 692KR5NCLD;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -750,7 +754,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

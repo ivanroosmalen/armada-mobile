@@ -272,6 +272,10 @@ PODS:
     - React
   - RNVectorIcons (6.7.0):
     - React
+  - Stripe (14.0.1)
+  - tipsi-stripe (7.5.3):
+    - React
+    - Stripe (~> 14.0.1)
   - Toast (4.0.0)
   - toolbar-android (0.1.0-rc.2):
     - React
@@ -326,6 +330,8 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - Stripe (~> 14.0.0)
+  - tipsi-stripe (from `../node_modules/tipsi-stripe`)
   - "toolbar-android (from `../node_modules/@react-native-community/toolbar-android`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -334,6 +340,7 @@ SPEC REPOS:
     - AppCenter
     - AppCenterReactNativeShared
     - boost-for-react-native
+    - Stripe
     - Toast
 
 EXTERNAL SOURCES:
@@ -427,6 +434,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
+  tipsi-stripe:
+    :path: "../node_modules/tipsi-stripe"
   toolbar-android:
     :path: "../node_modules/@react-native-community/toolbar-android"
   Yoga:
@@ -481,10 +490,12 @@ SPEC CHECKSUMS:
   RNScreens: b748efec66e095134c7166ca333b628cd7e6f3e2
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNVectorIcons: 368d6d8b8301224e5ffb6254191f4f8876c2be0d
+  Stripe: 4305b646743612854819fb5d5cf67aaeb93577c0
+  tipsi-stripe: fb5b32e890a4528322c491e1827133a3cb919e0a
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: 1d142bcf297e884dfa29134b77a8a2c75952ceb2
+PODFILE CHECKSUM: 4ccffa7b132f8d653d7eeb55957133d5bffbba19
 
 COCOAPODS: 1.9.3

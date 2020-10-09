@@ -13,6 +13,7 @@ class ScheduleElement extends React.Component {
 
   state = {
     attendDialogVisible: false,
+    loadingVisible: false,
     currentItem: {},
     navigation: {}
   };
@@ -46,7 +47,7 @@ class ScheduleElement extends React.Component {
               classId: item.entityId
             }
 
-            this.props.unattend(data);
+            this.unattend(data);
         } else if(item.supportOnlineClasses) {
             if(item.isFull && item.onlineIsFull) {
                 Toast.showWithGravity(translate('classFull'), Toast.LONG, Toast.TOP);
@@ -106,7 +107,8 @@ class ScheduleElement extends React.Component {
       );
     }
 
-    attend = (item, online = false) => {
+    async attend(item, online = false) {
+            this.setState({ loadingVisible: true});
             let data = {
                 classId: item.entityId,
                 startDate: item.startDate,
@@ -114,9 +116,14 @@ class ScheduleElement extends React.Component {
                 online
             }
 
-            this.props.attend(data);
+            await this.props.attend(data);
+            this.setState({ attendDialogVisible: false, loadingVisible: false});
+    }
 
-            this.setState({ attendDialogVisible: false});
+    async unattend(data) {
+            this.setState({ attendDialogVisible: true, loadingVisible: true});
+            await this.props.unattend(data);
+            this.setState({ attendDialogVisible: false, loadingVisible: false});
     }
 
     itemPressed(item) {
@@ -221,32 +228,42 @@ let items = {};
       </CalendarProvider>
 
                         <Modal isVisible={this.state.attendDialogVisible} onBackdropPress={() => this.setState({ attendDialogVisible: false })}>
-                            <View>
-                              {!this.state.currentItem.isFull && (
-                                  <Button
-                                    secondary
-                                    rounded
-                                    small
-                                    bgColor={ colors.primaryBackground }
-                                    textColor={ colors.primaryText }
-                                    style={ styles.editDetailsButton }
-                                    caption={ translate('online') }
-                                    onPress={() => this.attend(this.state.currentItem, true)}
-                                  />
-                              )}
+                            <View style={{flex: 1}}>
+                            {!this.state.loadingVisible && this.state.attendDialogVisible && (
+                                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                                  {!this.state.currentItem.isFull && (
+                                      <Button
+                                        secondary
+                                        rounded
+                                        small
+                                        bgColor={ colors.primaryBackground }
+                                        textColor={ colors.primaryText }
+                                        style={ styles.editDetailsButton }
+                                        caption={ translate('online') }
+                                        onPress={() => this.attend(this.state.currentItem, true)}
+                                      />
+                                  )}
 
-                              {!this.state.currentItem.onlineIsFull && (
-                                  <Button
-                                    secondary
-                                    rounded
-                                    small
-                                    bgColor={ colors.primaryBackground }
-                                    textColor={ colors.primaryText }
-                                    style={ styles.editDetailsButton }
-                                    caption={ translate('inPerson') }
-                                    onPress={() => this.attend(this.state.currentItem, false)}
-                                  />
-                              )}
+                                  {!this.state.currentItem.onlineIsFull && (
+                                      <Button
+                                        secondary
+                                        rounded
+                                        small
+                                        bgColor={ colors.primaryBackground }
+                                        textColor={ colors.primaryText }
+                                        style={ styles.editDetailsButton }
+                                        caption={ translate('inPerson') }
+                                        onPress={() => this.attend(this.state.currentItem, false)}
+                                      />
+                                  )}
+                              </View>
+                            )}
+
+                            {this.state.loadingVisible && this.state.attendDialogVisible && (
+                            <View style={{flex: 1, alignItems: 'center', marginTop: 200}}>
+                                <Text style={{color: colors.primaryText, fontSize: 20}}>{translate('pleaseWait')}</Text>
+                            </View>
+                            )}
                           </View>
                         </Modal>
       </View>
