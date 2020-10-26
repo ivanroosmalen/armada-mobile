@@ -117,6 +117,12 @@ export function register(entity) {
   }
 }
 
+export function registerByAcademy(entity) {
+  return async function(dispatch) {
+    return userService.registerByAcademy(entity);
+  }
+}
+
 export function updateProfileImage(id, data, options = {}) {
   return async function(dispatch) {
     return userService.updateProfileImage(id, data, options);

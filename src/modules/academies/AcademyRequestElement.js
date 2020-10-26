@@ -39,7 +39,7 @@ export default function AcademyRequestElement(props) {
                 </TouchableOpacity>
         <View style={styles.textContainer}>
             <Text style={styles.text}>
-                {item.user.alias} ({item.user.firstName} {item.user.lastName}) { translate('wantsToJoin') } {item.academy.name}
+                {item.user.alias} {item.user.firstName || item.user.lastName ? `(${item.user.firstName} ${item.user.lastName})` : ''}
             </Text>
 
             <View style={styles.buttonContainer}>

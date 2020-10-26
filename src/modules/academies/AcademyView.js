@@ -94,6 +94,9 @@ export default class AcademyScreen extends React.Component {
                     this.selectImage();
                 }, 500)
             break;
+            case 'manageMembers':
+                this.props.navigation.navigate('AcademyUsers', { id: this.props.academy[this.props.route.params.id]._id })
+            break;
             case 'join':
                 this.createAcademyRequest()
             break;
@@ -120,13 +123,18 @@ export default class AcademyScreen extends React.Component {
 
   async cancelMembership() {
     this.setState({ spinner: true });
-    await this.props.cancelMembership(this.props.route.params.id);
+    let academyMembers = this.props.academyMembers && this.props.academyMembers[this.props.route.params.id] || [];
+    let currentMember = this.props.loggedInUser && academyMembers.find(member => member.member._id === this.props.loggedInUser._id);
+    if(currentMember) {
+        await this.props.removeAcademyMember(currentMember._id);
+    }
     this.setState({ cancelMembershipDialog: false, spinner: false })
   }
 
   async getData(fromCache = true) {
     await Promise.all([
             this.props.getAcademy(this.props.route.params.id, {}, fromCache),
+            this.props.getAcademyMembers(this.props.route.params.id, { academyId: this.props.route.params.id }, {}, fromCache),
             this.props.list(`academy-${this.props.route.params.id}`, {
                 academyId: this.props.route.params.id,
                 startDate: moment().format('YYYY-MM-DD'),
@@ -175,6 +183,7 @@ export default class AcademyScreen extends React.Component {
   render() {
       let academy = this.props.academy ? this.props.academy[this.props.route.params.id] : {};
       let classes = this.props.classes && this.props.classes[`academy-${this.props.route.params.id}`];
+      let academyMembers = this.props.academyMembers && this.props.academyMembers[this.props.route.params.id];
       let nextClass = { schedule: {} };
       if(classes) {
           classes.sort((a, b) => {
@@ -192,8 +201,11 @@ export default class AcademyScreen extends React.Component {
       let academyRequest = this.props.academyRequest;
 
       let isLoggedIn = this.props.loggedInUser;
-      let isStudent = isLoggedIn && academy && academy.students && !!academy.students.find(student => (student._id === this.props.loggedInUser._id));
-      let userIsOwner = !!(isLoggedIn && academy && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id))
+      let currentUser = isLoggedIn && academyMembers && academyMembers.find(member => (member.member._id === this.props.loggedInUser._id));
+      let isStudent = !!currentUser;
+      let userIsOwner = currentUser && currentUser.isOwner;
+
+      let instructors = academyMembers && academyMembers.filter(member => member.isInstructor) || [];
 
       let menuOptions = [];
       let menuEntities = [];
@@ -204,6 +216,8 @@ export default class AcademyScreen extends React.Component {
 
         menuOptions.push(translate('updateAcademyImage'));
         menuEntities.push('updateImage');
+        menuOptions.push(translate('manageMembers'));
+        menuEntities.push('manageMembers');
       }
 
       if(!userIsOwner && !isStudent && !academyRequest) {
@@ -275,7 +289,34 @@ export default class AcademyScreen extends React.Component {
           </ImageBackground>
 
           <View style={styles.section}>
-            <ScrollView>
+            <View>
+                        {isLoggedIn && !userIsOwner && !isStudent && !academyRequest && (
+                            <Button
+                                bgColor={colors.primaryBackground}
+                                textColor={colors.primaryText}
+                                secondary
+                                rounded
+                                small
+                                style={ styles.joinButton }
+                                caption={ translate('join') }
+                                onPress={() => this.menuOptionSelected('join')}
+                              />
+                        )}
+                        {isLoggedIn && !userIsOwner && academyRequest && !isStudent && (
+                            <Button
+                                bgColor={colors.primaryBackground}
+                                textColor={colors.primaryText}
+                                secondary
+                                rounded
+                                small
+                                style={ styles.joinButton }
+                                caption={ translate('cancelRequest') }
+                                onPress={() => this.menuOptionSelected('cancelRequest')}
+                              />
+                        )}
+
+              <View style={styles.hr} />
+
               <View style={styles.expandingRow}>
                     <Text style={styles.itemLabel}>{ translate('styles') }</Text>
                     <View style={styles.multilineText}>
@@ -368,58 +409,72 @@ export default class AcademyScreen extends React.Component {
               <View style={styles.hr} />
 
               <View style={styles.userRow}>
-                    <Text style={styles.itemLabel}>{ translate('instructors') } ({academy && academy.instructors && academy.instructors.length})</Text>
 
-                    <FlatList
+                        {academy && userIsOwner && (
+                            <TouchableOpacity style={styles.headerContainer}
+                                onPress={() => {this.props.navigation.navigate('AcademyUsers', { id: academy._id })}}>
+                             <Text style={styles.itemLabel}>{ translate('instructors') } ({instructors && instructors.length})</Text>
+                              <Icon
+                                name="menu-right"
+                                size={25}
+                                color={colors.secondaryIcon}
+                              />
+                             </TouchableOpacity>
+                         )}
+
+                        {academy && !userIsOwner && (
+                            <Text style={styles.itemLabel}>{ translate('instructors') } ({instructors && instructors.length})</Text>
+                         )}
+
+                    <View style={ styles.imageContainer }>
+                      <FlatList
                           horizontal
                           keyExtractor={item => item._id }
-                          style={ styles.imageContainer }
-                          data={academy && academy.instructors}
+                          data={instructors}
                           renderItem={this._getRenderItemFunction}
                       />
+                    </View>
               </View>
               <View style={styles.hr} />
 
                   <View style={styles.userRow}>
-                        <Text style={styles.itemLabel}>{ translate('members') } ({academy && academy.students && academy.students.length})</Text>
+
+                        {academy && userIsOwner && (
+                            <TouchableOpacity style={styles.headerContainer}
+                                onPress={() => {this.props.navigation.navigate('AcademyUsers', { id: academy._id })}}>
+                             <Text style={styles.itemLabel}>{ translate('members') } ({academyMembers && academyMembers.length})</Text>
+                              <Icon
+                                name="menu-right"
+                                size={25}
+                                color={colors.secondaryIcon}
+                              />
+                             </TouchableOpacity>
+                         )}
+
+                        {academy && !userIsOwner && (
+                            <Text style={styles.itemLabel}>{ translate('members') } ({academyMembers && academyMembers.length})</Text>
+                         )}
 
                         {isStudent && (
+                        <View style={ styles.imageContainer }>
                         <FlatList
                               horizontal
                               keyExtractor={item => item._id }
-                              style={ styles.imageContainer }
-                              data={academy && academy.students}
+                              data={academyMembers}
                               renderItem={this._getRenderItemFunction}
                           />
-                        )}
-                        {isLoggedIn && !userIsOwner && !isStudent && !academyRequest && (
-                            <Button
-                                secondary
-                                rounded
-                                small
-                                style={ styles.joinButton }
-                                caption={ translate('join') }
-                                onPress={() => this.menuOptionSelected('join')}
-                              />
-                        )}
-                        {isLoggedIn && !userIsOwner && academyRequest && !isStudent && (
-                            <Button
-                                secondary
-                                rounded
-                                small
-                                style={ styles.joinButton }
-                                caption={ translate('cancelRequest') }
-                                onPress={() => this.menuOptionSelected('cancelRequest')}
-                              />
+                          </View>
                         )}
                   </View>
 
-            </ScrollView>
+            </View>
           </View>
 
                         <Modal isVisible={this.state.cancelMembershipDialog} onBackdropPress={() => (this.setState({ cancelMembershipDialog: false }))}>
                             <View>
                               <Button
+                                bgColor={colors.primaryBackground}
+                                textColor={colors.primaryText}
                                 secondary
                                 rounded
                                 small
@@ -429,6 +484,8 @@ export default class AcademyScreen extends React.Component {
                               />
 
                               <Button
+                                bgColor={colors.primaryBackground}
+                                textColor={colors.primaryText}
                                 secondary
                                 rounded
                                 small
@@ -446,15 +503,9 @@ export default class AcademyScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: 'white',
   },
-  header: {
-    flex: 2,
-    padding: 20,
-  },
   section: {
-    flex: 4,
     position: 'relative',
     backgroundColor: colors.secondaryBackground
   },
@@ -464,7 +515,6 @@ const styles = StyleSheet.create({
   itemLabel: {
     width: 200,
     fontWeight: 'bold',
-    position: 'absolute',
     top: 10,
     paddingHorizontal: 20,
     color: colors.terciaryText
@@ -508,10 +558,8 @@ const styles = StyleSheet.create({
     color: colors.black
   },
   userRow: {
-      alignItems: 'center',
-      paddingHorizontal: 20,
-      flexDirection: 'row',
-      height: 145
+      flexDirection: 'column',
+      minHeight: 100
     },
   hr: {
     borderBottomColor: '#e3e3e3',
@@ -526,7 +574,8 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     backgroundColor: colors.white,
-    marginTop: 15
+    marginTop: 20,
+    paddingLeft: 20
   },
   cancelMembershipButton: {
     width: 300,
@@ -534,6 +583,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   joinButton: {
+    width: 150,
+    marginTop: 20,
+    marginBottom: 20,
+    alignSelf: 'center'
   },
   optionsMenu: {
     opacity: 1,
@@ -550,6 +603,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignItems: 'center',
     zIndex: 100,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginRight: 10
   }
 });
 

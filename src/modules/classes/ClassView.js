@@ -48,10 +48,14 @@ export default class ClassScreen extends React.Component {
     }
 
     async getData(fromCache = true) {
-        await Promise.all([
+        let requests = [
             this.props.getAcademy(this.props.route.params.academyId, {}, fromCache),
-            this.props.getClass(this.props.route.params.id, {}, fromCache)
-        ]);
+            this.props.getClass(this.props.route.params.id, {}, fromCache),
+        ];
+        if(this.props.loggedInUser) {
+            requests.push(this.props.getAcademyMembers(this.props.route.params.academyId + '-current', { academyId: this.props.route.params.academyId, memberId: this.props.loggedInUser._id }))
+        }
+        await Promise.all(requests);
     }
 
   locationSelected(location) {
@@ -188,7 +192,7 @@ export default class ClassScreen extends React.Component {
   _getRenderItemFunction = ({ item }) => {
     return (
        <UserElement
-            user={item}
+            user={item.academyMember}
        />
     );
   };
@@ -198,9 +202,10 @@ export default class ClassScreen extends React.Component {
       let startDate = this.props.route.params.startDate;
       let endDate = this.props.route.params.endDate;
       let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {}
+      let currentMember = this.props.academyMembers && this.props.academyMembers[this.props.route.params.academyId + '-current'] && this.props.academyMembers[this.props.route.params.academyId + '-current'][0]
 
-      let userIsOwner = !!(this.props.loggedInUser && academy.owners && academy.owners.find(owner => owner._id === this.props.loggedInUser._id));
-      let userIsStudent = !!(this.props.loggedInUser && academy.students && academy.students.find(student => student._id === this.props.loggedInUser._id));
+      let userIsOwner = currentMember && currentMember.isOwner;
+      let userIsStudent = !!currentMember;
       let userIsAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => attendee._id === this.props.loggedInUser._id));
 
       if(moment(classObj.schedule.startDate).valueOf() !== moment(startDate).valueOf()) {

@@ -32,6 +32,15 @@ class UserService extends BaseService {
                 return this.makeRequest(httpConfig, {});
             }
 
+    async registerByAcademy(entity) {
+                const httpConfig = {
+                    method: 'POST',
+                    url: this.buildURL(['registerByAcademy']),
+                    data: entity
+                };
+                return this.makeRequest(httpConfig, {});
+            }
+
     async updateProfileImage(id, data, options) {
                 const httpConfig = {
                     method: 'POST',

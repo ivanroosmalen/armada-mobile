@@ -22,6 +22,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { translate, i18n } from '../../translations/index.js';
 import Spinner from 'react-native-loading-spinner-overlay';
 import stripe from 'tipsi-stripe'
+stripe.setOptions({
+  publishableKey: 'pk_live_51HW8PNFxab6j0Gj1EVO6miXsi7imXGvQTiSFl2JI5OpBDIYK4cwA2qJxXoSQXYv8Z6aIn2rw7HKXx6pVtAqdahdR00X0zmbr29'
+})
 import Toast from 'react-native-simple-toast';
 
 export default class NotificationListScreen extends React.Component {

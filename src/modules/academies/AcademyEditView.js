@@ -54,20 +54,6 @@ export default class AcademyEditScreen extends React.Component {
             });
           };
 
-          onSelectedInstructors = selectedInstructors => {
-            let instructors = this.state.editingAcademy.students && this.state.editingAcademy.students.filter(student => selectedInstructors.indexOf(student._id) !== -1);
-
-            if(!instructors) {
-                if(selectedInstructors[0] === this.props.loggedInUser._id) {
-                    instructors = [ this.props.loggedInUser ];
-                }
-            }
-            this.state.editingAcademy.instructors = instructors;
-            this.setState({
-                editingAcademy: this.state.editingAcademy
-            });
-          };
-
          onAddressSelect = address => {
             let location = {
                 placeId: address.place_id,
@@ -206,7 +192,6 @@ export default class AcademyEditScreen extends React.Component {
   render() {
       const { martialArtList, editingAcademy } = this.state;
       let selectedMAs = editingAcademy.martialArts && editingAcademy.martialArts.map(ma => ma.name);
-      let selectedInstructors = editingAcademy.instructors && editingAcademy.instructors.map(instructor => instructor._id) || [];
       let selectedLocations = editingAcademy.locations;
       autocompleteMinHeight = 50;
       let loggedInUser = this.props.loggedInUser;
@@ -277,30 +262,6 @@ export default class AcademyEditScreen extends React.Component {
                       tagBorderColor={ colors.primaryText }
                       tagTextColor={ colors.primaryText }
                       displayKey="name"
-                      submitButtonText={ translate('submit') }
-                    />
-
-                    <MultiSelect
-                      items={(editingAcademy && editingAcademy.students) ? editingAcademy.students : [loggedInUser]}
-                      uniqueKey="_id"
-                      ref={(component) => { this.multiSelect = component }}
-                      onSelectedItemsChange={ this.onSelectedInstructors }
-                      selectedItems={ selectedInstructors }
-                      selectText={ translate('selectInstructors') }
-                      searchInputPlaceholderText={ translate('searchMembers') }
-                      selectedItemTextColor={colors.quaternaryText}
-                      selectedItemIconColor={colors.quaternaryText}
-                      itemTextColor={colors.terciaryText}
-                      searchInputStyle={{ color: colors.terciaryText }}
-                      submitButtonColor={colors.terciaryText}
-                      textColor={colors.primaryText}
-                      styleMainWrapper={ styles.instructorMultiSelect }
-                      styleListContainer={{height: 200}}
-                      styleDropdownMenuSubsection={{ backgroundColor: colors.primaryBackground, borderBottomColor: colors.primaryText }}
-                      tagRemoveIconColor={ colors.primaryText }
-                      tagBorderColor={ colors.primaryText }
-                      tagTextColor={ colors.primaryText }
-                      displayKey="alias"
                       submitButtonText={ translate('submit') }
                     />
 
@@ -438,11 +399,6 @@ const styles = StyleSheet.create({
   textInput: {
     alignSelf: 'stretch',
     marginTop: 20,
-  },
-  instructorMultiSelect: {
-    alignSelf: 'stretch',
-    marginTop: 20,
-    zIndex:100
   },
   maMultiSelect: {
       alignSelf: 'stretch',

@@ -42,6 +42,7 @@ export default class AcademyRequestListScreen extends React.Component {
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
 
+
     fadeIn(delay, from = 0) {
         const { anim } = this.state;
         return {

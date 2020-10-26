@@ -21,7 +21,7 @@ import AuthScreen from '../auth/AuthViewContainer';
 import ContactScreen from '../contact/ContactViewContainer';
 import NotificationListScreen from '../notifications/NotificationListViewContainer';
 import SubscriptionScreen from '../payments/SubscriptionViewContainer';
-import PaymentMethodScreen from '../payments/PaymentMethodViewContainer';
+import AcademyUsersScreen from '../academies/AcademyUsersViewContainer';
 
 import { translate } from '../../translations/index.js';
 
@@ -312,9 +312,8 @@ const StackNavigationData = [
       },
     },
     {
-      name: 'PaymentMethod',
-      displayName: translate('paymentMethods'),
-      component: PaymentMethodScreen,
+      name: 'AcademyUsers',
+      component: AcademyUsersScreen,
       headerLeft: headerLeftComponent,
       headerBackground: { source: headerBackground },
       headerTitleStyle: {

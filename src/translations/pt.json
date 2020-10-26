@@ -146,6 +146,13 @@
   "cancelSubscription": "Cancele subscrição",
   "tooManyMembers": "Sua contagem de membros é maior do que a quantidade solicitada",
   "memberLimitReached": "Limite de membros atingido",
-  "pleaseWait": "Um momento por favor..."
+  "pleaseWait": "Um momento por favor...",
+  "manageMembers": "Gerenciar membros",
+  "noMembers":"Não tem membros",
+  "isInstructor": "Instrutor",
+  "isManager": "Gerente",
+  "isOwner": "Proprietário",
+  "addUser": "Adicionar Usuário",
+  "removeMember": "Remover membro"
 
 }

@@ -5,6 +5,7 @@ import app from '../modules/AppState';
 import users from './users/user-reducers';
 import academies from './academies/academy-reducers';
 import academyRequests from './academyRequests/academyRequest-reducers';
+import academyMembers from './academyMembers/academyMember-reducers';
 import martialArts from './martialArts/martialArt-reducers';
 import scheduleItems from './scheduleItems/scheduleItem-reducers';
 import classes from './classes/class-reducers';
@@ -18,6 +19,7 @@ const appReducer = combineReducers({
   martialArts,
   academies,
   academyRequests,
+  academyMembers,
   scheduleItems,
   classes,
   notifications,

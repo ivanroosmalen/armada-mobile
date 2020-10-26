@@ -145,5 +145,12 @@
   "cancelSubscription": "Cancel subscription",
   "tooManyMembers": "Your member count is higher than the requested amount",
   "memberLimitReached": "Member limit reached",
-  "pleaseWait": "One moment please..."
+  "pleaseWait": "One moment please...",
+  "manageMembers": "Manage members",
+  "noMembers":"You have no members",
+  "isInstructor": "Instructor",
+  "isManager": "Manager",
+  "isOwner": "Owner",
+  "addUser": "Add User",
+  "removeMember": "Remove Member"
 }

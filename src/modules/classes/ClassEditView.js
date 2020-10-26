@@ -90,16 +90,12 @@ export default class ClassEditScreen extends React.Component {
         }
 
         onInstructorSelected = (index) => {
-          let instructor = this.props.academy[this.props.route.params.academyId].instructors[index];
-          let inst = {
-            _id: instructor._id,
-            alias: instructor.alias,
-            firstName: instructor.firstName,
-            lastName: instructor.lastName,
-            thumbnailImg: instructor.thumbnailImg
-          };
+          let academyMember = this.props.academyMembers[this.props.route.params.academyId][index];
+          let instructor = {};
+          Object.assign(instructor, academyMember.member);
+          instructor.academyMember = academyMember;
           this.state.editingClass.instructors.length = 0;
-          this.state.editingClass.instructors.push(inst);
+          this.state.editingClass.instructors.push(instructor);
 
           this.setState({
               editingClass: this.state.editingClass
@@ -186,7 +182,8 @@ export default class ClassEditScreen extends React.Component {
         this.props.clearClass(this.props.route.params.id);
 
         let dataRequests = [
-            this.props.getAcademy(this.props.route.params.academyId)
+            this.props.getAcademy(this.props.route.params.academyId),
+            this.props.getAcademyMembers(this.props.route.params.academyId, { academyId: this.props.route.params.academyId })
         ];
 
         if(this.props.route.params && this.props.route.params.id) {
@@ -199,21 +196,14 @@ export default class ClassEditScreen extends React.Component {
       async prepareData() {
         await this.getData();
 
-        let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {}
-        let instructor = academy && academy.instructors ? academy.instructors[0] : {};
-        let instructors = [];
-        if(instructor) {
-            instructors = [{
-              _id: instructor._id,
-              alias: instructor.alias,
-              firstName: instructor.firstName,
-              lastName: instructor.lastName,
-              thumbnailImg: instructor.thumbnailImg
-            }]
-        }
+        let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {};
+        let academyMember = this.props.academyMembers && this.props.academyMembers[this.props.route.params.academyId] && this.props.academyMembers[this.props.route.params.academyId][0];
+        let instructor = {};
+        Object.assign(instructor, academyMember.member);
+        instructor.academyMember = academyMember;
 
         let defaults = {
-          instructors: instructors,
+          instructors: instructor ? [instructor] : [],
           schedule: {
               startDate: new Date(),
               endDate: new Date(),
@@ -301,11 +291,12 @@ export default class ClassEditScreen extends React.Component {
   render() {
       const { editingClass } = this.state;
       let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {}
+      let academyMembers = this.props.academyMembers && this.props.academyMembers[this.props.route.params.academyId] || [];
       let martialArts = [];
       let martialArtIndex = -1;
       let locations = [];
       let locationIndex = -1;
-      let instructors = [];
+      let instructors = academyMembers.map(member => member.member.alias);
       let instructorIndex = -1;
       let intervalIndex = -1;
       academy.martialArts && academy.martialArts.forEach((ma, index) => {
@@ -324,10 +315,9 @@ export default class ClassEditScreen extends React.Component {
       });
 
       locations.push(translate('noLocation'));
-      academy.instructors && academy.instructors.forEach((inst, index) => {
-        instructors.push(inst.alias);
 
-        if(editingClass.instructors && editingClass.instructors.length && inst.alias === editingClass.instructors[0].alias) {
+      instructors.forEach((inst, index) => {
+        if(editingClass.instructors && editingClass.instructors.length && editingClass.instructors[0].academyMember.member && inst === editingClass.instructors[0].academyMember.member.alias) {
             instructorIndex = index;
         }
       });
