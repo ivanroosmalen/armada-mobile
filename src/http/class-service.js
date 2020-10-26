@@ -3,7 +3,7 @@ import BaseService from './base-service.js';
 class ClassService extends BaseService {
 
     constructor(entity) {
-        super(entity, 'https://academy.armadama.com/v1/');
+        super(entity, 'https://misc.armadama.com/v1/');
     }
 
     async attend(data) {

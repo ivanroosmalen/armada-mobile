@@ -442,7 +442,7 @@ export default class AcademyScreen extends React.Component {
                         {academy && userIsOwner && (
                             <TouchableOpacity style={styles.headerContainer}
                                 onPress={() => {this.props.navigation.navigate('AcademyUsers', { id: academy._id })}}>
-                             <Text style={styles.itemLabel}>{ translate('members') } ({academyMembers && academyMembers.length})</Text>
+                             <Text style={styles.itemLabel}>{ translate('members') } ({academy.memberCount || 0})</Text>
                               <Icon
                                 name="menu-right"
                                 size={25}

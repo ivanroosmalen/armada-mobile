@@ -46,7 +46,7 @@ export default function AcademyElement(props) {
                                         {item.martialArts.map(ma => ma.name).join(',')}
                                       </Text>
                                       <Text style={styles.members} numberOfLines={1}>
-                                        {item.students.length} {translate('students')}
+                                        {item.memberCount || 0} {translate('students')}
                                       </Text>
                                     </View>
                                   </View>
