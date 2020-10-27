@@ -12,7 +12,10 @@ class UserScheduleScreen extends React.Component {
   state = {
     anim: new Animated.Value(0),
     refreshing: false,
-    academyDialogVisible: false
+    academyDialogVisible: false,
+    academyIds: [],
+    startDate: ''
+
   }
 
   addClass(ownerAcademies) {
@@ -56,7 +59,33 @@ class UserScheduleScreen extends React.Component {
                 startDate: moment().toISOString(),
                 endDate: moment().add(31, 'days').toISOString(),
             }
+            console.log(fromCache)
             await this.props.list(this.props.loggedInUser._id, data, {}, fromCache);
+        }
+
+        this.setState({ academyIds });
+    }
+
+    async onDayPress(day) {
+        if(this.props.loggedInUser) {
+            this.setState({ refreshing: true });
+            let data = {};
+            if(this.state.startDate === day.dateString) {
+                data = {
+                    academyId: this.state.academyIds.join(','),
+                    startDate: moment().toISOString(),
+                    endDate: moment().add(31, 'days').toISOString(),
+                }
+            } else {
+                data = {
+                    academyId: this.state.academyIds.join(','),
+                    startDate: moment(day.dateString).startOf('day').format(),
+                    endDate: moment(day.dateString).endOf('day').format(),
+                }
+            }
+
+            await this.props.list(this.props.loggedInUser._id, data, {}, false);
+            this.setState({ startDate: day.dateString, refreshing: false })
         }
     }
 
@@ -107,7 +136,9 @@ class UserScheduleScreen extends React.Component {
             unattend={this.props.unattend}
             onRefresh={() => this.onRefresh()}
             refreshing={this.state.refreshing}
-            navigation={this.props.navigation}/>
+            navigation={this.props.navigation}
+            onDayPress={(day) => this.onDayPress(day)}
+            />
 
         {!!ownerAcademies.length && (
             <TouchableOpacity

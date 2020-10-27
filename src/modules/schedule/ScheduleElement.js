@@ -194,6 +194,8 @@ let items = {};
           <WeekCalendar
             firstDay={1}
             markedDates={markedDates}
+            onDayPress={(day) => {this.props.onDayPress(day)}}
+            hideArrows={false}
             theme={{
                 calendarBackground: colors.terciaryBackground,
                 backgroundColor: colors.terciaryBackground,
@@ -222,7 +224,7 @@ let items = {};
             textSectionTitleColor: 'blue',
             textSectionTitleDisabledColor: 'blue',
           }}
-          onRefresh={() => (this.props.refreshing && this.props.onRefresh())}
+          onRefresh={() => this.props.onRefresh()}
           refreshing={this.props.refreshing}
         />
       </CalendarProvider>

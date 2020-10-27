@@ -11,7 +11,8 @@ class ScheduleScreen extends React.Component {
 
   state = {
     anim: new Animated.Value(0),
-    refreshing: false
+    refreshing: false,
+    startDate: ''
   }
 
     async onRefresh() {
@@ -20,12 +21,37 @@ class ScheduleScreen extends React.Component {
       this.setState({ refreshing: false })
     }
 
+    onDayPress = async (day) => {
+        if(this.props.loggedInUser) {
+            this.setState({ refreshing: true });
+            let data = {};
+            if(this.state.startDate === day.dateString) {
+                data = {
+                    academyId: this.props.route.params.id,
+                    startDate: moment().toISOString(),
+                    endDate: moment().add(31, 'days').toISOString(),
+                }
+            } else {
+                data = {
+                    academyId: this.props.route.params.id,
+                    startDate: moment(day.dateString).startOf('day').format(),
+                    endDate: moment(day.dateString).endOf('day').format(),
+                }
+
+            }
+
+            await this.props.list(`academy-${this.props.route.params.id}`, data, {}, false);
+            this.setState({ startDate: day.dateString, refreshing: false })
+        }
+    }
+
   async getData(fromCache = true) {
     let data = {
         academyId: this.props.route.params.id,
         startDate: moment().toISOString(),
         endDate: moment().add(31, 'days').toISOString(),
     }
+
     await Promise.all([
         this.props.list(`academy-${this.props.route.params.id}`, data, {}, fromCache),
         this.props.getAcademy(this.props.route.params.id, {}, fromCache)
@@ -79,7 +105,9 @@ class ScheduleScreen extends React.Component {
             unattend={this.props.unattend}
             onRefresh={() => this.onRefresh()}
             refreshing={this.state.refreshing}
-            navigation={this.props.navigation}/>
+            navigation={this.props.navigation}
+            onDayPress={this.onDayPress}
+            />
 
         {userIsOwner && (
         <TouchableOpacity

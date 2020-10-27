@@ -83,10 +83,10 @@ export default class HomeScreen extends React.Component {
     });
 
     if(this.props.loggedInUser) {
-        this.props.getClasses(this.props.loggedInUser._id, {
+        this.props.getClasses(this.props.loggedInUser._id + '-home', {
             academyId: academyIds.join(','),
             startDate: moment().toISOString(),
-            endDate: moment().add(31, 'days').format('YYYY-MM-DD'),
+            endDate: moment().add(7, 'days').format('YYYY-MM-DD'),
         }, {}, classesFromCache);
     }
 
@@ -307,6 +307,7 @@ export default class HomeScreen extends React.Component {
                         attend={this.props.attend}
                         unattend={this.props.unattend}
                         refreshing={false}
+                        onRefresh={() => {}}
                         navigation={this.props.navigation}
                         hideWeekView={true}/>
                     </View>
