@@ -23,8 +23,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
 import Spinner from 'react-native-loading-spinner-overlay';
 import openMap from 'react-native-open-maps';
-
+import MultiSelect from 'react-native-multiple-select';
 import UserElement from '../profile/UserElement';
+import ClassAttendee from './ClassAttendee';
 
 export default class ClassScreen extends React.Component {
 
@@ -33,12 +34,14 @@ export default class ClassScreen extends React.Component {
     deleteDialogVisible: false,
     deleteConfirmationDialogVisible: false,
     attendDialogVisible: false,
+    setAttendanceDialogVisible: false,
     deleteSingleItem: true,
-    menuOptions: [translate('edit'), translate('delete')],
-    menuEntities: ['edit', 'delete'],
+    menuOptions: [translate('setAttendance'), translate('edit'), translate('delete')],
+    menuEntities: ['set attendance', 'edit', 'delete'],
     anim: new Animated.Value(0),
     refreshing: false,
-    spinner: false
+    spinner: false,
+    attendees: []
   }
 
     async onRefresh() {
@@ -53,9 +56,15 @@ export default class ClassScreen extends React.Component {
             this.props.getClass(this.props.route.params.id, {}, fromCache),
         ];
         if(this.props.loggedInUser) {
-            requests.push(this.props.getAcademyMembers(this.props.route.params.academyId + '-current', { academyId: this.props.route.params.academyId, memberId: this.props.loggedInUser._id }))
+            requests.push(this.props.getAcademyMembers(this.props.route.params.academyId, { academyId: this.props.route.params.academyId }))
         }
         await Promise.all(requests);
+
+        if(this.props.class && this.props.class[this.props.route.params.id] && this.props.class[this.props.route.params.id].attendees) {
+            let classCopy = {};
+            Object.assign(classCopy, this.props.class[this.props.route.params.id])
+            this.setState({ attendees: classCopy.attendees })
+        }
     }
 
   locationSelected(location) {
@@ -103,6 +112,9 @@ export default class ClassScreen extends React.Component {
                 } else {
                     this.setState({ deleteConfirmationDialogVisible: true });
                 }
+            break;
+            case 'set attendance':
+                this.setState({ setAttendanceDialogVisible: true });
             break;
         }
   }
@@ -162,11 +174,10 @@ export default class ClassScreen extends React.Component {
         }
         let entity = await this.props.attend(data);
 
-        if(entity._id !== this.props.route.params.id) {
+        if(entity && entity._id !== this.props.route.params.id) {
             this.props.navigation.pop(1);
             this.props.navigation.navigate('Class', { id: entity._id, academyId: this.props.route.params.academyId, startDate: entity.schedule.startDate, endDate: entity.schedule.endDate })
         }
-
 
         this.setState({ spinner: false, attendDialogVisible: false });
     }
@@ -197,16 +208,69 @@ export default class ClassScreen extends React.Component {
     );
   };
 
+  addAttendee = (academyMember, online) => {
+    let attendees = this.state.attendees;
+    let existingAttendee = attendees.find(attendee => attendee.academyMember._id === academyMember._id);
+
+    if(existingAttendee) {
+        existingAttendee.online = online;
+    } else {
+        let attendee = {};
+        attendee.academyMember = academyMember;
+        attendee.online = online;
+        attendees.push(attendee)
+    }
+
+    this.setState({ attendees })
+  }
+
+  removeAttendee = (memberId) => {
+    let attendees = this.state.attendees;
+    attendees = attendees.filter(attendee => attendee.academyMember._id !== memberId);
+    this.setState({ attendees });
+  }
+
+  onSetAttendance = async () => {
+    let data = {
+        attendees: this.state.attendees,
+        classId: this.props.route.params.id,
+        startDate: this.props.route.params.startDate,
+        endDate: this.props.route.params.endDate,
+    }
+    let entity = await this.props.batchUpdateAttendance(data);
+
+    if(entity && entity._id !== this.props.route.params.id) {
+        this.props.navigation.pop(1);
+        this.props.navigation.navigate('Class', { id: entity._id, academyId: this.props.route.params.academyId, startDate: entity.schedule.startDate, endDate: entity.schedule.endDate })
+    }
+
+    this.setState({ setAttendanceDialogVisible: false })
+  }
+
+  _getRenderUsersFunction = ({ item }, attendees, supportOnlineClasses) => {
+    let attendee = attendees.find(attendee => attendee.academyMember._id === item._id);
+
+    return (
+       <ClassAttendee
+            academyMember={item}
+            attendee={attendee}
+            supportOnlineClasses={supportOnlineClasses}
+            addAttendee={this.addAttendee}
+            removeAttendee={this.removeAttendee}
+       />
+    );
+  };
+
   render() {
       let classObj = this.props.class && this.props.class[this.props.route.params.id] ? this.props.class[this.props.route.params.id] : { schedule: {} };
       let startDate = this.props.route.params.startDate;
       let endDate = this.props.route.params.endDate;
-      let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {}
-      let currentMember = this.props.academyMembers && this.props.academyMembers[this.props.route.params.academyId + '-current'] && this.props.academyMembers[this.props.route.params.academyId + '-current'][0]
-
+      let academy = this.props.academy && this.props.academy[this.props.route.params.academyId] ? this.props.academy[this.props.route.params.academyId] : {};
+      let academyMembers = (this.props.academyMembers && this.props.academyMembers[this.props.route.params.academyId] && this.props.academyMembers[this.props.route.params.academyId]) || [];
+      let currentMember = this.props.loggedInUser && academyMembers.find(academyMember => academyMember.member._id === this.props.loggedInUser._id) || {};
       let userIsOwner = currentMember && currentMember.isOwner;
       let userIsStudent = !!currentMember;
-      let userIsAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => attendee._id === this.props.loggedInUser._id));
+      let userIsAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => attendee.academyMember.member._id === this.props.loggedInUser._id));
 
       if(moment(classObj.schedule.startDate).valueOf() !== moment(startDate).valueOf()) {
         classObj.attendees = [];
@@ -215,8 +279,8 @@ export default class ClassScreen extends React.Component {
       let attendees = classObj.attendees.filter(attendee => !attendee.online) || [];
       let onlineAttendees = classObj.attendees.filter(attendee => !!attendee.online) || [];
 
-      let classIsFull = attendees && attendees.length === classObj.classSize;
-      let onlineClassIsFull = onlineAttendees && onlineAttendees.length === classObj.onlineClassSize;
+      let classIsFull = attendees && attendees.length >= classObj.classSize;
+      let onlineClassIsFull = onlineAttendees && onlineAttendees.length >= classObj.onlineClassSize;
 
       return (
         <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
@@ -354,7 +418,7 @@ export default class ClassScreen extends React.Component {
                                       <Text style={{color: colors.primaryText}}>{text}</Text>
                                     </View>
                                   )}
-                                  dropdownStyle={{ height: 80}}
+                                  dropdownStyle={{ height: 120}}
                                   onSelect={(index) => this.menuOptionSelected(this.state.menuEntities[index])}
                                   renderSeparator={() => (<View></View>)}
                                 >
@@ -368,7 +432,7 @@ export default class ClassScreen extends React.Component {
 
                         <Modal isVisible={this.state.attendDialogVisible} onBackdropPress={() => (this.setState({ attendDialogVisible: false }))}>
                             <View>
-                              {!classIsFull && (
+                              {!onlineClassIsFull && (
                                   <Button
                                     secondary
                                     rounded
@@ -381,7 +445,7 @@ export default class ClassScreen extends React.Component {
                                   />
                               )}
 
-                              {!onlineClassIsFull && (
+                              {!classIsFull && (
                                   <Button
                                     secondary
                                     rounded
@@ -470,6 +534,27 @@ export default class ClassScreen extends React.Component {
                                 style={ styles.editDetailsButton }
                                 caption={ translate('cancel') }
                                 onPress={() => this.onDeleteConfirmationPressed(false)}
+                              />
+                          </View>
+                        </Modal>
+
+                        <Modal isVisible={this.state.setAttendanceDialogVisible} onBackdropPress={() => (this.setState({ setAttendanceDialogVisible: false }))}>
+                          <View style={{maxHeight: 400}}>
+                            <FlatList
+                              keyExtractor={item => item._id }
+                              style={ styles.imageContainer }
+                              data={academyMembers}
+                              renderItem={(obj) => this._getRenderUsersFunction(obj, classObj.attendees, classObj.supportOnlineClasses)}
+                            />
+                              <Button
+                                secondary
+                                rounded
+                                small
+                                bgColor={ colors.primaryBackground }
+                                textColor={ colors.primaryText }
+                                style={ styles.editDetailsButton }
+                                caption={ translate('submit') }
+                                onPress={() => this.onSetAttendance()}
                               />
                           </View>
                         </Modal>

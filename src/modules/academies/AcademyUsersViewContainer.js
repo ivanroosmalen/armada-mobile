@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import AcademyUsersView from './AcademyUsersView';
 import { get as getAcademy } from '../../redux/academies/actions.js';
 import { registerByAcademy } from '../../redux/users/actions.js';
-import { list as getAcademyMembers, update as updateAcademyMembers, remove as removeAcademyMembers } from '../../redux/academyMembers/actions.js';
+import { list as getAcademyMembers, update as updateAcademyMembers, remove as removeAcademyMembers, create as createAcademyMembers, linkUser } from '../../redux/academyMembers/actions.js';
 
 export default compose(
   connect(
@@ -18,8 +18,10 @@ export default compose(
     dispatch => ({
       getAcademy: (id, options, fromCache) => dispatch(getAcademy(id, options, fromCache)),
       getAcademyMembers: (key, params, options, fromCache) => dispatch(getAcademyMembers(key, params, options, fromCache)),
+      createAcademyMembers: (params, options) => dispatch(createAcademyMembers(params, options)),
       updateAcademyMembers: (id, entity, options) => dispatch(updateAcademyMembers(id, entity, options)),
       removeAcademyMembers: (id) => dispatch(removeAcademyMembers(id)),
-      registerByAcademy: (entity) => dispatch(registerByAcademy(entity))
+      registerByAcademy: (entity) => dispatch(registerByAcademy(entity)),
+      linkUser: (id, entity) => dispatch(linkUser(id, entity))
     }),
   ))(AcademyUsersView);

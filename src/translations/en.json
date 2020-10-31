@@ -78,6 +78,7 @@
   "attending":"Attending",
   "attendingOnline": "Attending Online",
   "attend":"Attend",
+  "online":"Online",
   "unattend":"Unattend",
   "classFull":"Class is full",
   "updateSeries":"Update entire series",
@@ -152,5 +153,8 @@
   "isManager": "Manager",
   "isOwner": "Owner",
   "addUser": "Add User",
-  "removeMember": "Remove Member"
+  "addUserSendEmail": "Add user and send email",
+  "removeMember": "Remove Member",
+  "linkUser": "Link user",
+  "setAttendance": "Set Attendance"
 }

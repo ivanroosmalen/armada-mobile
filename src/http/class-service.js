@@ -24,6 +24,15 @@ class ClassService extends BaseService {
             return this.makeRequest(httpConfig, {});
     }
 
+    async batchUpdateAttendance(data) {
+        const httpConfig = {
+            method: 'PATCH',
+            url: this.buildURL([ 'attend', 'batch' ]),
+            data: data
+        };
+        return this.makeRequest(httpConfig, {});
+    }
+
     async getUserAttendanceMetrics(params = {}) {
             const httpConfig = {
                 method: 'GET',

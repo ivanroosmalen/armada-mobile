@@ -53,8 +53,11 @@ export function create(entity, options) {
 export function attend(data) {
   return async function(dispatch, getState) {
     let response = await service.attend(data);
-    dispatch(get(response.data.entity._id));
-    dispatch({type: CLASS_LIST_UPDATE});
+    if(response.status === 200) {
+        dispatch(get(response.data.entity._id));
+        dispatch({type: CLASS_LIST_UPDATE});
+    }
+
     return response.data.entity;
   }
 }
@@ -64,6 +67,17 @@ export function unattend(data) {
     let response = await service.unattend(data);
     dispatch(get(response.data.entity._id));
     dispatch({type: CLASS_LIST_UPDATE});
+    return response.data.entity;
+  }
+}
+
+export function batchUpdateAttendance(entity) {
+  return async function(dispatch, getState) {
+    let response = await service.batchUpdateAttendance(entity);
+    if(response.status === 200) {
+        dispatch(get(response.data.entity._id));
+        dispatch({type: CLASS_LIST_UPDATE});
+    }
     return response.data.entity;
   }
 }

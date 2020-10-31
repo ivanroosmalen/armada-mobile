@@ -147,7 +147,7 @@ let items = {};
         let endDate = moment(classObj.schedule.endDate);
         let duration = endDate.valueOf() && startDate.valueOf() ? endDate.valueOf() - startDate.valueOf() : 0;
         let timeDuration = moment.duration(duration);
-        let isAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => (attendee._id === this.props.loggedInUser._id)))
+        let isAttending = !!(this.props.loggedInUser && classObj.attendees && classObj.attendees.find(attendee => (attendee.academyMember.member._id === this.props.loggedInUser._id)))
 
         let attendees = classObj.attendees.filter(attendee => !attendee.online) || [];
         let onlineAttendees = classObj.attendees.filter(attendee => !!attendee.online) || [];
@@ -195,7 +195,6 @@ let items = {};
             firstDay={1}
             markedDates={markedDates}
             onDayPress={(day) => {this.props.onDayPress(day)}}
-            hideArrows={false}
             theme={{
                 calendarBackground: colors.terciaryBackground,
                 backgroundColor: colors.terciaryBackground,
@@ -233,7 +232,7 @@ let items = {};
                             <View style={{flex: 1}}>
                             {!this.state.loadingVisible && this.state.attendDialogVisible && (
                                 <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                                  {!this.state.currentItem.isFull && (
+                                  {!this.state.currentItem.onlineIsFull && (
                                       <Button
                                         secondary
                                         rounded
@@ -246,7 +245,7 @@ let items = {};
                                       />
                                   )}
 
-                                  {!this.state.currentItem.onlineIsFull && (
+                                  {!this.state.currentItem.isFull && (
                                       <Button
                                         secondary
                                         rounded

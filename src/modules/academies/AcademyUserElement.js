@@ -106,6 +106,23 @@ export default function AcademyUserElement(props) {
             {!expandContent && (
                 <View style={{ flexDirection: 'column' }}>
 
+                    {!ownerIsCurrent && !academyMember.member._id && (
+                    <View style={{ marginVertical: 10, }}>
+                      <Button
+                            bgColor={colors.primaryBackground}
+                            textColor={colors.primaryText}
+                            secondary
+                            rounded
+                            style={{
+                                width: 250,
+                                alignSelf: 'center'
+                             }}
+                            caption={ translate('linkUser') }
+                            onPress={() => props.onLinkUser(academyMember)}
+                          />
+                    </View>
+                    )}
+
                     <View  style={{alignSelf: 'stretch'}}>
                             <MultiSelect
                               items={props.academy.martialArts}
@@ -177,6 +194,7 @@ export default function AcademyUserElement(props) {
                           />
                     </View>
                     )}
+
                 </View>
             )}
             </View>

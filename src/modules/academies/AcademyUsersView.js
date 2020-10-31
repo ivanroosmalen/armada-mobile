@@ -20,7 +20,6 @@ import settings from '../../settings.js';
 import Modal from 'react-native-modal';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { translate, i18n } from '../../translations/index.js';
-import Spinner from 'react-native-loading-spinner-overlay';
 import stripe from 'tipsi-stripe'
 import Toast from 'react-native-simple-toast';
 import isEmail from 'validator/lib/isEmail';
@@ -32,7 +31,6 @@ export default class NotificationListScreen extends React.Component {
   state = {
     anim: new Animated.Value(0),
     refreshing: false,
-    spinner: false,
     addUserDialogVisible: false,
     entity: {
         email: '',
@@ -44,7 +42,8 @@ export default class NotificationListScreen extends React.Component {
         emailError: ''
     },
     isValid: false,
-    submitSuccess: false
+    submitSuccess: false,
+    memberToLink: {}
   }
 
     onChangeText = async (key, val) => {
@@ -57,21 +56,23 @@ export default class NotificationListScreen extends React.Component {
       }
     }
 
-    validate = () => {
+    validate = (linkUser = false) => {
         this.state.isValid = true;
 
-        if(!isEmail(this.state.entity.email)) {
-            this.state.errors.emailError = translate('emailError');
-            this.state.isValid = false;
+        if(linkUser) {
+            if(!isEmail(this.state.entity.email)) {
+                this.state.errors.emailError = translate('emailError');
+                this.state.isValid = false;
+            } else {
+                this.state.errors.emailError = '';
+            }
         } else {
-            this.state.errors.emailError = '';
-        }
-
-        if(!this.state.entity.alias) {
-            this.state.errors.aliasError = translate('aliasError');
-            this.state.isValid = false;
-        } else {
-            this.state.errors.aliasError = '';
+            if(!this.state.entity.alias) {
+                this.state.errors.aliasError = translate('aliasError');
+                this.state.isValid = false;
+            } else {
+                this.state.errors.aliasError = '';
+            }
         }
 
         this.setState({
@@ -82,21 +83,61 @@ export default class NotificationListScreen extends React.Component {
     }
 
   addUser = async () => {
-        if(this.validate()) {
-            this.setState({ spinner: true });
+           if(this.validate()) {
+               this.setState({ refreshing: true });
+               let entity = this.state.entity;
+               if(entity.email) {
+                   entity.academyId = this.props.route.params.id;
+                   let response = await this.props.registerByAcademy(entity);
+                   if(response.status === 201 || response.status === 200) {
+                       this.state.errors.pageError = '';
+
+                       await this.getData(false);
+                       this.setState({ addUserDialogVisible: false })
+                   } else {
+                       this.state.errors.pageError = translate('registerError');
+                   }
+               } else {
+                   let academyMember = {
+                       member: {
+                           alias: entity.alias
+                       },
+                       academy: {
+                           _id: this.props.route.params.id
+                       }
+                   }
+                   await this.props.createAcademyMembers(academyMember);
+
+                   await this.getData(false);
+                   this.setState({ addUserDialogVisible: false })
+               }
+
+               this.setState({ refreshing: false });
+           }
+     }
+
+  linkUser = async () => {
+        if(this.validate(true)) {
+            this.setState({ refreshing: true });
             let entity = this.state.entity;
-            entity.academyId = this.props.route.params.id;
-            let response = await this.props.registerByAcademy(this.state.entity);
-            if(response.status === 201) {
+
+            let response = await this.props.linkUser(this.state.memberToLink._id, entity);
+
+            if(response.status === 201 || response.status === 200) {
                 this.state.errors.pageError = '';
+
+                await this.getData(false);
+                this.setState({ linkUserDialogVisible: false })
             } else {
                 this.state.errors.pageError = translate('registerError');
             }
 
-            await this.getData(false);
-            this.setState({ spinner: false });
-            this.setState({ addUserDialogVisible: false })
+            this.setState({ refreshing: false });
         }
+  }
+
+  onLinkUser = async (academyMember) => {
+    this.setState({ memberToLink: academyMember, linkUserDialogVisible: true });
   }
 
   async onRefresh() {
@@ -110,7 +151,7 @@ export default class NotificationListScreen extends React.Component {
     if(currentUser) {
         await Promise.all([
             this.props.getAcademy(this.props.route.params.id, {}, fromCache),
-            this.props.getAcademyMembers(this.props.route.params.id, { academyId: this.props.route.params.id, sort: 'member.name' }, {}, fromCache)
+            this.props.getAcademyMembers(this.props.route.params.id, { academyId: this.props.route.params.id, sort: 'member.alias' }, {}, fromCache)
         ])
     }
   }
@@ -167,7 +208,8 @@ export default class NotificationListScreen extends React.Component {
             ownerIsCurrent={ownerIsCurrent}
             updateAcademyMembers={updateAcademyMembers}
             removeAcademyMembers={removeAcademyMembers}
-            key={item._id}
+            onLinkUser={this.onLinkUser}
+            key={item._id+item.member._id+item.member.alias}
        />
     );
   };
@@ -176,7 +218,19 @@ export default class NotificationListScreen extends React.Component {
     let currentUser = this.props.loggedInUser;
     let academy = this.props.academy && this.props.academy[this.props.route.params.id] || {};
     let academyMembers = this.props.academyMembers && this.props.academyMembers[this.props.route.params.id] || [];
+    academyMembers = academyMembers.sort((a,b) => {
+          if(!a.member.alias) {
+            a.member.alias = 'Unknown'
+          }
+          if(!b.member.alias) {
+            b.member.alias = 'Unknown'
+          }
+
+          return a.member.alias.trim().toLowerCase() > b.member.alias.trim().toLowerCase()
+      })
     let userIsOwner = !!(currentUser && academyMembers && academyMembers.find(academyMember => (academyMember.member._id === this.props.loggedInUser._id && academyMember.isOwner)))
+
+    console.log(academyMembers)
 
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, 0)]} >
@@ -239,8 +293,39 @@ export default class NotificationListScreen extends React.Component {
                                 style={{
                                  zIndex: 100
                                  }}
-                                caption={ translate('addUser') }
+                                caption={ this.state.entity.email ? translate('addUserSendEmail') : translate('addUser') }
                                 onPress={() => this.addUser()}
+                              />
+                          </View>
+                          </KeyboardInputWrapper>
+                        </Modal>
+
+                        <Modal isVisible={this.state.linkUserDialogVisible} onBackdropPress={() => this.setState({ linkUserDialogVisible: false })}>
+                            <KeyboardInputWrapper>
+                            <View style={{ backgroundColor: colors.primaryBackground, paddingVertical: 50, borderRadius: 15 }}>
+                                <TextInput
+                                  placeholder={ 'email'}
+                                  style={styles.textAreaInput}
+                                  onChangeText={val => this.onChangeText('email', val)}
+                                />
+                                <Text style={{ fontSize: 12, color: 'red'}}>
+                                    {this.state.errors.emailError}
+                                </Text>
+
+                              <Text style={{ fontSize: 12, color: 'red'}}>
+                                    {this.state.errors.pageError}
+                              </Text>
+
+                            <Button
+                                bgColor={colors.secondaryBackground}
+                                textColor={colors.secondaryText}
+                                secondary
+                                rounded
+                                style={{
+                                 zIndex: 100
+                                 }}
+                                caption={ translate('linkUser') }
+                                onPress={() => this.linkUser()}
                               />
                           </View>
                           </KeyboardInputWrapper>

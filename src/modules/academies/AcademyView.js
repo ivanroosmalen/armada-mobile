@@ -134,7 +134,7 @@ export default class AcademyScreen extends React.Component {
   async getData(fromCache = true) {
     await Promise.all([
             this.props.getAcademy(this.props.route.params.id, {}, fromCache),
-            this.props.getAcademyMembers(this.props.route.params.id, { academyId: this.props.route.params.id }, {}, fromCache),
+            this.props.getAcademyMembers(this.props.route.params.id, { academyId: this.props.route.params.id, sort: 'member.alias' }, {}, fromCache),
             this.props.list(`academy-${this.props.route.params.id}`, {
                 academyId: this.props.route.params.id,
                 startDate: moment().format('YYYY-MM-DD'),
@@ -145,7 +145,7 @@ export default class AcademyScreen extends React.Component {
   }
 
   async componentDidMount() {
-    await this.getData();
+    await this.getData(false);
 
     Animated.timing(this.state.anim, { toValue: 1000, duration: 1000 }).start();
   }
@@ -183,7 +183,17 @@ export default class AcademyScreen extends React.Component {
   render() {
       let academy = this.props.academy ? this.props.academy[this.props.route.params.id] : {};
       let classes = this.props.classes && this.props.classes[`academy-${this.props.route.params.id}`];
-      let academyMembers = this.props.academyMembers && this.props.academyMembers[this.props.route.params.id];
+      let academyMembers = this.props.academyMembers && this.props.academyMembers[this.props.route.params.id] || [];
+      academyMembers = academyMembers.sort((a,b) => {
+          if(!a.member.alias) {
+            a.member.alias = 'Unknown'
+          }
+          if(!b.member.alias) {
+            b.member.alias = 'Unknown'
+          }
+
+          return a.member.alias.trim().toLowerCase() > b.member.alias.trim().toLowerCase()
+      })
       let nextClass = { schedule: {} };
       if(classes) {
           classes.sort((a, b) => {

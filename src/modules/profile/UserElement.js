@@ -26,6 +26,7 @@ export default function UserElement(props) {
 
   return (
     <View key={item._id} style={styles.itemOneRow}>
+                {!!item._id && (
                 <TouchableOpacity key={item._id} onPress={() => _openProfile(item)}>
                                   <View style={styles.itemOneContainer}>
                                       <Image style={styles.avatar} source={{ uri: item.thumbnailImg || placeholderImage }} />
@@ -34,6 +35,18 @@ export default function UserElement(props) {
                                       </Text>
                                   </View>
                                 </TouchableOpacity>
+                )}
+
+                {!item._id && (
+                <View key={item._id}>
+                                  <View style={styles.itemOneContainer}>
+                                      <Image style={styles.avatar} source={{ uri: item.thumbnailImg || placeholderImage }} />
+                                      <Text style={styles.alias} numberOfLines={1}>
+                                        {item.alias}
+                                      </Text>
+                                  </View>
+                                </View>
+                )}
           </View>
   );
 }

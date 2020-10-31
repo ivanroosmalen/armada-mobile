@@ -40,6 +40,14 @@ export function create(entity, options) {
   }
 }
 
+export function linkUser(id, entity, options) {
+  return async function(dispatch) {
+    let response = await service.linkUser(id, entity, options);
+    dispatch({type: ACADEMY_MEMBER, data: response.data.entity, key: id});
+    return response;
+  }
+}
+
 export function update(id, entity, options) {
   return async function(dispatch) {
     let response = await service.update(id, entity, options);

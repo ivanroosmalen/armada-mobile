@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import ClassView from './ClassView';
 import { get as getAcademy }  from '../../redux/academies/actions.js'
-import { get, update, create, remove, attend, unattend } from '../../redux/classes/actions.js'
+import { get, update, create, remove, attend, unattend, batchUpdateAttendance } from '../../redux/classes/actions.js'
 import { list as getAcademyMembers } from '../../redux/academyMembers/actions.js';
 
 export default compose(
@@ -23,5 +23,6 @@ export default compose(
       unattend: (data) => dispatch(unattend(data)),
       removeClass: (id) => dispatch(remove(id)),
       updateClass: (id, entity) => dispatch(update(id, entity)),
+      batchUpdateAttendance: (entity) => dispatch(batchUpdateAttendance(entity)),
     })
   ))(ClassView);

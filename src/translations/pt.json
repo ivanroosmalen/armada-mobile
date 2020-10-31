@@ -78,6 +78,7 @@
   "attending":"Comparecendo",
   "attendingOnline": "Comparecendo Online",
   "attend":"Comparece",
+  "online":"Online",
   "unattend":"Não comparece",
   "classFull":"Aula está cheia",
   "updateSeries":"Atualize toda a série",
@@ -153,6 +154,8 @@
   "isManager": "Gerente",
   "isOwner": "Proprietário",
   "addUser": "Adicionar Usuário",
-  "removeMember": "Remover membro"
-
+  "addUserSendEmail": "Adicionar Usuário e envie email",
+  "removeMember": "Remover membro",
+  "linkUser": "Conectar usuário",
+  "setAttendance": "Definir Comparecimento"
 }
