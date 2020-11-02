@@ -37,7 +37,8 @@ export default class HomeScreen extends React.Component {
           backgroundGradientToOpacity: 1,
           color: () => colors.secondaryText,
           strokeWidth: 2,
-          useShadowColorFromDataset: false
+          useShadowColorFromDataset: false,
+          decimalPlaces: 0,
         },
         maxAttendanceValue: 0,
         allUserAcademies: [],
@@ -86,7 +87,7 @@ export default class HomeScreen extends React.Component {
         this.props.getClasses(this.props.loggedInUser._id + '-home', {
             academyId: academyIds.join(','),
             startDate: moment().toISOString(),
-            endDate: moment().add(7, 'days').format('YYYY-MM-DD'),
+            endDate: moment().add(14, 'days').format('YYYY-MM-DD'),
         }, {}, classesFromCache);
     }
 
@@ -197,7 +198,6 @@ export default class HomeScreen extends React.Component {
             key={item._id}
             isOwner={false}
             titleColor={colors.terciaryText}
-            height={'auto'}
        />
     );
   };
@@ -209,7 +209,7 @@ export default class HomeScreen extends React.Component {
            let notifications = this.props.notifications && this.props.notifications.length ? [this.props.notifications[0]] : [];
            let todaysNotifications = this.props.notifications && this.props.notifications.length ? this.props.notifications.filter(notification => (moment(notification.createdDate) > moment().startOf('day'))) : [];
            let maxAttendanceValue = this.state.maxAttendanceValue;
-           let classes = this.props.classes && this.props.loggedInUser ? this.props.classes[this.props.loggedInUser._id] : [];
+           let classes = this.props.classes && this.props.loggedInUser ? this.props.classes[this.props.loggedInUser._id + '-home'] : [];
 
            return (
              <Animated.ScrollView
@@ -246,7 +246,7 @@ export default class HomeScreen extends React.Component {
                               withInnerLines={false}
                               segments={maxAttendanceValue}
                               yAxisInterval={1}
-                              formatYLabel={(value) => (parseInt(value))}
+                              fromZero={true}
                             />
                         </View>
                      </View>
@@ -289,7 +289,7 @@ export default class HomeScreen extends React.Component {
               </View>
 
               {!!(classes && classes.length && currentUser) && (
-                    <View style={{flexShrink: 0, marginVertical: 10, flex: !!(notifications && notifications.length) ? 0 : 1, height: !!(notifications && notifications.length) ? 250 : 0}}>
+                <View style={{maxHeight: 600, minHeight: 400, marginVertical: 10 }}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {this.props.navigation.navigate('UserSchedule', { id: this.props.loggedInUser._id })}}>
                      <Text style={styles.header}>
@@ -302,7 +302,7 @@ export default class HomeScreen extends React.Component {
                       />
                      </TouchableOpacity>
                     <ScheduleElement
-                        classes={this.props.classes[this.props.loggedInUser._id]}
+                        classes={classes}
                         loggedInUser={this.props.loggedInUser}
                         attend={this.props.attend}
                         unattend={this.props.unattend}
@@ -310,14 +310,14 @@ export default class HomeScreen extends React.Component {
                         onRefresh={() => {}}
                         navigation={this.props.navigation}
                         hideWeekView={true}/>
-                    </View>
+                </View>
               )}
 
 
               {!(classes && classes.length) && !!(displayedAcademies && displayedAcademies.length) && (
                   <View style={styles.academySection} ref={this._academyListElement}>
                      <TouchableOpacity style={styles.headerContainer}
-                        onPress={() => {hasAcademies ? this.props.navigation.navigate('UserAcademies', { id: currentUser._id }) : this.props.navigation.navigate('Academies')}}>
+                        onPress={() => {hasAcademies ? this.props.navigation.navigate('UserAcademies', { id: currentUser._id }) : this.props.navigation.navigate('AcademyList')}}>
                      <Text style={styles.header}>
                          {hasAcademies ? translate('yourAcademies') + ' ('+displayedAcademies.length+')' : translate('academiesNearYou')}
                      </Text>
@@ -385,7 +385,7 @@ export default class HomeScreen extends React.Component {
                             textColor={ colors.primaryText }
                             style={ styles.createAcademyButton }
                             caption={ translate('academies') }
-                            onPress={() => this.props.navigation.navigate('Academies')}
+                            onPress={() => this.props.navigation.navigate('AcademyList')}
                           />
                   </View>
                 </View>
@@ -403,10 +403,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   section: {
-    flexShrink: 1
+//    flexShrink: 1
   },
   academySection: {
-    flexShrink: 0,
+//    flexShrink: 0,
     justifyContent: 'flex-end'
   },
   quarterSection: {

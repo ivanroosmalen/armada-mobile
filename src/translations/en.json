@@ -132,7 +132,8 @@
   "weeklyAttendance": "Weekly attendance",
   "dailyAttendance": "Daily attendance",
   "total": "total",
-  "managerDashboard": "Manager Dashboard",
+  "managerDashboard": "Manage",
+  "metrics": "Metrics",
   "website": "Website",
   "subscriptions": "Subscriptions",
   "yourMemberLimit": "Your member limit is currently",
@@ -156,5 +157,7 @@
   "addUserSendEmail": "Add user and send email",
   "removeMember": "Remove Member",
   "linkUser": "Link user",
-  "setAttendance": "Set Attendance"
+  "setAttendance": "Set Attendance",
+  "average": "Daily average",
+  "weeklyAverage": "Weekly average"
 }

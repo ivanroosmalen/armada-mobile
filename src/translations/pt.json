@@ -133,7 +133,8 @@
   "weeklyAttendance": "Comparecimento semanal",
   "dailyAttendance": "Comparecimento diário",
   "total": "total",
-  "managerDashboard": "Painel do Gerente",
+  "managerDashboard": "Gerir",
+  "metrics": "Métricos",
   "website": "O site",
   "subscriptions": "Subscrições",
   "yourMemberLimit": "Seu limite de membros atualmente é de",
@@ -157,5 +158,7 @@
   "addUserSendEmail": "Adicionar Usuário e envie email",
   "removeMember": "Remover membro",
   "linkUser": "Conectar usuário",
-  "setAttendance": "Definir Comparecimento"
+  "setAttendance": "Definir Comparecimento",
+  "average": "Média diária",
+  "weeklyAverage": "Média semanal"
 }

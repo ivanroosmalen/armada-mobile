@@ -1,6 +1,7 @@
 import HomeScreen from '../home/HomeViewContainer';
 import AcademyListScreen from '../academies/AcademyListViewContainer';
 import OwnerDashboardScreen from '../home/OwnerDashboardViewContainer';
+import AcademyMetricsScreen from '../academies/AcademyMetricsViewContainer';
 import { TouchableOpacity, Image } from 'react-native';
 
 const headerLeftComponent = (props) => {
@@ -39,11 +40,12 @@ const tabNavigationData = [
     ifOwner: true
   },
   {
-      name: 'academies',
-      component: AcademyListScreen,
-      icon: 'mixed-martial-arts',
-      headerLeft: headerLeftComponent,
-    }
+    name: 'metrics',
+    component: AcademyMetricsScreen,
+    icon: 'chart-line',
+    headerLeft: null,
+    ifOwner: true
+  }
 ];
 
 export default tabNavigationData;

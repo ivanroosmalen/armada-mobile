@@ -230,8 +230,6 @@ export default class NotificationListScreen extends React.Component {
       })
     let userIsOwner = !!(currentUser && academyMembers && academyMembers.find(academyMember => (academyMember.member._id === this.props.loggedInUser._id && academyMember.isOwner)))
 
-    console.log(academyMembers)
-
     return (
       <Animated.View style={[styles.container, this.fadeIn(0, 0)]} >
             <ScrollView refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}>

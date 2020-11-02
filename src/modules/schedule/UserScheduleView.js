@@ -59,7 +59,7 @@ class UserScheduleScreen extends React.Component {
                 startDate: moment().toISOString(),
                 endDate: moment().add(31, 'days').toISOString(),
             }
-            console.log(fromCache)
+
             await this.props.list(this.props.loggedInUser._id, data, {}, fromCache);
         }
 

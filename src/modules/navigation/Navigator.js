@@ -91,7 +91,6 @@ function CustomDrawerContent(props) {
           />
           </View>
 
-          <View style={styles.divider} />
           </View>
       )}
 
@@ -115,23 +114,7 @@ function CustomDrawerContent(props) {
 
       {currentUser && (
         <View>
-            <DrawerItem
-              key={`profile`}
-              label={() => (
-                <View
-                  style={styles.menuLabelFlex}>
-                    <Icon
-                              name="account"
-                              style={{
-                                fontSize: 20,
-                                color: colors.primaryIcon
-                              }}
-                            />
-                  <Text style={styles.menuTitle}>{ translate('myProfile') }</Text>
-                </View>
-              )}
-              onPress={() => props.navigation.navigate('Profile', { id: currentUser._id })}
-            />
+            <View style={styles.divider} />
 
             <DrawerItem
               key={`academies`}
@@ -206,50 +189,69 @@ function CustomDrawerContent(props) {
               onPress={() => props.navigation.navigate('AcademyRequestList')}
             />
             )}
-        </View>
-      )}
 
-      <View style={styles.divider} />
+            { isAcademyOwner && !isDemoUser && (
+                <DrawerItem
+                  key={`requests`}
+                  label={() => (
+                    <View
+                      style={styles.menuLabelFlex}>
+                        <Icon
+                                  name="file-document-edit"
+                                  style={{
+                                    fontSize: 20,
+                                    color: colors.primaryIcon
+                                  }}
+                                />
+                      <Text style={{  marginLeft: 10, color: colors.primaryText }}>{ translate('subscriptions')  || 'Subscriptions' }</Text>
+                    </View>
+                  )}
+                  onPress={() => props.navigation.navigate('Subscription')}
+                />
+            )}
 
-        { isAcademyOwner && !isDemoUser && (
             <DrawerItem
-              key={`requests`}
+              key={`account`}
               label={() => (
                 <View
                   style={styles.menuLabelFlex}>
                     <Icon
-                              name="file-document-edit"
+                              name="account-edit"
                               style={{
                                 fontSize: 20,
                                 color: colors.primaryIcon
                               }}
                             />
-                  <Text style={{  marginLeft: 10, color: colors.primaryText }}>{ translate('subscriptions')  || 'Subscriptions' }</Text>
+                  <Text style={styles.menuTitle}>{ translate('account') || 'Account'}</Text>
                 </View>
               )}
-              onPress={() => props.navigation.navigate('Subscription')}
+              onPress={() => props.navigation.navigate('Account')}
             />
-        )}
+        </View>
+      )}
+
+      <View style={styles.divider} />
+
+        <DrawerItem
+              key={`academies`}
+              label={() => (
+                <View
+                  style={styles.menuLabelFlex}>
+                    <Icon
+                              name="magnify"
+                              style={{
+                                fontSize: 20,
+                                color: colors.primaryIcon
+                              }}
+                            />
+                  <Text style={styles.menuTitle}>{ translate('academies') }</Text>
+                </View>
+              )}
+              onPress={() => props.navigation.navigate('AcademyList')}
+            />
 
       {currentUser && (
         <View>
-        <DrawerItem
-          key={`account`}
-          label={() => (
-            <View
-              style={styles.menuLabelFlex}>
-                <Icon
-                          name="account-edit"
-                          style={{
-                            fontSize: 20,
-                            color: colors.primaryIcon
-                          }}
-                        />
-              <Text style={styles.menuTitle}>{ translate('account') || 'Account'}</Text>
-            </View>
-          )}
-          onPress={() => props.navigation.navigate('Account')}
-        />
 
           <DrawerItem
             key={`logout`}

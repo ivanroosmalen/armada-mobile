@@ -7,18 +7,20 @@ import {
   FlatList,
   Dimensions,
   Animated,
-  RefreshControl
+  RefreshControl,
+  ScrollView
 } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import { fonts, colors } from '../../styles';
 import { Text } from '../../components/StyledText';
 import { translate } from '../../translations/index.js';
-import { Button } from '../../components';
+import { Button, Dropdown } from '../../components';
 import settings from '../../settings.js'
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AcademyElement from '../academies/AcademyElement';
 import AcademyRequestElement from '../academies/AcademyRequestElement';
+import UserElement from '../profile/UserElement';
 
 import { LineChart } from "react-native-chart-kit";
 
@@ -26,61 +28,39 @@ export default class OwnerDashboardScreen extends React.Component {
 
     state = {
         academies: [],
-        totalAttendanceValue: 0,
-        maxAttendanceValue: 0,
         anim: new Animated.Value(0),
         refreshing: false,
-        data: null,
-        chartConfig: {
-          backgroundGradientFrom: colors.secondaryBackground,
-          backgroundGradientFromOpacity: 1,
-          backgroundGradientTo: colors.secondaryBackground,
-          backgroundGradientToOpacity: 1,
-          color: () => colors.secondaryText,
-          strokeWidth: 2,
-          useShadowColorFromDataset: false
-        }
+        academyIndex: 0
       }
 
     async onRefresh() {
       this.setState({ refreshing: true })
-      await this.getData(false, false);
+      await this.getData(false);
       this.setState({ refreshing: false })
     }
 
-  async getData(academiesFromCache = true, othersFromCache = true) {
+    async getAssociatedData(academyId, fromCache = true) {
+        if(!academyId) {
+            return;
+        }
+        await Promise.all([
+            this.props.getAcademyMembers(academyId, { academyId: academyId }, {}, fromCache)
+        ])
+    }
+
+  async getData(fromCache = true) {
     let dataRequests = [];
     if(this.props.loggedInUser) {
-        let startDate = moment().subtract(2, 'weeks').toISOString();
-        let endDate = moment().toISOString();
-        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id, {}, academiesFromCache))
-        dataRequests.push(this.props.getAcademyRequests({ complete: false })),
-        dataRequests.push(this.props.getTotalAttendanceMetrics({ startDate, endDate, timezone: RNLocalize.getTimeZone() }, othersFromCache))
+        dataRequests.push(this.props.getUserAcademies(this.props.loggedInUser._id, {}, fromCache))
+        dataRequests.push(this.props.getAcademyRequests({ complete: false }))
     }
-    await Promise.all(dataRequests);
+    await Promise.all(dataRequests, fromCache);
 
-    let data = null;
-    let maxAttendanceValue = 0;
-    if(this.props.loggedInUser && this.props.totalAttendanceMetrics && this.props.totalAttendanceMetrics.byWeek && Object.keys(this.props.totalAttendanceMetrics.byWeek).length) {
-        data = {
-          labels: Object.keys(this.props.totalAttendanceMetrics.byWeek).map(date => date.substring(5,10)),
-          datasets: [
-            {
-              data: Object.values(this.props.totalAttendanceMetrics.byWeek),
-              color: () => colors.secondaryText,
-              strokeWidth: 1
-            }
-          ]
-        };
-
-        maxAttendanceValue = Math.max(...Object.values(this.props.totalAttendanceMetrics.byWeek))
-    }
-
+    let academies = this.props.loggedInUser && this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id]['owner'] || [];
+    let currentAcademy = academies[this.state.academyIndex] && academies[this.state.academyIndex] || {};
+    await this.getAssociatedData(currentAcademy._id);
     this.setState({
-        academies: this.props.loggedInUser && this.props.userAcademies && this.props.userAcademies[this.props.loggedInUser._id] && this.props.userAcademies[this.props.loggedInUser._id]['owner'] || [],
-        data,
-        totalAttendanceValue: this.props.totalAttendanceMetrics ? this.props.totalAttendanceMetrics.total : 0,
-        maxAttendanceValue
+        academies: academies
     });
   }
 
@@ -96,9 +76,15 @@ export default class OwnerDashboardScreen extends React.Component {
       }
 
       if(prevProps.loggedInUser !== this.props.loggedInUser) {
-        this.getData(false, false);
+        this.getData(false);
       }
     }
+
+  async onAcademySelected(index) {
+    let academyId = this.state.academies && this.state.academies[index] && this.state.academies[index]._id;
+    this.getAssociatedData(academyId);
+    this.setState({ academyIndex: index});
+  }
 
     fadeIn(delay, from = 0) {
         const { anim } = this.state;
@@ -140,24 +126,90 @@ export default class OwnerDashboardScreen extends React.Component {
     );
   };
 
+  _getRenderMembersFunction = ({ item }) => {
+
+    return (
+       <UserElement
+            user={item}
+       />
+
+    );
+  };
+
+
     render() {
            let currentUser = this.props.loggedInUser;
            let academies = this.state.academies;
+           let academyNames = academies && academies.map(academy => academy.name);
+           let currentAcademy = academies && academies[this.state.academyIndex] || null;
            let hasAcademies = !!(academies && academies.length);
-           let academyRequests = this.props.academyRequests || [];
-           let totalAttendanceValue = this.state.totalAttendanceValue;
-           let maxAttendanceValue = this.state.maxAttendanceValue;
+           let academyRequests = currentAcademy && this.props.academyRequests && this.props.academyRequests.filter(ar => ar.academy._id === currentAcademy._id) || [];
+           let academyMembers = currentAcademy && this.props.academyMembers && this.props.academyMembers[currentAcademy._id] || [];
+          academyMembers = academyMembers.sort((a,b) => {
+              if(!a.member.alias) {
+                a.member.alias = 'Unknown'
+              }
+              if(!b.member.alias) {
+                b.member.alias = 'Unknown'
+              }
+
+              return a.member.alias.trim().toLowerCase() > b.member.alias.trim().toLowerCase()
+          })
 
            return (
-             <Animated.ScrollView
+             <Animated.View
                 style={[,this.fadeIn(0, 0)]}
                 contentContainerStyle={styles.container}
-                refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
                 >
-                <View style={styles.section}>
+                <ScrollView style={styles.section}
+                    refreshControl={<RefreshControl refreshing={this.state.refreshing} onRefresh={() => this.onRefresh()} />}
+                    >
 
-                {!!(currentUser && academyRequests && academyRequests.length) && (
-                    <View style={{flexShrink: 1, marginVertical: 10}}>
+                    <View>
+                            <Dropdown
+                                color={colors.terciaryText}
+                                listBackgroundColor={colors.primaryBackground}
+                                listTextColor={colors.primaryText}
+                                fontSize={20}
+                                style={ styles.dropdown }
+                                items={academyNames}
+                                selectedIndex={this.state.academyIndex}
+                                onSelect={(index) => { this.onAcademySelected(index) }}
+                            />
+
+                    </View>
+
+                {currentUser && currentAcademy && (
+                  <View>
+                      <View style={styles.academySection}>
+                        <AcademyElement
+                                academy={currentAcademy}
+                                style={{flex: 1}}
+                           />
+                      </View>
+
+                    <View style={{marginVertical: 20}}>
+                      <TouchableOpacity style={styles.headerContainer}
+                            onPress={() => {this.props.navigation.navigate('AcademyUsers', { id: currentAcademy._id })}}>
+                         <Text style={styles.header}>{ translate('members') } ({currentAcademy.memberCount || 0})</Text>
+                          <Icon
+                            name="menu-right"
+                            size={25}
+                            color={colors.secondaryIcon}
+                          />
+                      </TouchableOpacity>
+                      <View style={ styles.imageContainer }>
+                          <FlatList
+                                horizontal
+                                keyExtractor={item => item._id }
+                                data={academyMembers}
+                                renderItem={this._getRenderMembersFunction}
+                            />
+                      </View>
+                    </View>
+
+                {!!(academyRequests && academyRequests.length) && (
+                    <View style={{marginVertical: 20}}>
                      <TouchableOpacity style={styles.headerContainer}
                         onPress={() => {this.props.navigation.navigate('AcademyRequestList')}}>
                          <Text style={styles.header}>
@@ -178,55 +230,12 @@ export default class OwnerDashboardScreen extends React.Component {
                     </View>
                  )}
 
-                {!!(currentUser && this.state.data) && (
-                     <View style={{flexShrink: 0, marginVertical: 10}}>
-                         <Text style={styles.header}>
-                             {translate('dailyAttendance')} ({totalAttendanceValue} {translate('total')})
-                         </Text>
-                        <View style={{marginTop: 10, marginLeft: -30}}>
-                            <LineChart
-                              data={this.state.data}
-                              chartConfig={this.state.chartConfig}
-                              width={Dimensions.get("window").width + 30}
-                              height={academyRequests.length ? 130 : 200}
-                              withVerticalLabels={false}
-                              withHorizontalLines={true}
-                              withVerticalLines={true}
-                              withInnerLines={false}
-                              segments={maxAttendanceValue}
-                              yAxisInterval={1}
-                              formatYLabel={(value) => (parseInt(value))}
-                            />
-                        </View>
-                     </View>
-                 )}
-              </View>
-
-              {currentUser && hasAcademies && (
-                  <View style={styles.academySection} ref={this._academyListElement}>
-                     <TouchableOpacity style={styles.headerContainer}
-                        onPress={() => {hasAcademies ? this.props.navigation.navigate('UserAcademies', { id: currentUser._id }) : this.props.navigation.navigate('Academies')}}>
-                     <Text style={styles.header}>
-                         { translate('yourAcademies') + ' ('+academies.length+')' }
-                     </Text>
-                      <Icon
-                        name="menu-right"
-                        size={25}
-                        color={colors.secondaryIcon}
-                      />
-                     </TouchableOpacity>
-                             <FlatList
-                               horizontal
-                               keyExtractor={item => item._id }
-                               style={{ backgroundColor: colors.white, paddingHorizontal: 15 }}
-                               data={academies}
-                               renderItem={this._getRenderItemFunction}
-                               contentContainerStyle={{ paddingRight: 30 }}
-                             />
                   </View>
               )}
 
-             </Animated.ScrollView>
+              </ScrollView>
+
+             </Animated.View>
            );
          }
 }
@@ -273,5 +282,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginRight: 10
+  },
+  imageContainer: {
+    backgroundColor: colors.white,
+    marginTop: 20,
+    paddingLeft: 20
+  },
+  itemLabel: {
+    width: 200,
+    fontWeight: 'bold',
+    top: 10,
+    paddingHorizontal: 20,
+    color: colors.terciaryText
   }
 });

@@ -1,25 +1,26 @@
+// @flow
 import { compose, lifecycle } from 'recompose';
 import { connect } from 'react-redux';
-import { list, getUserAcademies } from '../../redux/academies/actions.js'
-import { list as getAcademyRequests, approve } from '../../redux/academyRequests/actions.js'
+
+import AcademyMetricsView from './AcademyMetricsView';
+import { getUserAcademies } from '../../redux/academies/actions.js';
 import { list as getAcademyMembers } from '../../redux/academyMembers/actions.js';
-import OwnerDashboardScreen from './OwnerDashboardView';
+import { getTotalAttendanceMetrics, getUserAttendanceMetrics } from '../../redux/classes/actions.js'
 
 export default compose(
-connect(
+  connect(
     state => {
     return ({
       loggedInUser: state.users.loggedInUser,
-      academies: state.academies.academies,
       userAcademies: state.academies.userAcademies,
-      academyRequests: state.academyRequests.academyRequests,
-      academyListUpdate: state.academies.academyListUpdate,
       academyMembers: state.academyMembers.academyMembers,
+      totalAttendanceMetrics: state.classes.totalAttendanceMetrics,
+      userAttendanceMetrics: state.classes.userAttendanceMetrics
     })},
     dispatch => ({
       getUserAcademies: (id, params, fromCache) => dispatch(getUserAcademies(id, params, fromCache)),
-      getAcademyRequests: (params, fromCache) => dispatch(getAcademyRequests(params, fromCache)),
-      approveAcademyRequest: (id, data) => dispatch(approve(id, data)),
       getAcademyMembers: (key, params, options, fromCache) => dispatch(getAcademyMembers(key, params, options, fromCache)),
-    })
-  ))(OwnerDashboardScreen);
+      getTotalAttendanceMetrics: (params, fromCache) => dispatch(getTotalAttendanceMetrics(params, fromCache)),
+      getUserAttendanceMetrics: (params, fromCache) => dispatch(getUserAttendanceMetrics(params, fromCache)),
+    }),
+  ))(AcademyMetricsView);
