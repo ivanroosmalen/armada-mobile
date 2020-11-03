@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Button, Alert, Animated, RefreshControl } from 'react-native';
-
+import * as RNLocalize from 'react-native-localize';
 import { colors, fonts } from '../../styles';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -36,6 +36,7 @@ class ScheduleScreen extends React.Component {
                     academyId: this.props.route.params.id,
                     startDate: moment(day.dateString).startOf('day').format(),
                     endDate: moment(day.dateString).endOf('day').format(),
+                    timezone: RNLocalize.getTimeZone()
                 }
 
             }
@@ -50,6 +51,7 @@ class ScheduleScreen extends React.Component {
         academyId: this.props.route.params.id,
         startDate: moment().toISOString(),
         endDate: moment().add(31, 'days').toISOString(),
+        timezone: RNLocalize.getTimeZone()
     }
 
     await Promise.all([

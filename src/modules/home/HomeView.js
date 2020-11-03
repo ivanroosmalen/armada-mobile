@@ -9,7 +9,7 @@ import {
   Animated,
   RefreshControl
 } from 'react-native';
-
+import * as RNLocalize from 'react-native-localize';
 import { fonts, colors } from '../../styles';
 import { Text } from '../../components/StyledText';
 import { translate } from '../../translations/index.js';
@@ -88,6 +88,7 @@ export default class HomeScreen extends React.Component {
             academyId: academyIds.join(','),
             startDate: moment().toISOString(),
             endDate: moment().add(14, 'days').format('YYYY-MM-DD'),
+            timezone: RNLocalize.getTimeZone()
         }, {}, classesFromCache);
     }
 

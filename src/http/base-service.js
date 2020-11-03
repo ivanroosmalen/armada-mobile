@@ -8,6 +8,7 @@ class BaseService {
 
     constructor(entity, baseUrl) {
         this.url = (baseUrl || BASE_URL) + entity;
+//        this.url = (BASE_URL) + entity;
         this.httpRequest = axios;
     }
 

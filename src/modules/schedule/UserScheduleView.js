@@ -6,6 +6,7 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modal';
 import ScheduleElement from './ScheduleElement';
+import * as RNLocalize from 'react-native-localize';
 
 class UserScheduleScreen extends React.Component {
 
@@ -58,6 +59,7 @@ class UserScheduleScreen extends React.Component {
                 academyId: academyIds.join(','),
                 startDate: moment().toISOString(),
                 endDate: moment().add(31, 'days').toISOString(),
+                timezone: RNLocalize.getTimeZone()
             }
 
             await this.props.list(this.props.loggedInUser._id, data, {}, fromCache);
@@ -81,6 +83,7 @@ class UserScheduleScreen extends React.Component {
                     academyId: this.state.academyIds.join(','),
                     startDate: moment(day.dateString).startOf('day').format(),
                     endDate: moment(day.dateString).endOf('day').format(),
+                    timezone: RNLocalize.getTimeZone()
                 }
             }
 
