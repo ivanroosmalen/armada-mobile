@@ -279,8 +279,8 @@ export default class ClassScreen extends React.Component {
       let attendees = classObj.attendees.filter(attendee => !attendee.online) || [];
       let onlineAttendees = classObj.attendees.filter(attendee => !!attendee.online) || [];
 
-      let classIsFull = attendees && attendees.length >= classObj.classSize;
-      let onlineClassIsFull = onlineAttendees && onlineAttendees.length >= classObj.onlineClassSize;
+      let classIsFull = attendees && classObj.classSize && attendees.length >= classObj.classSize;
+      let onlineClassIsFull = onlineAttendees && classObj.onlineClassSize && onlineAttendees.length >= classObj.onlineClassSize;
 
       return (
         <Animated.View style={[styles.container, this.fadeIn(0, -20)]}>
